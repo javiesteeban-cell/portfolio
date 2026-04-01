@@ -2086,8 +2086,10 @@ function borrarTodo() {
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', function() {
-  // Enter key en login
-  document.getElementById('auth-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doAuth(); });
+  // Enter key en login y registro
+  document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  document.getElementById('reg-pass2').addEventListener('keydown', function(e){ if(e.key==='Enter') doRegister(); });
+  document.getElementById('recover-email').addEventListener('keydown', function(e){ if(e.key==='Enter') doRecover(); });
   restoreSession();
 });
 </script>
