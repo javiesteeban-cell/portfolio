@@ -20,20 +20,36 @@ button{cursor:pointer;font-family:inherit;border:none;}
 
 /* LOGIN */
 #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;position:relative;}
-.login-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:40px 36px;width:100%;max-width:400px;}
+.login-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:40px 36px;width:100%;max-width:420px;}
 .login-logo{text-align:center;font-size:1.8rem;font-weight:800;color:var(--ac);margin-bottom:6px;}
-.login-sub{text-align:center;color:var(--mu);font-size:.9rem;margin-bottom:32px;}
-.login-box h2{font-size:1.1rem;font-weight:700;margin-bottom:20px;}
-.lf{margin-bottom:14px;}
-.lf label{display:block;font-size:.82rem;color:var(--mu);margin-bottom:5px;font-weight:600;}
-.login-box .btn{width:100%;padding:12px;font-size:1rem;font-weight:700;border-radius:var(--rr);margin-top:6px;}
-.login-sep{text-align:center;color:var(--mu);font-size:.82rem;margin:16px 0;position:relative;}
-.login-sep::before,.login-sep::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--bd);}
-.login-sep::before{left:0;}
-.login-sep::after{right:0;}
-.login-err{color:var(--r);font-size:.83rem;margin-top:8px;text-align:center;min-height:18px;}
-.login-toggle{text-align:center;margin-top:16px;font-size:.85rem;color:var(--mu);}
-.login-toggle a{color:var(--ac);cursor:pointer;text-decoration:none;}
+.login-sub{text-align:center;color:var(--mu);font-size:.88rem;margin-bottom:28px;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:24px;}
+.auth-tab{flex:1;text-align:center;padding:12px 0;font-size:.9rem;font-weight:700;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
+.auth-tab.active{color:var(--ac);border-bottom-color:var(--ac);}
+.auth-tab:hover:not(.active){color:var(--tx);}
+.auth-panel{display:none;}
+.auth-panel.active{display:block;}
+.lf{margin-bottom:16px;}
+.lf label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:5px;font-weight:600;letter-spacing:.2px;}
+.lf-pw{position:relative;}
+.lf-pw input{padding-right:42px;}
+.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mu);cursor:pointer;padding:4px;font-size:.85rem;line-height:1;transition:color .2s;}
+.pw-toggle:hover{color:var(--tx);}
+.pw-str{height:3px;border-radius:2px;background:var(--bd);margin-top:8px;overflow:hidden;}
+.pw-str-fill{height:100%;border-radius:2px;width:0;transition:width .3s,background .3s;}
+.pw-str-text{font-size:.72rem;margin-top:4px;color:var(--mu);}
+.login-box .btn{width:100%;padding:13px;font-size:.95rem;font-weight:700;border-radius:var(--rr);margin-top:6px;}
+.login-err{color:var(--r);font-size:.82rem;margin-top:10px;text-align:center;min-height:18px;}
+.login-ok{color:var(--g);font-size:.82rem;margin-top:10px;text-align:center;min-height:18px;}
+.login-link{text-align:center;margin-top:14px;font-size:.83rem;color:var(--mu);}
+.login-link a{color:var(--ac);cursor:pointer;text-decoration:none;}
+.login-link a:hover{text-decoration:underline;}
+.auth-msg-box{text-align:center;padding:20px 10px;}
+.auth-msg-icon{font-size:2.2rem;margin-bottom:12px;color:var(--ac);}
+.auth-msg-title{font-size:1.05rem;font-weight:700;margin-bottom:8px;}
+.auth-msg-text{font-size:.85rem;color:var(--mu);line-height:1.5;}
+.auth-back{display:inline-block;margin-top:18px;font-size:.85rem;color:var(--ac);cursor:pointer;text-decoration:none;}
+.auth-back:hover{text-decoration:underline;}
 
 /* APP LAYOUT */
 #main-app{display:none;flex-direction:column;min-height:100vh;}
@@ -280,16 +296,75 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
 <div id="login-screen">
   <a href="../" style="position:absolute;top:18px;left:18px;font-size:.85rem;font-weight:600;color:var(--mu);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color='var(--mu)'">&larr; Inicio</a>
   <div class="login-box">
-    <div class="login-logo">◈ Portfolio</div>
+    <div class="login-logo">&#9674; Portfolio</div>
     <div class="login-sub">Gestión de patrimonio personal</div>
-    <h2 id="auth-title">Iniciar sesión</h2>
-    <div class="lf"><label>Email</label><input type="email" id="auth-email" placeholder="tu@email.com"></div>
-    <div class="lf"><label>Contraseña</label><input type="password" id="auth-pass" placeholder="••••••••"></div>
-    <div id="auth-err" class="login-err"></div>
-    <div class="btn-row" style="margin-top:4px;">
-      <button class="btn bp" style="flex:1" onclick="doAuth()">Entrar</button>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchAuth('login')">Iniciar sesión</div>
+      <div class="auth-tab" onclick="switchAuth('register')">Crear cuenta</div>
     </div>
-    <div class="login-toggle" id="auth-toggle">¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a></div>
+
+    <!-- LOGIN -->
+    <div class="auth-panel active" id="panel-login">
+      <div class="lf"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div class="lf">
+        <label>Contraseña</label>
+        <div class="lf-pw">
+          <input type="password" id="login-pass" placeholder="Tu contraseña" autocomplete="current-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('login-pass',this)" aria-label="Mostrar contraseña">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="login-err" class="login-err"></div>
+      <button class="btn bp" onclick="doLogin()">Entrar</button>
+      <div class="login-link"><a onclick="switchAuth('recover')">He olvidado mi contraseña</a></div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div class="auth-panel" id="panel-register">
+      <div class="lf"><label>Email</label><input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div class="lf">
+        <label>Contraseña</label>
+        <div class="lf-pw">
+          <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="checkPwStrength()">
+          <button type="button" class="pw-toggle" onclick="togglePw('reg-pass',this)" aria-label="Mostrar contraseña">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="pw-str"><div class="pw-str-fill" id="pw-str-fill"></div></div>
+        <div class="pw-str-text" id="pw-str-text"></div>
+      </div>
+      <div class="lf">
+        <label>Confirmar contraseña</label>
+        <div class="lf-pw">
+          <input type="password" id="reg-pass2" placeholder="Repite la contraseña" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('reg-pass2',this)" aria-label="Mostrar contraseña">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="reg-err" class="login-err"></div>
+      <button class="btn bp" onclick="doRegister()">Crear cuenta</button>
+    </div>
+
+    <!-- RECUPERAR -->
+    <div class="auth-panel" id="panel-recover">
+      <div class="lf"><label>Email de tu cuenta</label><input type="email" id="recover-email" placeholder="tu@email.com" autocomplete="email"></div>
+      <div id="recover-err" class="login-err"></div>
+      <div id="recover-ok" class="login-ok"></div>
+      <button class="btn bp" onclick="doRecover()">Enviar enlace de recuperación</button>
+      <div class="login-link" style="margin-top:16px"><a onclick="switchAuth('login')">Volver al inicio de sesión</a></div>
+    </div>
+
+    <!-- CONFIRMACIÓN EMAIL -->
+    <div class="auth-panel" id="panel-confirm">
+      <div class="auth-msg-box">
+        <div class="auth-msg-icon">&#9993;</div>
+        <div class="auth-msg-title">Revisa tu correo</div>
+        <div class="auth-msg-text">Hemos enviado un enlace de verificación a <strong id="confirm-email-label"></strong>. Haz clic en el enlace para activar tu cuenta.</div>
+        <a class="auth-back" onclick="switchAuth('login')">Volver al inicio de sesión</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -777,40 +852,137 @@ function tagHTML(tipo) {
 }
 
 // ============ AUTH ============
-var authMode = 'login';
-function toggleAuthMode() {
-  authMode = authMode === 'login' ? 'register' : 'login';
-  document.getElementById('auth-title').textContent = authMode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
-  document.getElementById('auth-toggle').innerHTML = authMode === 'login'
-    ? '¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a>'
-    : '¿Ya tienes cuenta? <a onclick="toggleAuthMode()">Inicia sesión</a>';
+function switchAuth(panel) {
+  var panels = document.querySelectorAll('.auth-panel');
+  var tabs = document.querySelectorAll('.auth-tab');
+  panels.forEach(function(p) { p.classList.remove('active'); });
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  var el = document.getElementById('panel-' + panel);
+  if (el) el.classList.add('active');
+  if (panel === 'login') tabs[0].classList.add('active');
+  if (panel === 'register') tabs[1].classList.add('active');
+  // Clear errors
+  ['login-err','reg-err','recover-err','recover-ok'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.textContent = '';
+  });
 }
 
-function demoLogin() {
-  currentSession = { user: { id: 'demo', email: 'demo@portfolio.local' } };
-  localStorage.setItem('pf_session', JSON.stringify(currentSession));
-  showApp();
+function togglePw(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  var show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 }
 
-async function doAuth() {
-  var email = document.getElementById('auth-email').value.trim();
-  var pass = document.getElementById('auth-pass').value;
-  var err = document.getElementById('auth-err');
-  if (!email || !pass) { err.textContent = 'Rellena email y contraseña'; return; }
+function checkPwStrength() {
+  var pw = document.getElementById('reg-pass').value;
+  var fill = document.getElementById('pw-str-fill');
+  var text = document.getElementById('pw-str-text');
+  var score = 0;
+  if (pw.length >= 8) score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  var levels = [
+    { w: '0%', c: 'var(--bd)', t: '' },
+    { w: '20%', c: 'var(--r)', t: 'Muy débil' },
+    { w: '40%', c: 'var(--r)', t: 'Débil' },
+    { w: '60%', c: 'var(--am)', t: 'Aceptable' },
+    { w: '80%', c: 'var(--am)', t: 'Buena' },
+    { w: '100%', c: 'var(--g)', t: 'Fuerte' }
+  ];
+  var l = levels[score];
+  fill.style.width = l.w;
+  fill.style.background = l.c;
+  text.textContent = pw.length > 0 ? l.t : '';
+  text.style.color = l.c;
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'apikey': SUPA_KEY };
+}
+
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var err = document.getElementById('login-err');
   err.textContent = '';
-  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración. Inténtalo de nuevo más tarde.'; return; }
-  var endpoint = SUPA_URL + '/auth/v1/' + (authMode === 'register' ? 'signup' : 'token?grant_type=password');
+  if (!email || !pass) { err.textContent = 'Introduce email y contraseña.'; return; }
+  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
   try {
-    var res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+    var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST', headers: authHeaders(),
       body: JSON.stringify({ email: email, password: pass })
     });
     var data = await res.json();
-    if (data.error || data.error_description) { err.textContent = data.error_description || data.error; return; }
+    if (data.error || data.error_description) {
+      var msg = data.error_description || data.error || '';
+      if (msg.toLowerCase().includes('invalid login')) msg = 'Email o contraseña incorrectos.';
+      if (msg.toLowerCase().includes('email not confirmed')) msg = 'Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.';
+      err.textContent = msg; return;
+    }
     currentSession = data;
     localStorage.setItem('pf_session', JSON.stringify(currentSession));
     showApp();
+  } catch(e) { err.textContent = 'Error de conexión. Inténtalo de nuevo.'; }
+}
+
+async function doRegister() {
+  var email = document.getElementById('reg-email').value.trim();
+  var pass = document.getElementById('reg-pass').value;
+  var pass2 = document.getElementById('reg-pass2').value;
+  var err = document.getElementById('reg-err');
+  err.textContent = '';
+  if (!email) { err.textContent = 'Introduce tu email.'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'El formato del email no es válido.'; return; }
+  if (pass.length < 8) { err.textContent = 'La contraseña debe tener al menos 8 caracteres.'; return; }
+  if (pass !== pass2) { err.textContent = 'Las contraseñas no coinciden.'; return; }
+  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
+  try {
+    var res = await fetch(SUPA_URL + '/auth/v1/signup', {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ email: email, password: pass })
+    });
+    var data = await res.json();
+    if (data.error || data.error_description) {
+      var msg = data.error_description || data.error || '';
+      if (msg.toLowerCase().includes('already registered')) msg = 'Este email ya tiene una cuenta. Inicia sesión.';
+      err.textContent = msg; return;
+    }
+    // Si Supabase devuelve sesión directamente (confirmación desactivada)
+    if (data.access_token) {
+      currentSession = data;
+      localStorage.setItem('pf_session', JSON.stringify(currentSession));
+      showApp();
+    } else {
+      // Confirmación por email activada
+      document.getElementById('confirm-email-label').textContent = email;
+      switchAuth('confirm');
+    }
+  } catch(e) { err.textContent = 'Error de conexión. Inténtalo de nuevo.'; }
+}
+
+async function doRecover() {
+  var email = document.getElementById('recover-email').value.trim();
+  var err = document.getElementById('recover-err');
+  var ok = document.getElementById('recover-ok');
+  err.textContent = ''; ok.textContent = '';
+  if (!email) { err.textContent = 'Introduce tu email.'; return; }
+  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
+  try {
+    var res = await fetch(SUPA_URL + '/auth/v1/recover', {
+      method: 'POST', headers: authHeaders(),
+      body: JSON.stringify({ email: email })
+    });
+    if (res.ok) {
+      ok.textContent = 'Si el email existe, recibirás un enlace para restablecer tu contraseña.';
+    } else {
+      var data = await res.json();
+      err.textContent = data.error_description || data.error || 'Error al enviar el enlace.';
+    }
   } catch(e) { err.textContent = 'Error de conexión.'; }
 }
 
