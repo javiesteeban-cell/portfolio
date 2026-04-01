@@ -554,7 +554,7 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
           <span class="flash-msg" id="cfg-flash"></span>
         </div>
       </div>
-      <div class="card config-section">
+      <div class="card config-section" style="display:none">
         <h3>Supabase (sincronización en la nube)</h3>
         <div class="fr">
           <div class="ef"><label>URL del proyecto</label><input id="cfg-supaUrl" placeholder="https://xxx.supabase.co"></div>
@@ -600,8 +600,8 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
 
 <script>
 // ============ CONFIG ============
-var SUPA_URL = '';
-var SUPA_KEY = '';
+var SUPA_URL = 'https://zftcneehgfdtphqyftab.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmdGNuZWVoZ2ZkdHBocXlmdGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMzI0NDEsImV4cCI6MjA5MDYwODQ0MX0.-4O4-80qnveGYnOrcOSGk2uE99jAAjWdL1-NFi2TwMQ';
 var currentSession = null;
 var saveTimer = null;
 var isLoading = false;
@@ -904,7 +904,7 @@ function showApp() {
     document.getElementById('user-email-label').textContent = currentSession.user.email || '';
   }
   var cfg = localStorage.getItem('pf_supa_cfg');
-  if (cfg) { try { var c = JSON.parse(cfg); SUPA_URL = c.url||''; SUPA_KEY = c.key||''; } catch(e) {} }
+  if (cfg) { try { var c = JSON.parse(cfg); if (c.url) SUPA_URL = c.url; if (c.key) SUPA_KEY = c.key; } catch(e) {} }
   tryLoad();
 }
 
