@@ -1019,15 +1019,18 @@ async function tryLoad() {
     try {
       var uid = currentSession.user.id;
       var token = currentSession.access_token || '';
-      var res = await fetch(SUPA_URL + '/rest/v1/portfolio?user_id=eq.' + uid, {
+      var res = await fetch(SUPA_URL + '/rest/v1/portfolio?user_id=eq.' + uid + '&select=data', {
         headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token }
       });
-      var rows = await res.json();
-      if (rows && rows[0] && rows[0].data) {
-        var cloud = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
-        if (!local || (cloud._savedAt || 0) > (local._savedAt || 0)) mergeState(cloud);
+      if (!res.ok) { console.error('Load failed:', res.status, await res.text()); }
+      else {
+        var rows = await res.json();
+        if (rows && rows[0] && rows[0].data) {
+          var cloud = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
+          if (!local || (cloud._savedAt || 0) > (local._savedAt || 0)) mergeState(cloud);
+        }
       }
-    } catch(e) {}
+    } catch(e) { console.error('Load error:', e); }
   }
   isLoading = false;
   renderAll();
@@ -1050,16 +1053,15 @@ async function syncToCloud() {
   try {
     var uid = currentSession.user.id;
     var token = currentSession.access_token || '';
-    var hdrs = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
-    // UPSERT: intenta insertar, si ya existe actualiza
-    var res = await fetch(SUPA_URL + '/rest/v1/portfolio', {
+    var hdrs = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' };
+    var res = await fetch(SUPA_URL + '/rest/v1/portfolio?on_conflict=user_id', {
       method: 'POST',
-      headers: Object.assign({}, hdrs, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-      body: JSON.stringify({ user_id: uid, data: JSON.stringify(S) })
+      headers: hdrs,
+      body: JSON.stringify({ user_id: uid, data: S })
     });
     if (res.ok) { setSyncStatus('saved'); }
-    else { setSyncStatus('error'); }
-  } catch(e) { setSyncStatus('error'); }
+    else { console.error('Sync failed:', res.status, await res.text()); setSyncStatus('error'); }
+  } catch(e) { console.error('Sync error:', e); setSyncStatus('error'); }
 }
 
 function setSyncStatus(st) {
