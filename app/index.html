@@ -994,9 +994,28 @@ function doLogout() {
   document.getElementById('login-screen').style.display = 'flex';
 }
 
-function restoreSession() {
+async function restoreSession() {
   var sess = localStorage.getItem('pf_session');
-  if (sess) { try { currentSession = JSON.parse(sess); showApp(); } catch(e) {} }
+  if (!sess) return;
+  try { currentSession = JSON.parse(sess); } catch(e) { return; }
+  if (!currentSession || !currentSession.user) { currentSession = null; return; }
+  // Refrescar token si tenemos refresh_token
+  if (currentSession.refresh_token && SUPA_URL && SUPA_KEY) {
+    try {
+      var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST', headers: authHeaders(),
+        body: JSON.stringify({ refresh_token: currentSession.refresh_token })
+      });
+      if (res.ok) {
+        var data = await res.json();
+        if (data.access_token) {
+          currentSession = data;
+          localStorage.setItem('pf_session', JSON.stringify(currentSession));
+        }
+      }
+    } catch(e) {}
+  }
+  showApp();
 }
 
 // ============ PERSISTENCE ============
