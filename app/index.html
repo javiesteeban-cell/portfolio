@@ -19,7 +19,7 @@ select option{background:var(--s2);}
 button{cursor:pointer;font-family:inherit;border:none;}
 
 /* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;position:relative;}
 .login-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:40px 36px;width:100%;max-width:400px;}
 .login-logo{text-align:center;font-size:1.8rem;font-weight:800;color:var(--ac);margin-bottom:6px;}
 .login-sub{text-align:center;color:var(--mu);font-size:.9rem;margin-bottom:32px;}
@@ -278,6 +278,7 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
 
 <!-- ============ LOGIN ============ -->
 <div id="login-screen">
+  <a href="../" style="position:absolute;top:18px;left:18px;font-size:.85rem;font-weight:600;color:var(--mu);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color='var(--mu)'">&larr; Inicio</a>
   <div class="login-box">
     <div class="login-logo">◈ Portfolio</div>
     <div class="login-sub">Gestión de patrimonio personal</div>
@@ -288,8 +289,6 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
     <div class="btn-row" style="margin-top:4px;">
       <button class="btn bp" style="flex:1" onclick="doAuth()">Entrar</button>
     </div>
-    <div class="login-sep">o</div>
-    <button class="btn" style="width:100%;background:var(--s2);color:var(--tx);border:1px solid var(--bd);padding:11px;" onclick="demoLogin()">Continuar en modo demo</button>
     <div class="login-toggle" id="auth-toggle">¿No tienes cuenta? <a onclick="toggleAuthMode()">Regístrate</a></div>
   </div>
 </div>
@@ -799,7 +798,7 @@ async function doAuth() {
   var err = document.getElementById('auth-err');
   if (!email || !pass) { err.textContent = 'Rellena email y contraseña'; return; }
   err.textContent = '';
-  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Configura Supabase primero o usa modo demo.'; return; }
+  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración. Inténtalo de nuevo más tarde.'; return; }
   var endpoint = SUPA_URL + '/auth/v1/' + (authMode === 'register' ? 'signup' : 'token?grant_type=password');
   try {
     var res = await fetch(endpoint, {
