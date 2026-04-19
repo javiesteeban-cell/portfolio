@@ -1734,6 +1734,7 @@ function renderPropList() {
     } else {
       html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">ROCE</div><div class="prop-sum-v" style="color:var(--am)">' + pct1(c.roce*100) + '</div></div>';
       html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">Rent. capital</div><div class="prop-sum-v" style="color:' + colorVal(c.cfNetoAnual) + '">' + pct1(c.yieldCF*100) + '</div></div>';
+      html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">Cashflow / mes</div><div class="prop-sum-v" style="color:' + colorVal(c.cfNetoMensual) + '">' + eur(c.cfNetoMensual) + '</div></div>';
     }
     html += '</div>';
 
