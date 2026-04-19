@@ -494,20 +494,31 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
           </div>
           <div class="ef span2"><label>Nombre / Dirección</label><input id="prop-nombre" placeholder="Ej: Piso Madrid Centro"></div>
           <div class="ef"><label>Valor de mercado (€)</label><input type="number" id="prop-valor" placeholder="0"></div>
-          <div class="ef"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca()"></div>
-          <div class="ef"><label>Gastos de compra (€)</label><input type="number" id="prop-gastos" placeholder="Notaría, impuestos..."></div>
+          <div class="ef"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca();updateGastosCompra();"></div>
+          <div class="ef"><label>Gastos de compra (€)</label><input type="number" id="prop-gastos" placeholder="11% del precio + comisión" readonly style="background:var(--s3);color:var(--mu);cursor:default;"></div>
           <div class="ef" id="prop-f-alquiler"><label>Alquiler mensual (€)</label><input type="number" id="prop-alquiler" placeholder="0"></div>
+          <div class="ef spanall">
+            <label>Pago a inmobiliaria (comisiones)</label>
+            <select id="prop-tiene-comision" onchange="onPropComisionToggle()">
+              <option value="no">No</option>
+              <option value="si">Sí — añadir comisión</option>
+            </select>
+          </div>
+          <div class="ef spanall" id="prop-f-comision" style="display:none;">
+            <label>Comisión inmobiliaria (€)</label>
+            <input type="number" id="prop-comisionInmo" placeholder="0" oninput="updateGastosCompra()">
+          </div>
           <div class="spanall" id="prop-f-gastos-ded">
             <div class="gastos-section">
               <div class="gastos-section-hdr">
-                <span class="gastos-section-lbl">Gastos deducibles anuales</span>
-                <span class="gastos-section-total">Total: <strong id="prop-gastos-total">0 €</strong></span>
+                <span class="gastos-section-lbl">Gastos deducibles</span>
+                <span class="gastos-section-total">Total anual: <strong id="prop-gastos-total">0 €</strong></span>
               </div>
               <div class="gastos-sub-grid">
-                <div class="ef"><label>IBI (€)</label><input type="number" id="prop-ibi" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Seguro (€)</label><input type="number" id="prop-seguro" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Comunidad (€)</label><input type="number" id="prop-comunidad" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Otros (€)</label><input type="number" id="prop-otrosGastos" placeholder="0" oninput="updateGastosTotal()"></div>
+                <div class="ef"><label>IBI (€/año)</label><input type="number" id="prop-ibi" placeholder="0" oninput="updateGastosTotal()"></div>
+                <div class="ef"><label>Seguro (€/año)</label><input type="number" id="prop-seguro" placeholder="0" oninput="updateGastosTotal()"></div>
+                <div class="ef"><label>Comunidad (€/mes)</label><input type="number" id="prop-comunidad" placeholder="0" oninput="updateGastosTotal()"></div>
+                <div class="ef"><label>Otros (€/año)</label><input type="number" id="prop-otrosGastos" placeholder="0" oninput="updateGastosTotal()"></div>
               </div>
             </div>
           </div>
@@ -1556,9 +1567,23 @@ function updateHipoteca() {
 }
 
 function updateGastosTotal() {
-  var total = gv('prop-ibi') + gv('prop-seguro') + gv('prop-comunidad') + gv('prop-otrosGastos');
+  var total = gv('prop-ibi') + gv('prop-seguro') + gv('prop-comunidad') * 12 + gv('prop-otrosGastos');
   var el = document.getElementById('prop-gastos-total');
   if (el) el.textContent = eur(total);
+}
+
+function updateGastosCompra() {
+  var precio = gv('prop-precioCompra');
+  var comision = document.getElementById('prop-tiene-comision').value === 'si' ? gv('prop-comisionInmo') : 0;
+  var total = precio * 0.11 + comision;
+  document.getElementById('prop-gastos').value = total > 0 ? Math.round(total) : '';
+}
+
+function onPropComisionToggle() {
+  var tiene = document.getElementById('prop-tiene-comision').value === 'si';
+  document.getElementById('prop-f-comision').style.display = tiene ? 'block' : 'none';
+  if (!tiene) document.getElementById('prop-comisionInmo').value = '';
+  updateGastosCompra();
 }
 
 function onPropUsoChange() {
@@ -1602,10 +1627,11 @@ function saveProp() {
     valor: gv('prop-valor'),
     entrada: entrada,
     gastos: gv('prop-gastos'),
+    comisionInmo: document.getElementById('prop-tiene-comision').value === 'si' ? gv('prop-comisionInmo') : 0,
     alquiler: gv('prop-alquiler'),
     ibi: gv('prop-ibi'),
     seguro: gv('prop-seguro'),
-    comunidad: gv('prop-comunidad'),
+    comunidad: gv('prop-comunidad') * 12,
     otrosGastos: gv('prop-otrosGastos'),
     precioCompra: precioCompra,
     pctEntrada: pctEntrada,
@@ -1634,14 +1660,18 @@ function editProp(id) {
   onPropUsoChange();
   document.getElementById('prop-nombre').value = p.nombre;
   document.getElementById('prop-valor').value = p.valor;
-  document.getElementById('prop-gastos').value = p.gastos;
   document.getElementById('prop-alquiler').value = p.alquiler;
   document.getElementById('prop-ibi').value = p.ibi || '';
   document.getElementById('prop-seguro').value = p.seguro || '';
-  document.getElementById('prop-comunidad').value = p.comunidad || '';
+  document.getElementById('prop-comunidad').value = p.comunidad ? (p.comunidad / 12) : '';
   document.getElementById('prop-otrosGastos').value = p.otrosGastos !== undefined ? p.otrosGastos : (p.gastosDed && p.ibi === undefined ? p.gastosDed : '');
   updateGastosTotal();
   document.getElementById('prop-precioCompra').value = p.precioCompra || '';
+  var tieneComi = nv(p.comisionInmo) > 0;
+  document.getElementById('prop-tiene-comision').value = tieneComi ? 'si' : 'no';
+  document.getElementById('prop-comisionInmo').value = tieneComi ? p.comisionInmo : '';
+  onPropComisionToggle();
+  document.getElementById('prop-gastos').value = p.gastos || '';
   var tieneHip = !!(nv(p.tin) && nv(p.plazoAnios));
   document.getElementById('prop-tiene-hipoteca').value = tieneHip ? 'si' : 'no';
   onPropHipotecaToggle();
@@ -1671,7 +1701,9 @@ function cancelEditProp() {
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-gastos','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('prop-tiene-comision').value = 'no';
+  onPropComisionToggle();
   document.getElementById('prop-tiene-hipoteca').value = 'no';
   onPropHipotecaToggle();
   document.getElementById('prop-gastos-total').textContent = '0 €';
