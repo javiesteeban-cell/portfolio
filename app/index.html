@@ -777,8 +777,8 @@ function calcProp(p) {
   var BASE = (S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0;
   var alqAnual = nv(p.alquiler) * 12;
   var gastosDed = (p.ibi !== undefined)
-    ? nv(p.ibi) + nv(p.seguro) + nv(p.comunidad) + nv(p.otrosGastos) + nv(p.reforma)
-    : nv(p.gastosDed) + nv(p.reforma);
+    ? nv(p.ibi) + nv(p.seguro) + nv(p.comunidad) + nv(p.otrosGastos)
+    : nv(p.gastosDed);
   var cuotaMensual, interesesMensual, amortiMensual, saldoPendiente = 0;
   if (nv(p.tin) && nv(p.plazoAnios)) {
     var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
@@ -1740,7 +1740,7 @@ function renderPropList() {
   var html = '';
   S.propiedades.forEach(function(p) {
     var c = calcProp(p);
-    var gastosTotal = (p.ibi !== undefined) ? nv(p.ibi)+nv(p.seguro)+nv(p.comunidad)+nv(p.otrosGastos)+nv(p.reforma) : nv(p.gastosDed)+nv(p.reforma);
+    var gastosTotal = (p.ibi !== undefined) ? nv(p.ibi)+nv(p.seguro)+nv(p.comunidad)+nv(p.otrosGastos) : nv(p.gastosDed);
     html += '<div class="prop-card" data-id="' + p.id + '">';
 
     var esHabitual = p.uso === 'habitual';
@@ -1823,7 +1823,6 @@ function renderPropList() {
         if (nv(p.seguro)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Seguro</span><span class="fv" style="color:var(--mu)">' + eur(p.seguro) + '</span></div>';
         if (nv(p.comunidad)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Comunidad</span><span class="fv" style="color:var(--mu)">' + eur(p.comunidad) + '</span></div>';
         if (nv(p.otrosGastos)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Otros</span><span class="fv" style="color:var(--mu)">' + eur(p.otrosGastos) + '</span></div>';
-        if (nv(p.reforma)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Reforma</span><span class="fv" style="color:var(--mu)">' + eur(p.reforma) + '</span></div>';
       }
       html += '<div class="frow"><span class="fl">IRPF estimado</span><span class="fv" style="color:var(--r)">' + eur(c.impuesto) + '</span></div>';
       html += '<div class="frow"><span class="fl">CF neto anual</span><span class="fv" style="color:' + colorVal(c.cfNetoAnual) + '">' + eur(c.cfNetoAnual) + '</span></div>';
