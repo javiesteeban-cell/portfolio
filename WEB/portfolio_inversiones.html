@@ -508,6 +508,17 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
             <label>Comisión inmobiliaria (€)</label>
             <input type="number" id="prop-comisionInmo" placeholder="0" oninput="updateGastosCompra()">
           </div>
+          <div class="ef spanall">
+            <label>Reforma</label>
+            <select id="prop-tiene-reforma" onchange="onPropReformaToggle()">
+              <option value="no">No</option>
+              <option value="si">Sí — añadir coste de reforma</option>
+            </select>
+          </div>
+          <div class="ef spanall" id="prop-f-reforma" style="display:none;">
+            <label>Coste de reforma (€)</label>
+            <input type="number" id="prop-reforma" placeholder="0">
+          </div>
           <div class="spanall" id="prop-f-gastos-ded">
             <div class="gastos-section">
               <div class="gastos-section-hdr">
@@ -788,7 +799,7 @@ function calcProp(p) {
   var rendNeto  = rendBruto - reduccion;
   var impuesto  = irpf(BASE + Math.max(0, rendNeto)) - irpf(BASE);
   var cfNetoAnual = alqAnual - gastosDed - cuotaAnual - impuesto;
-  var capPropio   = nv(p.entrada) + nv(p.gastos);
+  var capPropio   = nv(p.entrada) + nv(p.gastos) + nv(p.reforma);
   var roce     = capPropio > 0 ? (cfNetoAnual + amortiAnual) / capPropio : 0;
   var yieldCF  = capPropio > 0 ? cfNetoAnual / capPropio : 0;
   var yieldBruto = nv(p.valor) > 0 ? alqAnual / nv(p.valor) : 0;
@@ -1586,6 +1597,12 @@ function onPropComisionToggle() {
   updateGastosCompra();
 }
 
+function onPropReformaToggle() {
+  var tiene = document.getElementById('prop-tiene-reforma').value === 'si';
+  document.getElementById('prop-f-reforma').style.display = tiene ? 'block' : 'none';
+  if (!tiene) document.getElementById('prop-reforma').value = '';
+}
+
 function onPropUsoChange() {
   var esHabitual = document.getElementById('prop-uso').value === 'habitual';
   document.getElementById('prop-f-alquiler').style.display    = esHabitual ? 'none' : '';
@@ -1628,6 +1645,7 @@ function saveProp() {
     entrada: entrada,
     gastos: gv('prop-gastos'),
     comisionInmo: document.getElementById('prop-tiene-comision').value === 'si' ? gv('prop-comisionInmo') : 0,
+    reforma: document.getElementById('prop-tiene-reforma').value === 'si' ? gv('prop-reforma') : 0,
     alquiler: gv('prop-alquiler'),
     ibi: gv('prop-ibi'),
     seguro: gv('prop-seguro'),
@@ -1671,6 +1689,10 @@ function editProp(id) {
   document.getElementById('prop-tiene-comision').value = tieneComi ? 'si' : 'no';
   document.getElementById('prop-comisionInmo').value = tieneComi ? p.comisionInmo : '';
   onPropComisionToggle();
+  var tieneRef = nv(p.reforma) > 0;
+  document.getElementById('prop-tiene-reforma').value = tieneRef ? 'si' : 'no';
+  document.getElementById('prop-reforma').value = tieneRef ? p.reforma : '';
+  onPropReformaToggle();
   document.getElementById('prop-gastos').value = p.gastos || '';
   var tieneHip = !!(nv(p.tin) && nv(p.plazoAnios));
   document.getElementById('prop-tiene-hipoteca').value = tieneHip ? 'si' : 'no';
@@ -1701,9 +1723,11 @@ function cancelEditProp() {
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('prop-tiene-comision').value = 'no';
   onPropComisionToggle();
+  document.getElementById('prop-tiene-reforma').value = 'no';
+  onPropReformaToggle();
   document.getElementById('prop-tiene-hipoteca').value = 'no';
   onPropHipotecaToggle();
   document.getElementById('prop-gastos-total').textContent = '0 €';
