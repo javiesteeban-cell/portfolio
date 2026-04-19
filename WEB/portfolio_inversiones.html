@@ -494,7 +494,7 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
           </div>
           <div class="ef span2"><label>Nombre / Dirección</label><input id="prop-nombre" placeholder="Ej: Piso Madrid Centro"></div>
           <div class="ef"><label>Valor de mercado (€)</label><input type="number" id="prop-valor" placeholder="0"></div>
-          <div class="ef"><label>Entrada propia (€)</label><input type="number" id="prop-entrada" placeholder="0"></div>
+          <div class="ef"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca()"></div>
           <div class="ef"><label>Gastos de compra (€)</label><input type="number" id="prop-gastos" placeholder="Notaría, impuestos..."></div>
           <div class="ef" id="prop-f-alquiler"><label>Alquiler mensual (€)</label><input type="number" id="prop-alquiler" placeholder="0"></div>
           <div class="spanall" id="prop-f-gastos-ded">
@@ -511,14 +511,20 @@ input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
               </div>
             </div>
           </div>
-          <div class="spanall">
+          <div class="ef spanall">
+            <label>Financiación con hipoteca</label>
+            <select id="prop-tiene-hipoteca" onchange="onPropHipotecaToggle()">
+              <option value="no">No — pagada al 100% con capital propio</option>
+              <option value="si">Sí — hipoteca financiada</option>
+            </select>
+          </div>
+          <div class="spanall" id="prop-f-hipoteca" style="display:none;">
             <div class="gastos-section">
               <div class="gastos-section-hdr">
                 <span class="gastos-section-lbl">Hipoteca — sistema de amortización francés</span>
-                <span style="font-size:.72rem;color:var(--mu)">Opcional — dejar vacío si no hay hipoteca</span>
+                <span style="font-size:.72rem;color:var(--mu)">Datos de la financiación</span>
               </div>
               <div class="gastos-sub-grid">
-                <div class="ef"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca()"></div>
                 <div class="ef"><label>% Entrada</label><input type="number" id="prop-pctEntrada" placeholder="20" step="0.1" oninput="updateHipoteca()"></div>
                 <div class="ef"><label>Capital financiado (€)</label><input type="number" id="prop-capitalFin" placeholder="Automático" readonly style="background:var(--s3);color:var(--mu);cursor:default;"></div>
                 <div class="ef"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
@@ -1561,6 +1567,15 @@ function onPropUsoChange() {
   document.getElementById('prop-f-gastos-ded').style.display  = esHabitual ? 'none' : '';
 }
 
+function onPropHipotecaToggle() {
+  var tiene = document.getElementById('prop-tiene-hipoteca').value === 'si';
+  document.getElementById('prop-f-hipoteca').style.display = tiene ? 'block' : 'none';
+  if (!tiene) {
+    ['prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+    document.getElementById('prop-hip-result').style.display = 'none';
+  }
+}
+
 function toggleProp(id) {
   var el = document.querySelector('.prop-card[data-id="' + id + '"]');
   if (el) el.classList.toggle('expanded');
@@ -1576,23 +1591,27 @@ function toggleAddProp() {
 function saveProp() {
   var nombre = document.getElementById('prop-nombre').value.trim();
   if (!nombre) { flash('prop-flash', 'El nombre es obligatorio', 'var(--r)'); return; }
+  var tieneHip = document.getElementById('prop-tiene-hipoteca').value === 'si';
+  var precioCompra = gv('prop-precioCompra');
+  var pctEntrada = tieneHip ? gv('prop-pctEntrada') : 100;
+  var entrada = tieneHip ? precioCompra * pctEntrada / 100 : precioCompra;
   var prop = {
     id: editPropId || Date.now(),
     uso: document.getElementById('prop-uso').value || 'alquiler',
     nombre: nombre,
     valor: gv('prop-valor'),
-    entrada: gv('prop-entrada'),
+    entrada: entrada,
     gastos: gv('prop-gastos'),
     alquiler: gv('prop-alquiler'),
     ibi: gv('prop-ibi'),
     seguro: gv('prop-seguro'),
     comunidad: gv('prop-comunidad'),
     otrosGastos: gv('prop-otrosGastos'),
-    precioCompra: gv('prop-precioCompra'),
-    pctEntrada: gv('prop-pctEntrada'),
-    tin: gv('prop-tin'),
-    plazoAnios: gv('prop-plazoAnios'),
-    cuotaNum: gv('prop-cuotaNum') || 1
+    precioCompra: precioCompra,
+    pctEntrada: pctEntrada,
+    tin: tieneHip ? gv('prop-tin') : 0,
+    plazoAnios: tieneHip ? gv('prop-plazoAnios') : 0,
+    cuotaNum: tieneHip ? (gv('prop-cuotaNum') || 1) : 1
   };
   if (editPropId) {
     var idx = S.propiedades.findIndex(function(x){ return x.id === editPropId; });
@@ -1615,7 +1634,6 @@ function editProp(id) {
   onPropUsoChange();
   document.getElementById('prop-nombre').value = p.nombre;
   document.getElementById('prop-valor').value = p.valor;
-  document.getElementById('prop-entrada').value = p.entrada;
   document.getElementById('prop-gastos').value = p.gastos;
   document.getElementById('prop-alquiler').value = p.alquiler;
   document.getElementById('prop-ibi').value = p.ibi || '';
@@ -1624,11 +1642,16 @@ function editProp(id) {
   document.getElementById('prop-otrosGastos').value = p.otrosGastos !== undefined ? p.otrosGastos : (p.gastosDed && p.ibi === undefined ? p.gastosDed : '');
   updateGastosTotal();
   document.getElementById('prop-precioCompra').value = p.precioCompra || '';
-  document.getElementById('prop-pctEntrada').value   = p.pctEntrada   || '';
-  document.getElementById('prop-tin').value          = p.tin          || '';
-  document.getElementById('prop-plazoAnios').value   = p.plazoAnios   || '';
-  document.getElementById('prop-cuotaNum').value     = p.cuotaNum     || '';
-  updateHipoteca();
+  var tieneHip = !!(nv(p.tin) && nv(p.plazoAnios));
+  document.getElementById('prop-tiene-hipoteca').value = tieneHip ? 'si' : 'no';
+  onPropHipotecaToggle();
+  if (tieneHip) {
+    document.getElementById('prop-pctEntrada').value = p.pctEntrada || '';
+    document.getElementById('prop-tin').value        = p.tin        || '';
+    document.getElementById('prop-plazoAnios').value = p.plazoAnios || '';
+    document.getElementById('prop-cuotaNum').value   = p.cuotaNum   || '';
+    updateHipoteca();
+  }
   document.getElementById('add-prop-panel').style.display = 'block';
   showTab('inmo');
   setTimeout(function(){ document.getElementById('add-prop-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
@@ -1648,8 +1671,9 @@ function cancelEditProp() {
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-entrada','prop-gastos','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
-  document.getElementById('prop-hip-result').style.display = 'none';
+  ['prop-nombre','prop-valor','prop-gastos','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('prop-tiene-hipoteca').value = 'no';
+  onPropHipotecaToggle();
   document.getElementById('prop-gastos-total').textContent = '0 €';
   document.getElementById('add-prop-panel').style.display = 'none';
 }
