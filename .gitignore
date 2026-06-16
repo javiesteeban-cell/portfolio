@@ -8,3 +8,10 @@ Thumbs.db
 # Editor
 *.swp
 *.swo
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
