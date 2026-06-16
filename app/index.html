@@ -2,719 +2,1322 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Portfolio de Inversiones</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<title>Portfolio · Patrimonio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 :root{
-  --bg:#0f0f13;--s1:#1a1a22;--s2:#22222e;--s3:#1e1e28;
-  --bd:#2e2e3e;--ac:#7c6fff;--g:#4ecb9e;--am:#f7a440;--r:#e05c5c;
-  --tx:#e8e8f0;--mu:#888899;--rr:10px;--rl:14px;
+  /* Surfaces — 6-level depth */
+  --bg:#08080c; --s0:#0e0e15; --s1:#13131c; --s2:#1a1a25; --s3:#22222e; --s4:#2a2a38;
+  /* Borders — hairline */
+  --bd:rgba(255,255,255,.05); --bd-h:rgba(255,255,255,.09); --bd-s:rgba(255,255,255,.14); --bd-a:rgba(255,107,53,.32);
+  /* Text */
+  --tx:#f1f1f7; --tx2:#c4c4d2; --mu:#7e7e90; --mu2:#54546a; --mu3:#33334a;
+  /* Brand + status */
+  --ac:#ff6b35; --ac2:#ff8559; --ac-g:rgba(255,107,53,.16);
+  --g:#4ecb9e; --g2:#65d6ab; --g-g:rgba(78,203,158,.14);
+  --am:#f7c648; --am2:#f9d26e; --am-g:rgba(247,198,72,.14);
+  --r:#e05c5c; --r2:#e87272; --r-g:rgba(224,92,92,.14);
+  --bl:#4fa6f7; --bl-g:rgba(79,166,247,.14);
+  /* Tipo colors */
+  --c-fondo:#ff6b35; --c-fondo-dist:#ff9568; --c-crypto:#f7c648; --c-p2p:#4ecb9e;
+  --c-inmo:#4fa6f7; --c-habitual:#ff6b35; --c-liq:#4ecb9e;
+  /* Radii */
+  --rs:6px; --rr:9px; --rl:14px; --rxl:20px;
+  /* Shadows */
+  --sh1:0 1px 0 rgba(255,255,255,.03) inset, 0 1px 2px rgba(0,0,0,.4);
+  --sh2:0 1px 0 rgba(255,255,255,.04) inset, 0 4px 14px rgba(0,0,0,.32);
+  --sh3:0 1px 0 rgba(255,255,255,.05) inset, 0 16px 38px rgba(0,0,0,.55);
+  --sh4:0 1px 0 rgba(255,255,255,.07) inset, 0 32px 80px rgba(0,0,0,.7);
+  /* Easing */
+  --tf:140ms cubic-bezier(.4,0,.2,1);
+  --tb:220ms cubic-bezier(.4,0,.2,1);
+  --tl:380ms cubic-bezier(.16,1,.3,1);
+  /* Sidebar */
+  --sb-w:224px;
 }
+
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,sans-serif;font-size:15px;min-height:100vh;}
-input,select,textarea{background:var(--s2);color:var(--tx);border:1px solid var(--bd);border-radius:var(--rr);padding:9px 12px;font-size:15px;width:100%;outline:none;font-family:inherit;}
-input:focus,select:focus,textarea:focus{border-color:var(--ac);}
-select option{background:var(--s2);}
-button{cursor:pointer;font-family:inherit;border:none;}
+*::selection{background:var(--ac-g);color:var(--tx);}
+html,body{min-height:100vh;background:var(--bg);}
+body{
+  color:var(--tx);
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  font-size:14px; line-height:1.45;
+  font-feature-settings:"cv11","ss01","ss02";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:
+    radial-gradient(ellipse 900px 700px at 0% -300px,rgba(255,107,53,.07),transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% -100px,rgba(78,203,158,.035),transparent 60%);
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+.mono,.num{font-family:'JetBrains Mono','SF Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum","zero";}
+.tab-num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
 
-/* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;position:relative;}
-.login-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:40px 36px;width:100%;max-width:420px;}
-.login-logo{text-align:center;font-size:1.8rem;font-weight:800;color:var(--ac);margin-bottom:6px;}
-.login-sub{text-align:center;color:var(--mu);font-size:.88rem;margin-bottom:28px;}
-.auth-tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:24px;}
-.auth-tab{flex:1;text-align:center;padding:12px 0;font-size:.9rem;font-weight:700;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
-.auth-tab.active{color:var(--ac);border-bottom-color:var(--ac);}
-.auth-tab:hover:not(.active){color:var(--tx);}
-.auth-panel{display:none;}
-.auth-panel.active{display:block;}
-.lf{margin-bottom:16px;}
-.lf label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:5px;font-weight:600;letter-spacing:.2px;}
-.lf-pw{position:relative;}
-.lf-pw input{padding-right:42px;}
-.pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mu);cursor:pointer;padding:4px;font-size:.85rem;line-height:1;transition:color .2s;}
-.pw-toggle:hover{color:var(--tx);}
-.pw-str{height:3px;border-radius:2px;background:var(--bd);margin-top:8px;overflow:hidden;}
-.pw-str-fill{height:100%;border-radius:2px;width:0;transition:width .3s,background .3s;}
-.pw-str-text{font-size:.72rem;margin-top:4px;color:var(--mu);}
-.login-box .btn{width:100%;padding:13px;font-size:.95rem;font-weight:700;border-radius:var(--rr);margin-top:6px;}
-.login-err{color:var(--r);font-size:.82rem;margin-top:10px;text-align:center;min-height:18px;}
-.login-ok{color:var(--g);font-size:.82rem;margin-top:10px;text-align:center;min-height:18px;}
-.login-link{text-align:center;margin-top:14px;font-size:.83rem;color:var(--mu);}
-.login-link a{color:var(--ac);cursor:pointer;text-decoration:none;}
-.login-link a:hover{text-decoration:underline;}
-.auth-msg-box{text-align:center;padding:20px 10px;}
-.auth-msg-icon{font-size:2.2rem;margin-bottom:12px;color:var(--ac);}
-.auth-msg-title{font-size:1.05rem;font-weight:700;margin-bottom:8px;}
-.auth-msg-text{font-size:.85rem;color:var(--mu);line-height:1.5;}
-.auth-back{display:inline-block;margin-top:18px;font-size:.85rem;color:var(--ac);cursor:pointer;text-decoration:none;}
-.auth-back:hover{text-decoration:underline;}
+input,select,textarea,button{font-family:inherit;}
+input,select,textarea{
+  background:var(--s2); color:var(--tx);
+  border:1px solid var(--bd); border-radius:var(--rr);
+  padding:10px 12px; font-size:14px; width:100%; outline:none;
+  transition:border-color var(--tf),background var(--tf),box-shadow var(--tf);
+  font-variant-numeric:tabular-nums;
+}
+input[type=number]{font-family:'JetBrains Mono','SF Mono',ui-monospace,monospace;font-size:13px;}
+input:hover,select:hover,textarea:hover{border-color:var(--bd-h);}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--ac); background:var(--s3);
+  box-shadow:0 0 0 3px var(--ac-g);
+}
+select option{background:var(--s3);color:var(--tx);}
+button{cursor:pointer;border:none;background:none;color:inherit;}
+input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 
-/* APP LAYOUT */
-#main-app{display:none;flex-direction:column;min-height:100vh;}
-.topbar{background:var(--s1);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-.topbar-logo{font-size:1rem;font-weight:800;color:var(--ac);}
-.topbar-right{display:flex;align-items:center;gap:12px;}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--mu);}
-.sync-dot.saving{background:var(--am);animation:pulse .8s infinite;}
-.sync-dot.saved{background:var(--g);}
-.sync-dot.error{background:var(--r);}
-.user-email{font-size:.78rem;color:var(--mu);}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+}
+
+/* ============ PIN LOGIN ============ */
+#pin-screen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;background:var(--bg);z-index:100;
+  background-image:
+    radial-gradient(ellipse 600px 400px at 50% 0%,rgba(255,107,53,.12),transparent 60%),
+    radial-gradient(ellipse 500px 300px at 50% 100%,rgba(78,203,158,.05),transparent 60%);
+}
+.pin-box{
+  width:100%; max-width:380px;
+  background:linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border:1px solid var(--bd-h);
+  border-radius:var(--rxl);
+  padding:44px 36px 36px;
+  box-shadow:var(--sh4);
+  position:relative; overflow:hidden;
+}
+.pin-box::before{
+  content:'';position:absolute;top:0;left:20px;right:20px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+}
+.pin-glow{
+  position:absolute;top:-100px;left:50%;transform:translateX(-50%);
+  width:340px;height:200px;
+  background:radial-gradient(ellipse,var(--ac-g),transparent 65%);
+  pointer-events:none;
+}
+.pin-brand{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  font-size:.74rem;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;
+  color:var(--mu);margin-bottom:8px;position:relative;
+}
+.pin-brand .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ac);box-shadow:0 0 10px var(--ac);
+}
+.pin-title{
+  text-align:center;font-size:1.55rem;font-weight:900;letter-spacing:-.6px;
+  margin-bottom:6px;position:relative;
+  background:linear-gradient(180deg,#fff 0%,#a8a3e8 100%);
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent;-webkit-text-fill-color:transparent;
+}
+.pin-sub{
+  text-align:center;font-size:.82rem;color:var(--mu);
+  margin-bottom:32px;position:relative;
+}
+.pin-dots{
+  display:flex;justify-content:center;gap:14px;margin-bottom:26px;position:relative;
+}
+.pin-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--s3);border:1px solid var(--bd-h);
+  transition:all var(--tf);
+}
+.pin-dot.filled{
+  background:var(--ac);border-color:var(--ac);
+  box-shadow:0 0 14px var(--ac-g);
+  transform:scale(1.1);
+}
+.pin-pad{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  margin-bottom:20px;position:relative;
+}
+.pin-key{
+  background:var(--s2);
+  border:1px solid var(--bd-h);
+  border-radius:var(--rr);
+  padding:14px 0;
+  font-size:1.4rem;font-weight:600;
+  color:var(--tx);
+  font-family:'JetBrains Mono',monospace;
+  transition:all var(--tf);
+  min-height:54px;
+}
+.pin-key:hover{background:var(--s3);border-color:var(--bd-s);transform:translateY(-1px);}
+.pin-key:active{transform:translateY(0) scale(.97);background:var(--ac-g);border-color:var(--ac);}
+.pin-key.fn{font-size:.78rem;font-weight:700;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;font-family:'Inter',sans-serif;}
+.pin-err{
+  color:var(--r);font-size:.84rem;text-align:center;
+  min-height:20px;margin-bottom:8px;position:relative;font-weight:600;
+}
+.pin-hint{
+  text-align:center;color:var(--mu);font-size:.78rem;
+  position:relative;margin-top:6px;
+}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+.pin-box.shake{animation:shake .4s;}
+
+/* ============ APP LAYOUT (sidebar + bento) ============ */
+#main-app{
+  display:none;
+  grid-template-columns:var(--sb-w) 1fr;
+  min-height:100vh;min-height:100dvh;
+}
+#main-app.show{display:grid;}
+
+/* SIDEBAR */
+.sb{
+  background:linear-gradient(180deg,var(--s0) 0%,var(--bg) 100%);
+  border-right:1px solid var(--bd);
+  padding:22px 14px 18px;
+  display:flex;flex-direction:column;gap:6px;
+  position:sticky;top:0;height:100vh;height:100dvh;
+  z-index:20;
+}
+.sb-brand{
+  display:flex;align-items:center;gap:10px;padding:6px 10px 18px;
+  border-bottom:1px solid var(--bd);margin-bottom:10px;
+}
+.sb-brand-t{font-weight:800;font-size:.95rem;letter-spacing:-.3px;}
+.sb-brand-s{font-size:.66rem;color:var(--mu);font-weight:600;letter-spacing:.7px;text-transform:uppercase;margin-top:1px;}
+.sb-section{
+  font-size:.62rem;color:var(--mu2);font-weight:700;
+  letter-spacing:1.3px;text-transform:uppercase;
+  padding:14px 10px 4px;
+}
+.sb-link{
+  display:flex;align-items:center;gap:11px;
+  padding:9px 11px;border-radius:8px;
+  font-size:.86rem;font-weight:600;color:var(--mu);
+  cursor:pointer;user-select:none;
+  transition:all var(--tf);
+  position:relative;
+}
+.sb-link:hover{color:var(--tx2);background:var(--s2);}
+.sb-link.active{color:var(--tx);background:var(--s3);}
+.sb-link.active::before{
+  content:'';position:absolute;left:-14px;top:8px;bottom:8px;width:3px;
+  background:var(--ac);border-radius:0 3px 3px 0;
+  box-shadow:0 0 12px var(--ac);
+}
+.sb-link svg{width:16px;height:16px;flex-shrink:0;opacity:.9;}
+.sb-link.active svg{color:var(--ac);}
+.sb-spacer{flex:1;}
+.sb-foot{
+  border-top:1px solid var(--bd);
+  padding-top:12px;display:flex;flex-direction:column;gap:6px;
+}
+.sb-foot-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;font-size:.7rem;color:var(--mu);
+}
+.sb-meta-dot{display:flex;align-items:center;gap:6px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mu2);transition:all var(--tb);}
+.dot.ok{background:var(--g);box-shadow:0 0 9px var(--g-g);}
+.dot.busy{background:var(--am);box-shadow:0 0 9px var(--am-g);animation:pulse .9s infinite;}
+.dot.err{background:var(--r);box-shadow:0 0 9px var(--r-g);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-/* TABS */
-.tabs{background:var(--s1);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:sticky;top:53px;z-index:40;}
-.tabs::-webkit-scrollbar{display:none;}
-.tab{padding:12px 18px;font-size:.83rem;font-weight:600;color:var(--mu);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;}
-.tab.active{color:var(--ac);border-bottom-color:var(--ac);}
-.tab:hover:not(.active){color:var(--tx);}
+/* MAIN AREA */
+.main{
+  min-width:0;display:flex;flex-direction:column;
+  background:var(--bg);
+}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 28px 14px;
+  border-bottom:1px solid var(--bd);
+  position:sticky;top:0;z-index:18;
+  background:rgba(8,8,12,.78);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  backdrop-filter:blur(24px) saturate(180%);
+}
+.topbar-l{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.topbar-eyebrow{
+  font-size:.65rem;color:var(--mu);font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.topbar-title{font-size:1.18rem;font-weight:800;letter-spacing:-.4px;line-height:1.15;}
+.topbar-r{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.content{
+  flex:1; padding:24px 28px 60px;
+  max-width:1440px; width:100%;
+  align-self:center;
+}
 
-/* CONTENT */
-.content{flex:1;padding:20px;max-width:1080px;margin:0 auto;width:100%;}
-.tab-panel{display:none;}
+.tab-panel{display:none;animation:fade .25s ease-out;}
 .tab-panel.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 
-/* CARDS */
-.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:20px;}
-.card+.card{margin-top:14px;}
+/* ============ BENTO ============ */
+.bento{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:14px;
+}
+.tile{
+  background:linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border:1px solid var(--bd);
+  border-radius:var(--rl);
+  padding:18px 20px;
+  box-shadow:var(--sh2);
+  position:relative;
+  transition:border-color var(--tf),box-shadow var(--tb);
+  min-width:0;
+}
+.tile::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+  pointer-events:none;
+}
+.tile:hover{border-color:var(--bd-h);}
+.tile-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;gap:10px;
+}
+.tile-l{
+  font-size:.66rem;color:var(--mu);font-weight:700;
+  letter-spacing:1.3px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.tile-l::before{
+  content:'';width:4px;height:4px;border-radius:50%;
+  background:var(--mu2);
+}
+.tile-aside{font-size:.7rem;color:var(--mu);font-weight:600;}
+.tile-v{
+  font-size:1.7rem;font-weight:800;letter-spacing:-.7px;line-height:1.05;
+  font-variant-numeric:tabular-nums;font-feature-settings:"tnum";
+}
+.tile-s{font-size:.78rem;color:var(--mu);margin-top:6px;}
+.tile-foot{
+  margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd);
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-size:.74rem;color:var(--mu);
+}
 
-/* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.kpi{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px;display:flex;flex-direction:column;}
-.kpi-l{font-size:.75rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-.kpi-v{font-size:1.4rem;font-weight:800;letter-spacing:-.5px;padding-bottom:10px;}
-.kpi-s{font-size:.78rem;color:var(--mu);margin-top:3px;}
-.kpi-yield{font-size:.9rem;font-weight:700;}
-.green{color:var(--g);}
-.amber{color:var(--am);}
-.red{color:var(--r);}
-.purple{color:var(--ac);}
+/* Span helpers */
+.c-2{grid-column:span 2;} .c-3{grid-column:span 3;} .c-4{grid-column:span 4;}
+.c-5{grid-column:span 5;} .c-6{grid-column:span 6;} .c-7{grid-column:span 7;}
+.c-8{grid-column:span 8;} .c-9{grid-column:span 9;} .c-12{grid-column:span 12;}
+
+/* HERO tile */
+.tile-hero{
+  background:
+    radial-gradient(ellipse 400px 200px at 80% 0%,rgba(255,107,53,.14),transparent 60%),
+    linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border-color:rgba(255,107,53,.22);
+  padding:22px 24px;
+  overflow:hidden;
+}
+.tile-hero::after{
+  content:'';position:absolute;top:-40%;right:-15%;
+  width:55%;height:180%;
+  background:radial-gradient(ellipse,var(--ac-g),transparent 60%);
+  pointer-events:none;
+}
+.tile-hero .tile-v{
+  font-size:2.6rem;letter-spacing:-1.4px;
+  background:linear-gradient(180deg,#fff 0%,#bcb6f0 100%);
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent!important;-webkit-text-fill-color:transparent;
+  padding-bottom:4px;
+}
+.tile-hero .tile-l{color:var(--tx2);}
+
+/* Delta chip */
+.chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:99px;
+  font-size:.7rem;font-weight:700;letter-spacing:.2px;
+  border:1px solid transparent;
+  font-variant-numeric:tabular-nums;
+}
+.chip.g{background:var(--g-g);color:var(--g);border-color:rgba(78,203,158,.24);}
+.chip.am{background:var(--am-g);color:var(--am);border-color:rgba(247,198,72,.24);}
+.chip.r{background:var(--r-g);color:var(--r);border-color:rgba(224,92,92,.24);}
+.chip.ac{background:var(--ac-g);color:var(--ac);border-color:rgba(255,107,53,.24);}
+.chip.mu{background:rgba(255,255,255,.04);color:var(--mu);border-color:var(--bd);}
+.chip svg{width:11px;height:11px;}
+
+/* COLORS */
+.g{color:var(--g);} .am{color:var(--am);} .r{color:var(--r);}
+.ac{color:var(--ac);} .mu{color:var(--mu);} .tx{color:var(--tx);} .tx2{color:var(--tx2);}
 
 /* BUTTONS */
-.btn{padding:9px 18px;border-radius:var(--rr);font-size:.88rem;font-weight:600;transition:opacity .2s,transform .15s;}
-.btn:hover{opacity:.85;transform:translateY(-1px);}
-.bp{background:var(--ac);color:#fff;}
-.br2{background:var(--r);color:#fff;}
-.bg2{background:var(--g);color:#0f0f13;}
-.ba{background:var(--am);color:#0f0f13;}
-.bsm{padding:6px 12px;font-size:.8rem;}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 14px;border-radius:var(--rr);
+  font-size:.82rem;font-weight:600;letter-spacing:.1px;
+  transition:all var(--tf);
+  white-space:nowrap;min-height:34px;
+  background:var(--s2);color:var(--tx2);
+  border:1px solid var(--bd-h);
+}
+.btn:hover{background:var(--s3);border-color:var(--bd-s);color:var(--tx);}
+.btn:active{transform:translateY(1px);}
+.btn.bp{
+  background:linear-gradient(180deg,var(--ac2),var(--ac));color:#fff;border:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.16) inset,0 3px 12px var(--ac-g);
+}
+.btn.bp:hover{box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 5px 18px var(--ac-g);}
+.btn.bg2{
+  background:linear-gradient(180deg,var(--g2),var(--g));color:#0a0a0f;border:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 2px 8px var(--g-g);
+}
+.btn.ba{
+  background:linear-gradient(180deg,var(--am2),var(--am));color:#0a0a0f;border:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.22) inset,0 2px 8px var(--am-g);
+}
+.btn.br2{
+  background:linear-gradient(180deg,var(--r2),var(--r));color:#fff;border:none;
+  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 2px 8px var(--r-g);
+}
+.btn.ghost{background:transparent;color:var(--mu);border-color:var(--bd);}
+.btn.ghost:hover{background:var(--s2);color:var(--tx);}
+.btn.sm{padding:6px 11px;font-size:.76rem;min-height:28px;border-radius:7px;}
+.btn.icon{padding:7px;min-width:32px;min-height:32px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 
-/* TAGS */
-.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.72rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
-.tf{background:rgba(124,111,255,.18);color:var(--ac);}
-.tfd{background:rgba(167,139,250,.18);color:#a78bfa;}
-.tc{background:rgba(247,164,64,.18);color:var(--am);}
-.tp{background:rgba(78,203,158,.18);color:var(--g);}
-.tinmo{background:rgba(160,168,255,.18);color:#a0a8ff;}
-.thabitual{background:rgba(124,111,255,.18);color:var(--ac);}
-.tliq{background:rgba(78,203,158,.12);color:var(--g);}
+/* ICONS */
+.ico{width:15px;height:15px;flex-shrink:0;}
+
+/* TAGS / pills */
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 8px;border-radius:99px;
+  font-size:.66rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  border:1px solid transparent;
+}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+.pill.fondo{background:rgba(255,107,53,.13);color:var(--c-fondo);border-color:rgba(255,107,53,.22);}
+.pill.fondo-dist{background:rgba(255,149,104,.13);color:var(--c-fondo-dist);border-color:rgba(255,149,104,.22);}
+.pill.etf{background:rgba(255,149,104,.13);color:var(--c-fondo-dist);border-color:rgba(255,149,104,.22);}
+.pill.crypto{background:rgba(247,198,72,.13);color:var(--c-crypto);border-color:rgba(247,198,72,.22);}
+.pill.p2p{background:rgba(78,203,158,.13);color:var(--c-p2p);border-color:rgba(78,203,158,.22);}
+.pill.inmo{background:rgba(79,166,247,.13);color:var(--c-inmo);border-color:rgba(79,166,247,.22);}
+.pill.habitual{background:rgba(255,107,53,.13);color:var(--c-habitual);border-color:rgba(255,107,53,.22);}
+.pill.liq{background:rgba(78,203,158,.10);color:var(--c-liq);border-color:rgba(78,203,158,.18);}
+.pill.ahorro,.pill.corriente,.pill.efectivo{background:rgba(78,203,158,.10);color:var(--c-liq);border-color:rgba(78,203,158,.18);}
+
+/* FILTER tabs */
+.ftabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.ftab{
+  padding:6px 13px;border-radius:99px;
+  font-size:.74rem;font-weight:600;
+  color:var(--mu);background:var(--s1);
+  border:1px solid var(--bd);cursor:pointer;
+  transition:all var(--tf);min-height:30px;
+  display:inline-flex;align-items:center;
+}
+.ftab:hover:not(.active){color:var(--tx2);background:var(--s2);border-color:var(--bd-h);}
+.ftab.active{background:var(--ac-g);color:var(--ac);border-color:rgba(255,107,53,.32);box-shadow:0 0 10px var(--ac-g);}
+
+/* SECTION header (in-content) */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.sec-l{font-size:.66rem;color:var(--mu);font-weight:700;letter-spacing:1.3px;text-transform:uppercase;}
+.sec-h2{font-size:1.06rem;font-weight:800;letter-spacing:-.3px;}
+.sec-line{height:1px;background:var(--bd);margin:18px 0;}
 
 /* FORMS */
-.fr{display:grid;gap:12px;grid-template-columns:1fr 1fr;}
-.ef{display:flex;flex-direction:column;gap:5px;}
-.ef label,.mf label{font-size:.8rem;color:var(--mu);font-weight:600;}
-.sep{height:1px;background:var(--bd);margin:18px 0;}
-.form-title{font-size:.9rem;font-weight:700;margin-bottom:14px;color:var(--mu);}
-.flash-msg{font-size:.82rem;color:var(--g);min-height:18px;margin-top:6px;}
+.fgrid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr);}
+.fgrid > .ef{grid-column:span 6;}
+.fgrid > .span3{grid-column:span 3;}
+.fgrid > .span4{grid-column:span 4;}
+.fgrid > .span6{grid-column:span 6;}
+.fgrid > .span12{grid-column:span 12;}
+.ef{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.ef label{
+  font-size:.7rem;color:var(--mu);font-weight:600;letter-spacing:.4px;
+}
+.ef .hint{font-size:.72rem;color:var(--mu);margin-top:2px;line-height:1.45;}
+.flash{font-size:.78rem;color:var(--g);min-height:18px;font-weight:600;}
+.flash.r{color:var(--r);}
+.flash.am{color:var(--am);}
 
-/* INV CARDS */
-.inv-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:8px;transition:border-color .2s;}
-.inv-card:hover{border-color:rgba(124,111,255,.3);}
-.inv-card-sum{display:flex;align-items:center;gap:14px;padding:13px 18px;cursor:pointer;user-select:none;}
-.inv-card-sum:hover{background:rgba(124,111,255,.04);}
-.inv-card-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1;}
-.inv-card-name{font-size:.97rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
-.inv-card-dot{color:var(--mu);opacity:.4;flex-shrink:0;}
-.inv-card-cap{font-size:.85rem;color:var(--mu);white-space:nowrap;flex-shrink:0;}
-.inv-card-metrics{display:grid;grid-template-columns:repeat(3,90px);gap:6px;flex-shrink:0;justify-content:end;min-height:38px;}
-.inv-card-m{text-align:right;}
-.inv-card-m-l{font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.3px;}
-.inv-card-m-v{font-size:.92rem;font-weight:700;white-space:nowrap;}
-.inv-card-body{padding:0 18px 16px;display:none;}
-.inv-card.open .inv-card-body{display:block;}
-.inv-card.open{border-color:rgba(124,111,255,.25);}
-.inv-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.inv-card-actions{display:flex;gap:6px;}
-.inv-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.inv-kpi{background:var(--s2);border-radius:var(--rr);padding:10px 12px;}
-.inv-kpi-l{font-size:.73rem;color:var(--mu);margin-bottom:3px;}
-.inv-kpi-v{font-size:.95rem;font-weight:700;}
-.qedit{cursor:pointer;transition:background .15s;}
-.qedit:hover{background:var(--s3);border-radius:var(--rr);}
-.qedit-input{background:var(--s2);border:1px solid var(--ac);border-radius:6px;color:var(--tx);font-size:16px;font-weight:700;padding:6px 8px;width:100%;text-align:right;outline:none;font-family:inherit;box-sizing:border-box;}
+.subbox{
+  background:var(--s2);border:1px solid var(--bd);
+  border-radius:var(--rr);padding:14px 16px;
+}
+.subbox-hd{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;flex-wrap:wrap;gap:8px;
+}
+.subbox-l{font-size:.66rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.7px;}
+.subbox-r{font-size:.78rem;color:var(--tx2);}
+.subbox-r strong{color:var(--am);font-weight:700;}
 
-/* PROP CARDS */
-.prop-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:18px 20px;margin-bottom:12px;transition:border-color .2s;}
-.prop-card:hover{border-color:rgba(124,111,255,.3);}
-.prop-summary{display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap;}
-.prop-sum-left{flex:0 0 auto;min-width:140px;}
-.prop-name{font-size:1.02rem;font-weight:700;}
-.prop-sum-kpis{display:flex;gap:18px;flex:1;flex-wrap:wrap;}
-.prop-sum-kpi{display:flex;flex-direction:column;min-width:80px;}
-.prop-sum-l{font-size:.68rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;}
-.prop-sum-v{font-size:.92rem;font-weight:700;}
-.prop-sum-actions{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.prop-chevron{color:var(--mu);font-size:.72rem;transition:transform .25s;margin-left:2px;user-select:none;}
-.prop-details{display:none;padding-top:16px;margin-top:16px;border-top:1px solid var(--bd);}
-.prop-card.expanded .prop-details{display:block;}
-.prop-card.expanded .prop-chevron{transform:rotate(180deg);}
-.roce-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
-.roce-kpi{background:var(--s2);border-radius:var(--rr);padding:12px 14px;}
-.roce-kpi-l{font-size:.7rem;color:var(--mu);margin-bottom:4px;}
-.roce-kpi-v{font-size:1rem;font-weight:700;}
+/* ADD panel */
+.add-tile{
+  border-color:rgba(255,107,53,.28)!important;
+  background:
+    radial-gradient(ellipse 500px 200px at 0% 0%,rgba(255,107,53,.06),transparent 60%),
+    linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%)!important;
+}
+.add-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd);
+}
+.add-title{font-size:.86rem;font-weight:700;letter-spacing:-.2px;}
+.x-btn{
+  width:28px;height:28px;border-radius:7px;
+  display:grid;place-items:center;
+  background:var(--s2);border:1px solid var(--bd-h);
+  color:var(--mu);font-size:1rem;line-height:1;
+  transition:all var(--tf);
+}
+.x-btn:hover{background:var(--s3);color:var(--tx);border-color:var(--bd-s);}
 
-/* BARRA PROGRESO */
-.brow{margin:4px 0 10px;}
-.blbl{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mu);margin-bottom:4px;}
-.btrk{background:var(--s2);border-radius:99px;height:6px;overflow:hidden;}
-.bfll{height:6px;border-radius:99px;transition:width .4s;}
-.bval{font-size:.78rem;color:var(--mu);margin-top:3px;}
+/* HIP grid */
+.hip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+.hip-kpi{
+  background:var(--s3);border:1px solid var(--bd);border-radius:var(--rr);
+  padding:10px 12px;
+}
+.hip-l{font-size:.62rem;color:var(--mu);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;}
+.hip-v{font-size:.92rem;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums;}
 
-/* TABLAS */
-.ht{width:100%;border-collapse:collapse;font-size:.88rem;}
-.ht th{padding:10px 12px;text-align:left;font-size:.75rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bd);}
-.ht td{padding:11px 12px;border-bottom:1px solid rgba(46,46,62,.5);}
-.ht tr:last-child td{border-bottom:none;}
-.ht tr:hover td{background:rgba(255,255,255,.02);}
-
-/* FILA DATOS */
-.frow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(46,46,62,.4);}
+/* ====== ROW / list items ====== */
+.row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;align-items:center;
+  padding:14px 18px;
+  background:linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border:1px solid var(--bd);
+  border-radius:var(--rl);
+  margin-bottom:8px;
+  position:relative;
+  transition:border-color var(--tf),background var(--tf),box-shadow var(--tb);
+  cursor:pointer;
+}
+.row::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  pointer-events:none;
+}
+.row:hover{border-color:var(--bd-h);}
+.row.open{
+  border-color:var(--bd-a);
+  background:linear-gradient(180deg,var(--s1) 0%,rgba(255,107,53,.025) 100%);
+}
+.row-l{display:flex;align-items:center;gap:10px;min-width:0;}
+.row-name{
+  font-size:.94rem;font-weight:700;letter-spacing:-.15px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+}
+.row-name .sep{color:var(--mu3);margin:0 4px;}
+.row-cap{font-size:.82rem;color:var(--mu);font-weight:600;font-variant-numeric:tabular-nums;}
+.row-metrics{
+  display:grid;grid-template-columns:repeat(3,minmax(80px,auto));gap:18px;flex-shrink:0;
+}
+.row-m{text-align:right;}
+.row-m-l{font-size:.6rem;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;font-weight:600;}
+.row-m-v{font-size:.88rem;font-weight:700;letter-spacing:-.15px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.row-body{display:none;padding:0 4px 4px;}
+.row.open .row-body{display:block;animation:slide .25s ease-out;}
+@keyframes slide{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+.row-body-hd{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:14px 0;padding-top:14px;border-top:1px dashed var(--bd);
+}
+.kpis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.kpis-grid.k3{grid-template-columns:repeat(3,1fr);}
+.kpis-grid.k6{grid-template-columns:repeat(6,1fr);}
+.minikpi{
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--rr);
+  padding:10px 12px;transition:all var(--tf);
+}
+.minikpi.click{cursor:pointer;}
+.minikpi.click:hover{background:var(--s3);border-color:var(--bd-h);}
+.mini-l{font-size:.6rem;color:var(--mu);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.mini-v{font-size:.9rem;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums;}
+.qedit-input{
+  background:var(--s4);border:1px solid var(--ac);
+  border-radius:var(--rs);color:var(--tx);
+  font-size:14px;font-weight:700;padding:5px 7px;
+  width:100%;text-align:left;outline:none;
+  font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 3px var(--ac-g);
+}
+.frow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd);gap:12px;}
 .frow:last-child{border-bottom:none;}
-.fl{font-size:.87rem;color:var(--mu);}
-.fv{font-size:.9rem;font-weight:600;}
+.fl{font-size:.82rem;color:var(--mu);}
+.fv{font-size:.84rem;font-weight:600;letter-spacing:-.15px;font-variant-numeric:tabular-nums;}
 
-/* RESULT BOXES */
-.hbox{background:rgba(78,203,158,.1);border:1px solid rgba(78,203,158,.25);border-radius:var(--rr);padding:14px 16px;}
-.wbox{background:rgba(247,164,64,.08);border:1px solid rgba(247,164,64,.2);border-radius:var(--rr);padding:14px 16px;}
+/* ====== PROP cards ====== */
+.prop-row{
+  background:linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border:1px solid var(--bd);
+  border-radius:var(--rl);
+  padding:18px 20px;margin-bottom:10px;
+  box-shadow:var(--sh2);position:relative;
+  transition:all var(--tf);
+}
+.prop-row::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+}
+.prop-row:hover{border-color:var(--bd-h);}
+.prop-row.expanded{border-color:var(--bd-a);}
+.prop-sum{
+  display:grid;grid-template-columns:minmax(160px,1fr) 1.6fr auto;
+  gap:18px;align-items:center;cursor:pointer;
+}
+.prop-name{font-size:1rem;font-weight:700;letter-spacing:-.2px;margin-bottom:4px;}
+.prop-kpis{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;}
+.prop-kpi{display:flex;flex-direction:column;min-width:80px;text-align:center;}
+.prop-kpi-l{font-size:.6rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.prop-kpi-v{font-size:.92rem;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums;}
+.prop-acts{display:flex;align-items:center;gap:6px;}
+.chev{color:var(--mu);font-size:.62rem;transition:transform var(--tb);}
+.prop-row.expanded .chev{transform:rotate(180deg);}
+.prop-det{display:none;padding-top:16px;margin-top:16px;border-top:1px solid var(--bd);}
+.prop-row.expanded .prop-det{display:block;animation:slide .25s ease-out;}
 
-/* CHART */
-.chart-wrap{position:relative;height:280px;}
+/* CHART wrap */
+.chart-wrap{position:relative;height:260px;}
+.chart-wrap.lg{height:320px;}
 
-/* SNAP ITEMS */
-.snap-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rr);padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-.snap-fecha{font-size:.85rem;color:var(--mu);}
-.snap-vals{display:flex;gap:20px;flex-wrap:wrap;}
-.snap-val{text-align:right;}
-.snap-val-l{font-size:.72rem;color:var(--mu);}
-.snap-val-v{font-size:.9rem;font-weight:700;}
+/* BARS list (resumen) */
+.bars{display:flex;flex-direction:column;gap:8px;}
+.bar{display:grid;grid-template-columns:130px 1fr 90px;gap:10px;align-items:center;}
+.bar-n{font-size:.74rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-trk{background:var(--s3);border-radius:99px;height:6px;overflow:hidden;border:1px solid var(--bd);}
+.bar-fll{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.16,1,.3,1);}
+.bar-v{font-size:.76rem;text-align:right;color:var(--tx2);font-variant-numeric:tabular-nums;font-weight:600;}
 
-/* LNOTE */
-.lnote{font-size:.78rem;color:var(--mu);margin-top:12px;line-height:1.5;}
+/* SIM */
+.sim-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.sim-item label{font-size:.78rem;color:var(--tx2);font-weight:600;}
+.sim-ticks{display:flex;justify-content:space-between;font-size:.62rem;color:var(--mu2);margin-top:4px;}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:5px;background:var(--s4);
+  border:1px solid var(--bd);border-radius:99px;
+  outline:none;padding:0;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(180deg,var(--ac2),var(--ac));
+  cursor:pointer;border:2px solid var(--bg);
+  box-shadow:0 2px 8px var(--ac-g);
+  transition:transform var(--tf);
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);}
+input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(180deg,var(--ac2),var(--ac));
+  cursor:pointer;border:2px solid var(--bg);
+}
+input[type=range].crypto::-webkit-slider-thumb{
+  background:linear-gradient(180deg,var(--am2),var(--am));
+  box-shadow:0 2px 8px var(--am-g);
+}
+input[type=range].crypto::-moz-range-thumb{
+  background:linear-gradient(180deg,var(--am2),var(--am));
+}
+
+/* SNAPSHOT items */
+.snap{
+  display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;
+  background:linear-gradient(180deg,var(--s1) 0%,var(--s0) 100%);
+  border:1px solid var(--bd);border-radius:var(--rl);
+  padding:14px 18px;margin-bottom:8px;
+  box-shadow:var(--sh2);position:relative;transition:all var(--tf);
+}
+.snap::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+}
+.snap:hover{border-color:var(--bd-h);}
+.snap-d{font-weight:700;font-size:.92rem;font-variant-numeric:tabular-nums;}
+.snap-sub{font-size:.72rem;color:var(--mu);margin-top:1px;}
+.snap-vals{display:flex;gap:22px;flex-wrap:wrap;}
+.snap-v{text-align:right;}
+.snap-v-l{font-size:.6rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.snap-v-v{font-size:.9rem;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums;}
 
 /* EMPTY */
-.empty{text-align:center;color:var(--mu);padding:40px 20px;font-size:.9rem;}
-
-/* SLIDERS */
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;background:var(--s3);border-radius:99px;outline:none;border:none;padding:0;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ac);cursor:pointer;border:2px solid var(--bg);}
-input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--ac);cursor:pointer;border:2px solid var(--bg);}
-input[type=range].crypto-range::-webkit-slider-thumb{background:var(--am);}
-input[type=range].crypto-range::-moz-range-thumb{background:var(--am);}
-.sim-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;}
-.sim-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-.sim-item label{font-size:.78rem;color:var(--mu);font-weight:600;display:block;margin-bottom:4px;}
-.sim-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
-.sim-title{font-size:.82rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;}
-.sim-ticks{display:flex;justify-content:space-between;font-size:.68rem;color:var(--mu);margin-top:4px;}
-@media(max-width:640px){.sim-row{grid-template-columns:1fr;gap:18px;}}
-.resumen-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.resumen-panels>.card+.card{margin-top:0;}
-.kpi-badge{display:inline-block;margin-top:auto;padding:4px 11px;border-radius:99px;font-size:.75rem;font-weight:700;align-self:flex-start;}
+.empty{
+  text-align:center;color:var(--mu);
+  padding:50px 24px;font-size:.86rem;
+  background:var(--s1);border:1px dashed var(--bd-h);
+  border-radius:var(--rl);
+}
 
 /* TOAST */
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:1px solid var(--bd);border-radius:var(--rr);padding:10px 20px;font-size:.88rem;opacity:0;transition:opacity .25s,transform .25s;z-index:999;pointer-events:none;white-space:nowrap;}
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(34,34,46,.92);
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  border:1px solid var(--bd-s);
+  border-radius:var(--rr);padding:11px 20px;
+  font-size:.84rem;font-weight:600;
+  opacity:0;transition:opacity .25s,transform .25s;
+  z-index:999;pointer-events:none;white-space:nowrap;
+  box-shadow:var(--sh4);
+}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* CONFIRM MODAL */
-#confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;}
-#confirm-overlay.show{display:flex;}
-#confirm-box{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rl);padding:28px 28px 22px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.4);}
-#confirm-msg{font-size:.97rem;font-weight:600;margin-bottom:6px;}
-#confirm-sub{font-size:.82rem;color:var(--mu);margin-bottom:22px;line-height:1.5;}
-.confirm-btns{display:flex;gap:10px;justify-content:flex-end;}
-@media(max-width:640px){#confirm-box{padding:22px 18px 18px;}.confirm-btns{flex-direction:column-reverse;}}
+/* CONFIRM */
+#confirm-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;
+}
+#confirm-ov.show{display:flex;animation:fade .2s ease-out;}
+#confirm-bx{
+  background:var(--s1);border:1px solid var(--bd-s);
+  border-radius:var(--rl);padding:28px 26px 22px;
+  max-width:380px;width:100%;box-shadow:var(--sh4);
+  position:relative;animation:popUp .25s cubic-bezier(.16,1,.3,1);
+}
+#confirm-bx::before{
+  content:'';position:absolute;top:0;left:14px;right:14px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+}
+@keyframes popUp{from{opacity:0;transform:translateY(20px) scale(.96);}to{opacity:1;transform:none;}}
+#confirm-msg{font-size:1rem;font-weight:700;margin-bottom:6px;letter-spacing:-.2px;}
+#confirm-sub{font-size:.82rem;color:var(--tx2);margin-bottom:22px;line-height:1.55;}
+.confirm-btns{display:flex;gap:8px;justify-content:flex-end;}
 
-/* FILTER TABS */
-.ftabs{display:flex;gap:8px;flex-wrap:wrap;}
-.ftab{padding:6px 14px;border-radius:99px;font-size:.82rem;font-weight:600;color:var(--mu);background:var(--s2);border:1px solid var(--bd);cursor:pointer;transition:all .2s;}
-.ftab.active{background:rgba(124,111,255,.18);color:var(--ac);border-color:rgba(124,111,255,.3);}
-/* ADD FORM */
-.inv-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.add-panel{border-color:rgba(124,111,255,.35);margin-bottom:14px;}
-.add-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd);}
-.add-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-.add-form-grid .span2{grid-column:span 2;}
-@media(max-width:640px){.add-form-grid{grid-template-columns:1fr 1fr;}.add-form-grid .span2{grid-column:span 2;}.add-form-grid .spanall{grid-column:span 2;}.gastos-sub-grid{grid-template-columns:1fr 1fr!important;}#prop-hip-result{grid-template-columns:1fr 1fr!important;}}
-.spanall{grid-column:1/-1;}
-.gastos-section{background:var(--s3);border-radius:var(--rr);padding:12px 14px;}
-.gastos-section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.gastos-section-lbl{font-size:.72rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;}
-.gastos-section-total{font-size:.8rem;color:var(--tx);}
-.gastos-section-total strong{color:var(--am);}
-.gastos-sub-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+/* MOBILE HAMBURGER */
+.hamb{display:none;width:34px;height:34px;border-radius:7px;background:var(--s2);border:1px solid var(--bd-h);align-items:center;justify-content:center;}
+.hamb svg{width:18px;height:18px;color:var(--tx2);}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;}
+.sb-overlay.show{display:block;}
 
-/* SECTION HEADERS */
-.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.sh h2{font-size:1rem;font-weight:700;}
-
-/* CONFIG */
-.config-section{margin-bottom:28px;}
-.config-section h3{font-size:.9rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;}
-.danger-zone{border:1px solid rgba(224,92,92,.3);border-radius:var(--rl);padding:18px;}
-
-/* RESPONSIVE */
-@media(max-width:640px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr);}
-  .fr{grid-template-columns:1fr;}
-  .inv-kpis{grid-template-columns:repeat(2,1fr);}
-  .roce-grid{grid-template-columns:repeat(2,1fr);}
-  .content{padding:14px;}
-  .topbar{padding:10px 14px;}
-  .tab{padding:11px 13px;font-size:.78rem;}
-  input,select{font-size:16px;}
-  .chart-wrap{height:210px;}
-  .resumen-panels{grid-template-columns:1fr;}
-  .snap-vals{gap:12px;}
-  .login-box{padding:28px 20px;}
-  .inv-kpis{grid-template-columns:1fr 1fr;}
-  .inv-card-sum{flex-wrap:wrap;padding:11px 14px;}
-  .inv-card-left{min-width:100%;}
-  .inv-card-metrics{grid-template-columns:repeat(3,1fr);width:100%;margin-top:8px;}
-  .inv-card-m{text-align:left;}
-  .inv-card-body{padding:0 14px 14px;}
-  .prop-summary{flex-wrap:wrap;gap:10px;}
-  .prop-sum-kpis{gap:10px;}
-  .prop-sum-kpi{min-width:70px;}
+/* ====== RESPONSIVE ====== */
+@media(max-width:1100px){
+  .c-2,.c-3,.c-4{grid-column:span 6;}
+  .c-5,.c-6{grid-column:span 12;}
+  .c-7,.c-8,.c-9{grid-column:span 12;}
+  .kpis-grid.k6{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:880px){
+  :root{--sb-w:0px;}
+  #main-app{grid-template-columns:1fr;}
+  .sb{
+    position:fixed;top:0;left:-260px;width:240px;height:100vh;height:100dvh;
+    z-index:30;transition:left .3s cubic-bezier(.4,0,.2,1);
+    box-shadow:var(--sh3);
+  }
+  .sb.open{left:0;}
+  .hamb{display:flex;}
+  .content{padding:18px 16px 50px;}
+  .topbar{padding:12px 16px;}
+  .topbar-eyebrow{font-size:.6rem;letter-spacing:1.2px;}
+  .topbar-title{font-size:1rem;}
+  .c-2,.c-3,.c-4,.c-5,.c-6,.c-7,.c-8,.c-9{grid-column:span 12;}
+  .tile-hero .tile-v{font-size:2rem;}
+  .fgrid > .ef,.fgrid > .span3,.fgrid > .span4{grid-column:span 6;}
+  .fgrid > .span6,.fgrid > .span12{grid-column:span 12;}
+  .row{grid-template-columns:1fr;gap:10px;padding:14px;}
+  .row-metrics{grid-template-columns:repeat(3,1fr);gap:10px;padding-top:10px;border-top:1px solid var(--bd);}
+  .row-m{text-align:left;}
+  .prop-sum{grid-template-columns:1fr;gap:12px;}
+  .prop-kpis{justify-content:flex-start;gap:18px;}
+  .prop-acts{justify-content:flex-end;border-top:1px solid var(--bd);padding-top:10px;}
+  .kpis-grid,.kpis-grid.k6{grid-template-columns:repeat(2,1fr);}
+  .hip-grid{grid-template-columns:repeat(2,1fr);}
+  .sim-row{grid-template-columns:1fr;gap:18px;}
+  .snap{grid-template-columns:1fr;}
+  .snap-vals{justify-content:flex-start;}
+  .chart-wrap{height:230px;}
+  .chart-wrap.lg{height:260px;}
+  .bar{grid-template-columns:100px 1fr 80px;}
+  input,select,textarea{font-size:16px;}
+}
+@media(max-width:520px){
+  .content{padding:14px 12px 40px;}
+  .bento{gap:10px;}
+  .tile{padding:14px 15px;}
+  .tile-v{font-size:1.4rem;}
+  .tile-hero .tile-v{font-size:1.8rem;}
+  .row,.prop-row,.snap{padding:14px;}
+  .fgrid > .ef,.fgrid > .span3,.fgrid > .span4,.fgrid > .span6{grid-column:span 12;}
+  .kpis-grid,.kpis-grid.k6,.hip-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
 
-<!-- ============ LOGIN ============ -->
-<div id="login-screen">
-  <a href="../" style="position:absolute;top:18px;left:18px;font-size:.85rem;font-weight:600;color:var(--mu);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color='var(--mu)'">&larr; Inicio</a>
-  <div class="login-box">
-    <div class="login-logo">&#9674; Portfolio</div>
-    <div class="login-sub">Gestión de patrimonio personal</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuth('login')">Iniciar sesión</div>
-      <div class="auth-tab" onclick="switchAuth('register')">Crear cuenta</div>
+<!-- ============ PIN SCREEN ============ -->
+<div id="pin-screen">
+  <div class="pin-box" id="pin-box">
+    <div class="pin-glow"></div>
+    <div class="pin-brand"><span class="dot"></span><span id="pin-eyebrow">Acceso seguro</span></div>
+    <div class="pin-title">Portfolio</div>
+    <div class="pin-sub" id="pin-sub">Introduce tu PIN para continuar</div>
+    <div class="pin-dots" id="pin-dots"></div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key fn" onclick="pinClear()">Borrar</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key fn" onclick="pinSubmit()">OK</button>
     </div>
-
-    <!-- LOGIN -->
-    <div class="auth-panel active" id="panel-login">
-      <div class="lf"><label>Email</label><input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"></div>
-      <div class="lf">
-        <label>Contraseña</label>
-        <div class="lf-pw">
-          <input type="password" id="login-pass" placeholder="Tu contraseña" autocomplete="current-password">
-          <button type="button" class="pw-toggle" onclick="togglePw('login-pass',this)" aria-label="Mostrar contraseña">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <div id="login-err" class="login-err"></div>
-      <button class="btn bp" onclick="doLogin()">Entrar</button>
-      <div class="login-link"><a onclick="switchAuth('recover')">He olvidado mi contraseña</a></div>
-    </div>
-
-    <!-- REGISTRO -->
-    <div class="auth-panel" id="panel-register">
-      <div class="lf"><label>Email</label><input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email"></div>
-      <div class="lf">
-        <label>Contraseña</label>
-        <div class="lf-pw">
-          <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="checkPwStrength()">
-          <button type="button" class="pw-toggle" onclick="togglePw('reg-pass',this)" aria-label="Mostrar contraseña">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-        <div class="pw-str"><div class="pw-str-fill" id="pw-str-fill"></div></div>
-        <div class="pw-str-text" id="pw-str-text"></div>
-      </div>
-      <div class="lf">
-        <label>Confirmar contraseña</label>
-        <div class="lf-pw">
-          <input type="password" id="reg-pass2" placeholder="Repite la contraseña" autocomplete="new-password">
-          <button type="button" class="pw-toggle" onclick="togglePw('reg-pass2',this)" aria-label="Mostrar contraseña">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <div id="reg-err" class="login-err"></div>
-      <button class="btn bp" onclick="doRegister()">Crear cuenta</button>
-    </div>
-
-    <!-- RECUPERAR -->
-    <div class="auth-panel" id="panel-recover">
-      <div class="lf"><label>Email de tu cuenta</label><input type="email" id="recover-email" placeholder="tu@email.com" autocomplete="email"></div>
-      <div id="recover-err" class="login-err"></div>
-      <div id="recover-ok" class="login-ok"></div>
-      <button class="btn bp" onclick="doRecover()">Enviar enlace de recuperación</button>
-      <div class="login-link" style="margin-top:16px"><a onclick="switchAuth('login')">Volver al inicio de sesión</a></div>
-    </div>
-
-    <!-- CONFIRMACIÓN EMAIL -->
-    <div class="auth-panel" id="panel-confirm">
-      <div class="auth-msg-box">
-        <div class="auth-msg-icon">&#9993;</div>
-        <div class="auth-msg-title">Revisa tu correo</div>
-        <div class="auth-msg-text">Hemos enviado un enlace de verificación a <strong id="confirm-email-label"></strong>. Haz clic en el enlace para activar tu cuenta.</div>
-        <a class="auth-back" onclick="switchAuth('login')">Volver al inicio de sesión</a>
-      </div>
-    </div>
+    <div class="pin-hint" id="pin-hint">PIN de 4 a 6 dígitos</div>
   </div>
 </div>
 
-<!-- ============ APP ============ -->
+<!-- ============ MAIN APP ============ -->
 <div id="main-app">
-  <div class="topbar">
-    <span class="topbar-logo">◈ Portfolio</span>
-    <div class="topbar-right">
-      <span class="sync-dot" id="sync-dot" title="Sincronización"></span>
-      <span class="user-email" id="user-email-label"></span>
-      <button class="btn bp bsm" onclick="saveSnap()" title="Guardar estado actual del patrimonio">Guardar</button>
-      <button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="doLogout()">Salir</button>
-    </div>
-  </div>
 
-  <div class="tabs" id="tabs">
-    <div class="tab active" onclick="showTab('resumen')">Resumen</div>
-    <div class="tab" onclick="showTab('inversiones')">Inversiones</div>
-    <div class="tab" onclick="showTab('inmo')">Inmobiliario</div>
-    <div class="tab" onclick="showTab('liquido')">Liquidez</div>
-    <div class="tab" onclick="showTab('graficas')">Gráficas</div>
-    <div class="tab" onclick="showTab('historico')">Histórico</div>
-    <div class="tab" style="margin-left:auto;" onclick="showTab('config')">Configuración</div>
-  </div>
-
-  <div class="content">
-
-    <!-- ===== RESUMEN ===== -->
-    <div id="tab-resumen" class="tab-panel active">
-      <div class="kpi-grid" id="resumen-kpis"></div>
-      <div class="resumen-panels">
-        <div class="card">
-          <div class="form-title">Cashflow mensual por activo</div>
-          <div id="resumen-cf-bars"></div>
-        </div>
-        <div class="card">
-          <div class="form-title">Patrimonio por categoría</div>
-          <div id="resumen-pat-bars"></div>
-        </div>
-      </div>
-      <div class="sim-card">
-        <div class="sim-header">
-          <span class="sim-title">Simulación rentabilidad potencial</span>
-          <span style="font-size:.78rem;color:var(--mu)">Afecta al CF potencial</span>
-        </div>
-        <div class="sim-row">
-          <div class="sim-item">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-              <label>Fondos acumulación / ETF</label>
-              <span style="font-size:.9rem;font-weight:700;color:var(--ac)" id="lbl-sim-fondo">3.5%</span>
-            </div>
-            <input type="range" id="sim-fondo" min="0" max="10" step="0.1" value="3.5" oninput="onSimChange()">
-            <div class="sim-ticks"><span>0%</span><span>5%</span><span>10%</span></div>
-          </div>
-          <div class="sim-item">
-            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-              <label>Criptomonedas</label>
-              <span style="font-size:.9rem;font-weight:700;color:var(--am)" id="lbl-sim-crypto">0.0%</span>
-            </div>
-            <input type="range" id="sim-crypto" min="0" max="10" step="0.1" value="0" oninput="onSimChange()" class="crypto-range">
-            <div class="sim-ticks"><span>0%</span><span>5%</span><span>10%</span></div>
-          </div>
-        </div>
+  <!-- Sidebar -->
+  <aside class="sb" id="sb">
+    <div class="sb-brand">
+      <div>
+        <div class="sb-brand-t">Portfolio</div>
+        <div class="sb-brand-s">Patrimonio</div>
       </div>
     </div>
 
-    <!-- ===== INVERSIONES ===== -->
-    <div id="tab-inversiones" class="tab-panel">
-      <div class="inv-bar">
-        <div class="ftabs">
-          <div class="ftab active" onclick="filterInv('todos',this)">Todos</div>
-          <div class="ftab" onclick="filterInv('fondo',this)">ETF/Fondo Acc</div>
-          <div class="ftab" onclick="filterInv('fondo-dist',this)">ETF/Fondo Dist</div>
-          <div class="ftab" onclick="filterInv('crypto',this)">Crypto</div>
-          <div class="ftab" onclick="filterInv('p2p',this)">P2P</div>
-        </div>
-        <button class="btn bp bsm" onclick="toggleAddInv()">+ Nueva inversión</button>
-      </div>
-      <div class="card add-panel" id="add-inv-panel" style="display:none;">
-        <div class="add-panel-hdr">
-          <span style="font-size:.88rem;font-weight:700;">Nueva inversión</span>
-          <button onclick="toggleAddInv()" style="background:none;border:none;color:var(--mu);font-size:1.4rem;line-height:1;cursor:pointer;padding:0 2px;">&times;</button>
-        </div>
-        <div class="add-form-grid">
-          <div class="ef span2"><label>Nombre</label><input id="inv-nombre" placeholder="Ej: Vanguard Global, BTC"></div>
-          <div class="ef"><label>Tipo</label>
-            <select id="inv-tipo" onchange="onInvTipoChange()">
-              <option value="" disabled selected>Seleccionar tipo...</option>
-              <option value="fondo">ETF / Fondo Acc</option>
-              <option value="fondo-dist">ETF / Fondo Dist</option>
-              <option value="crypto">Criptomoneda</option>
-              <option value="p2p">Préstamo P2P</option>
-            </select>
-          </div>
-          <div class="ef" id="inv-f-valor" style="display:none"><label>Valor (€)</label><input type="number" id="inv-valor" placeholder="0"></div>
-          <div class="ef" id="inv-f-tir" style="display:none"><label>TIR bruta anual (%)</label><input type="number" id="inv-tir" placeholder="0.00" step="0.01"></div>
-          <div class="ef" id="inv-f-fecha" style="display:none"><label>Fecha entrada</label><input type="date" id="inv-fecha"></div>
-          <div class="ef span2" id="inv-f-notas" style="display:none"><label>Notas <span style="color:var(--mu);font-weight:400">(opcional)</span></label><input id="inv-notas" placeholder="Plataforma, estrategia..."></div>
-        </div>
-        <div class="btn-row" id="inv-f-btns" style="display:none;margin-top:14px;">
-          <button class="btn bp" onclick="saveInv()">Guardar inversión</button>
-          <button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="toggleAddInv()">Cancelar</button>
-          <span class="flash-msg" id="inv-flash"></span>
-        </div>
-      </div>
-      <div id="inv-list"></div>
+    <div class="sb-section">Vista</div>
+    <div class="sb-link active" data-tab="resumen" onclick="showTab('resumen')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      Resumen
+    </div>
+    <div class="sb-link" data-tab="inversiones" onclick="showTab('inversiones')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+      Inversiones
+    </div>
+    <div class="sb-link" data-tab="inmo" onclick="showTab('inmo')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+      Inmobiliario
+    </div>
+    <div class="sb-link" data-tab="liquido" onclick="showTab('liquido')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Liquidez
     </div>
 
-    <!-- ===== INMOBILIARIO ===== -->
-    <div id="tab-inmo" class="tab-panel">
-      <div class="inv-bar">
-        <span style="font-size:.78rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;">Propiedades</span>
-        <button class="btn bp bsm" onclick="toggleAddProp()">+ Nueva propiedad</button>
+    <div class="sb-section">Analítica</div>
+    <div class="sb-link" data-tab="graficas" onclick="showTab('graficas')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Gráficas
+    </div>
+    <div class="sb-link" data-tab="historico" onclick="showTab('historico')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+      Histórico
+    </div>
+
+    <div class="sb-spacer"></div>
+
+    <div class="sb-foot">
+      <div class="sb-link" data-tab="config" onclick="showTab('config')">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3h0a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5h0a1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v0a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        Configuración
       </div>
-      <div class="card add-panel" id="add-prop-panel" style="display:none;">
-        <div class="add-panel-hdr">
-          <span id="prop-form-title" style="font-size:.88rem;font-weight:700;">Nueva propiedad</span>
-          <button onclick="cancelEditProp()" style="background:none;border:none;color:var(--mu);font-size:1.4rem;line-height:1;cursor:pointer;padding:0 2px;">&times;</button>
+      <div class="sb-foot-meta">
+        <span class="sb-meta-dot"><span class="dot" id="sync-dot"></span><span id="sync-lbl">Local</span></span>
+        <span class="mono" id="sync-time"></span>
+      </div>
+    </div>
+  </aside>
+  <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+        <button class="hamb" onclick="openSidebar()" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="topbar-l">
+          <div class="topbar-eyebrow" id="tb-eyebrow">Vista general</div>
+          <div class="topbar-title" id="tb-title">Resumen</div>
         </div>
-        <div class="add-form-grid">
-          <div class="ef spanall">
-            <label>Uso de la propiedad</label>
-            <select id="prop-uso" onchange="onPropUsoChange()">
-              <option value="alquiler">Inversión / Alquiler</option>
-              <option value="habitual">Vivienda habitual (uso propio)</option>
-            </select>
+      </div>
+      <div class="topbar-r">
+        <button class="btn ghost sm" onclick="saveSnap()" title="Guardar estado actual">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Snapshot
+        </button>
+        <button class="btn ghost sm icon" onclick="lockApp()" title="Bloquear">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ============ RESUMEN ============ -->
+      <div id="tab-resumen" class="tab-panel active">
+        <div class="bento" id="resumen-bento"></div>
+
+        <div class="bento" style="margin-top:14px;">
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Cashflow / mes por activo</span></div>
+            <div class="bars" id="resumen-cf-bars"></div>
           </div>
-          <div class="ef span2"><label>Nombre / Dirección</label><input id="prop-nombre" placeholder="Ej: Piso Madrid Centro"></div>
-          <div class="ef"><label>Valor de mercado (€)</label><input type="number" id="prop-valor" placeholder="0"></div>
-          <div class="ef"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca();updateGastosCompra();"></div>
-          <div class="ef"><label>Gastos de compra (€)</label><input type="number" id="prop-gastos" placeholder="11% del precio + comisión" readonly style="background:var(--s3);color:var(--mu);cursor:default;"></div>
-          <div class="ef" id="prop-f-alquiler"><label>Alquiler mensual (€)</label><input type="number" id="prop-alquiler" placeholder="0"></div>
-          <div class="ef spanall">
-            <label>Pago a inmobiliaria (comisiones)</label>
-            <select id="prop-tiene-comision" onchange="onPropComisionToggle()">
-              <option value="no">No</option>
-              <option value="si">Sí — añadir comisión</option>
-            </select>
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Patrimonio por activo</span></div>
+            <div class="bars" id="resumen-pat-bars"></div>
           </div>
-          <div class="ef spanall" id="prop-f-comision" style="display:none;">
-            <label>Comisión inmobiliaria (€)</label>
-            <input type="number" id="prop-comisionInmo" placeholder="0" oninput="updateGastosCompra()">
+        </div>
+
+        <div class="tile" style="margin-top:14px;">
+          <div class="tile-hd">
+            <span class="tile-l">Simulación rentabilidad potencial</span>
+            <span class="tile-aside">Afecta al CF potencial</span>
           </div>
-          <div class="ef spanall">
-            <label>Reforma</label>
-            <select id="prop-tiene-reforma" onchange="onPropReformaToggle()">
-              <option value="no">No</option>
-              <option value="si">Sí — añadir coste de reforma</option>
-            </select>
-          </div>
-          <div class="ef spanall" id="prop-f-reforma" style="display:none;">
-            <label>Coste de reforma (€)</label>
-            <input type="number" id="prop-reforma" placeholder="0">
-          </div>
-          <div class="spanall" id="prop-f-gastos-ded">
-            <div class="gastos-section">
-              <div class="gastos-section-hdr">
-                <span class="gastos-section-lbl">Gastos deducibles</span>
-                <span class="gastos-section-total">Total anual: <strong id="prop-gastos-total">0 €</strong></span>
+          <div class="sim-row">
+            <div class="sim-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <label>Fondos acumulación / ETF</label>
+                <span class="mono" style="font-size:.9rem;font-weight:700;color:var(--ac)" id="lbl-sim-fondo">3.5%</span>
               </div>
-              <div class="gastos-sub-grid">
-                <div class="ef"><label>IBI (€/año)</label><input type="number" id="prop-ibi" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Seguro (€/año)</label><input type="number" id="prop-seguro" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Comunidad (€/mes)</label><input type="number" id="prop-comunidad" placeholder="0" oninput="updateGastosTotal()"></div>
-                <div class="ef"><label>Otros (€/año)</label><input type="number" id="prop-otrosGastos" placeholder="0" oninput="updateGastosTotal()"></div>
-              </div>
+              <input type="range" id="sim-fondo" min="0" max="10" step="0.1" value="3.5" oninput="onSimChange()">
+              <div class="sim-ticks"><span>0%</span><span>5%</span><span>10%</span></div>
             </div>
-          </div>
-          <div class="ef spanall">
-            <label>Financiación con hipoteca</label>
-            <select id="prop-tiene-hipoteca" onchange="onPropHipotecaToggle()">
-              <option value="no">No — pagada al 100% con capital propio</option>
-              <option value="si">Sí — hipoteca financiada</option>
-            </select>
-          </div>
-          <div class="spanall" id="prop-f-hipoteca" style="display:none;">
-            <div class="gastos-section">
-              <div class="gastos-section-hdr">
-                <span class="gastos-section-lbl">Hipoteca — sistema de amortización francés</span>
-                <span style="font-size:.72rem;color:var(--mu)">Datos de la financiación</span>
+            <div class="sim-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <label>Criptomonedas</label>
+                <span class="mono" style="font-size:.9rem;font-weight:700;color:var(--am)" id="lbl-sim-crypto">0.0%</span>
               </div>
-              <div class="gastos-sub-grid">
-                <div class="ef"><label>% Entrada</label><input type="number" id="prop-pctEntrada" placeholder="20" step="0.1" oninput="updateHipoteca()"></div>
-                <div class="ef"><label>Capital financiado (€)</label><input type="number" id="prop-capitalFin" placeholder="Automático" readonly style="background:var(--s3);color:var(--mu);cursor:default;"></div>
-                <div class="ef"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
-                <div class="ef"><label>Plazo (años)</label><input type="number" id="prop-plazoAnios" placeholder="30" step="1" oninput="updateHipoteca()"></div>
-                <div class="ef"><label>Cuota nº actual</label><input type="number" id="prop-cuotaNum" placeholder="1" step="1" min="1" oninput="updateHipoteca()"></div>
-              </div>
-              <div id="prop-hip-result" style="display:none;margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-                <div style="background:var(--s2);border-radius:var(--rr);padding:10px 12px;"><div style="font-size:.68rem;color:var(--mu);margin-bottom:4px;font-weight:600;">CUOTA/MES</div><div style="font-weight:700;font-size:.92rem;" id="prop-hip-cuota">—</div></div>
-                <div style="background:var(--s2);border-radius:var(--rr);padding:10px 12px;"><div style="font-size:.68rem;color:var(--mu);margin-bottom:4px;font-weight:600;">INTERESES/MES</div><div style="font-weight:700;font-size:.92rem;color:var(--r)" id="prop-hip-interes">—</div></div>
-                <div style="background:var(--s2);border-radius:var(--rr);padding:10px 12px;"><div style="font-size:.68rem;color:var(--mu);margin-bottom:4px;font-weight:600;">AMORT./MES</div><div style="font-weight:700;font-size:.92rem;color:var(--g)" id="prop-hip-amorti">—</div></div>
-                <div style="background:var(--s2);border-radius:var(--rr);padding:10px 12px;"><div style="font-size:.68rem;color:var(--mu);margin-bottom:4px;font-weight:600;">SALDO PENDIENTE</div><div style="font-weight:700;font-size:.92rem;color:var(--ac)" id="prop-hip-saldo">—</div></div>
-              </div>
+              <input type="range" id="sim-crypto" min="0" max="10" step="0.1" value="0" oninput="onSimChange()" class="crypto">
+              <div class="sim-ticks"><span>0%</span><span>5%</span><span>10%</span></div>
             </div>
           </div>
         </div>
-        <div class="btn-row" style="margin-top:14px;">
-          <button class="btn bp" onclick="saveProp()">Guardar propiedad</button>
-          <button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="cancelEditProp()">Cancelar</button>
-          <span class="flash-msg" id="prop-flash"></span>
-        </div>
       </div>
-      <div id="prop-list"></div>
-    </div>
 
-    <!-- ===== LIQUIDEZ ===== -->
-    <div id="tab-liquido" class="tab-panel">
-      <div class="inv-bar">
-        <span style="font-size:.78rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;">Liquidez</span>
-        <button class="btn bp bsm" onclick="toggleAddLiq()">+ Nueva cuenta</button>
-      </div>
-      <div class="card add-panel" id="add-liq-panel" style="display:none;">
-        <div class="add-panel-hdr">
-          <span id="liq-form-title" style="font-size:.88rem;font-weight:700;">Nueva cuenta</span>
-          <button onclick="cancelEditLiq()" style="background:none;border:none;color:var(--mu);font-size:1.4rem;line-height:1;cursor:pointer;padding:0 2px;">&times;</button>
-        </div>
-        <div class="add-form-grid">
-          <div class="ef span2"><label>Nombre</label><input id="liq-nombre" placeholder="Ej: Trade Republic, Efectivo cartera..."></div>
-          <div class="ef"><label>Tipo</label>
-            <select id="liq-tipo" onchange="onLiqTipoChange()">
-              <option value="" disabled selected>Seleccionar tipo...</option>
-              <option value="ahorro">Cuenta de ahorro</option>
-              <option value="corriente">Cuenta corriente</option>
-              <option value="efectivo">Efectivo</option>
-            </select>
+      <!-- ============ INVERSIONES ============ -->
+      <div id="tab-inversiones" class="tab-panel">
+        <div class="sec-hd">
+          <div class="ftabs">
+            <div class="ftab active" onclick="filterInv('todos',this)">Todos</div>
+            <div class="ftab" onclick="filterInv('fondo',this)">ETF/Fondo Acc</div>
+            <div class="ftab" onclick="filterInv('fondo-dist',this)">ETF/Fondo Dist</div>
+            <div class="ftab" onclick="filterInv('crypto',this)">Crypto</div>
+            <div class="ftab" onclick="filterInv('p2p',this)">P2P</div>
           </div>
-          <div class="ef span2" id="liq-f-saldo" style="display:none"><label>Saldo (€)</label><input type="number" id="liq-saldo" placeholder="0"></div>
-          <div class="ef" id="liq-f-tae" style="display:none"><label>TAE (%)</label><input type="number" id="liq-tae" placeholder="0.00" step="0.01"></div>
+          <button class="btn bp sm" onclick="toggleAddInv()">+ Nueva inversión</button>
         </div>
-        <div class="btn-row" id="liq-f-btns" style="display:none;margin-top:14px;">
-          <button class="btn bp" onclick="saveLiq()">Guardar cuenta</button>
-          <button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="cancelEditLiq()">Cancelar</button>
-          <span class="flash-msg" id="liq-flash"></span>
-        </div>
-      </div>
-      <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)" id="liq-kpis"></div>
-      <div id="liq-list"></div>
-    </div>
 
-    <!-- ===== GRÁFICAS ===== -->
-    <div id="tab-graficas" class="tab-panel">
-      <div class="card" style="margin-bottom:14px;">
-        <div class="form-title">Evolución del patrimonio</div>
-        <div class="chart-wrap"><canvas id="main-chart"></canvas></div>
-      </div>
-      <div class="resumen-panels">
-        <div class="card">
-          <div class="form-title">Distribución por tipo</div>
-          <div class="chart-wrap"><canvas id="donut-chart2"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="form-title">Cashflow neto mensual</div>
-          <div class="chart-wrap"><canvas id="activo-chart"></canvas></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== HISTÓRICO ===== -->
-    <div id="tab-historico" class="tab-panel">
-      <div class="card" style="margin-bottom:14px;">
-        <div class="sh"><h2>Histórico de patrimonio</h2></div>
-        <p style="font-size:.83rem;color:var(--mu);">Pulsa <strong style="color:var(--ac)">Guardar</strong> en la barra superior para registrar el estado actual del patrimonio desde cualquier pestaña.</p>
-      </div>
-      <div id="snap-list"></div>
-    </div>
-
-    <!-- ===== CONFIG ===== -->
-    <div id="tab-config" class="tab-panel">
-      <div class="card config-section">
-        <h3>Perfil fiscal</h3>
-        <div class="fr" style="grid-template-columns:1fr 1fr;margin-bottom:14px;">
-          <div class="ef">
-            <label>Base IRPF previa (otros ingresos anuales €)</label>
-            <input type="number" id="cfg-baseIRPF" placeholder="0" oninput="previewIRPF()">
-            <p style="font-size:.78rem;color:var(--mu);margin-top:4px;line-height:1.4;">Suma tus ingresos del trabajo u otras rentas. El IRPF del alquiler se calcula sobre el tramo que excede esta base.</p>
+        <div class="tile add-tile" id="add-inv-panel" style="display:none;">
+          <div class="add-hd">
+            <span class="add-title">Nueva inversión</span>
+            <button class="x-btn" onclick="toggleAddInv()" aria-label="Cerrar">×</button>
           </div>
-          <div class="ef" style="justify-content:flex-start;padding-top:4px;">
-            <label style="visibility:hidden;">—</label>
-            <div id="cfg-irpf-preview" style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--rr);padding:14px 16px;min-height:64px;">
-              <div style="font-size:.7rem;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Tramo marginal sobre alquiler</div>
-              <div id="cfg-irpf-tramo" style="font-size:1.3rem;font-weight:800;color:var(--am);">—</div>
-              <div id="cfg-irpf-desc" style="font-size:.75rem;color:var(--mu);margin-top:2px;"></div>
+          <div class="fgrid">
+            <div class="ef span6"><label>Nombre</label><input id="inv-nombre" placeholder="Ej: Vanguard Global, BTC"></div>
+            <div class="ef span3"><label>Tipo</label>
+              <select id="inv-tipo" onchange="onInvTipoChange()">
+                <option value="" disabled selected>Seleccionar...</option>
+                <option value="fondo">ETF / Fondo Acc</option>
+                <option value="fondo-dist">ETF / Fondo Dist</option>
+                <option value="crypto">Criptomoneda</option>
+                <option value="p2p">Préstamo P2P</option>
+              </select>
+            </div>
+            <div class="ef span3" id="inv-f-valor" style="display:none"><label>Valor (€)</label><input type="number" id="inv-valor" placeholder="0"></div>
+            <div class="ef span4" id="inv-f-tir" style="display:none"><label>TIR bruta anual (%)</label><input type="number" id="inv-tir" placeholder="0.00" step="0.01"></div>
+            <div class="ef span4" id="inv-f-fecha" style="display:none"><label>Fecha entrada</label><input type="date" id="inv-fecha"></div>
+            <div class="ef span12" id="inv-f-notas" style="display:none"><label>Notas <span class="mu">(opcional)</span></label><input id="inv-notas" placeholder="Plataforma, estrategia..."></div>
+          </div>
+          <div class="btn-row" id="inv-f-btns" style="display:none;margin-top:14px;">
+            <button class="btn bp sm" onclick="saveInv()">Guardar inversión</button>
+            <button class="btn ghost sm" onclick="toggleAddInv()">Cancelar</button>
+            <span class="flash" id="inv-flash"></span>
+          </div>
+        </div>
+
+        <div id="inv-list"></div>
+      </div>
+
+      <!-- ============ INMOBILIARIO ============ -->
+      <div id="tab-inmo" class="tab-panel">
+        <div class="sec-hd">
+          <span class="sec-l">Propiedades</span>
+          <button class="btn bp sm" onclick="toggleAddProp()">+ Nueva propiedad</button>
+        </div>
+
+        <div class="tile add-tile" id="add-prop-panel" style="display:none;">
+          <div class="add-hd">
+            <span class="add-title" id="prop-form-title">Nueva propiedad</span>
+            <button class="x-btn" onclick="cancelEditProp()" aria-label="Cerrar">×</button>
+          </div>
+          <div class="fgrid">
+            <div class="ef span12">
+              <label>Uso de la propiedad</label>
+              <select id="prop-uso" onchange="onPropUsoChange()">
+                <option value="alquiler">Inversión / Alquiler</option>
+                <option value="habitual">Vivienda habitual (uso propio)</option>
+              </select>
+            </div>
+            <div class="ef span6"><label>Nombre / Dirección</label><input id="prop-nombre" placeholder="Ej: Piso Madrid Centro"></div>
+            <div class="ef span3"><label>Valor de mercado (€)</label><input type="number" id="prop-valor" placeholder="0"></div>
+            <div class="ef span3"><label>Precio de compra (€)</label><input type="number" id="prop-precioCompra" placeholder="0" oninput="updateHipoteca();updateGastosCompra();"></div>
+            <div class="ef span3"><label>Gastos de compra (€)</label><input type="number" id="prop-gastos" placeholder="11% del precio + comisión" readonly></div>
+            <div class="ef span3" id="prop-f-alquiler"><label>Alquiler mensual (€)</label><input type="number" id="prop-alquiler" placeholder="0"></div>
+
+            <div class="ef span6">
+              <label>Pago a inmobiliaria (comisiones)</label>
+              <select id="prop-tiene-comision" onchange="onPropComisionToggle()">
+                <option value="no">No</option>
+                <option value="si">Sí — añadir comisión</option>
+              </select>
+            </div>
+            <div class="ef span6" id="prop-f-comision" style="display:none;">
+              <label>Comisión inmobiliaria (€)</label>
+              <input type="number" id="prop-comisionInmo" placeholder="0" oninput="updateGastosCompra()">
+            </div>
+
+            <div class="ef span6">
+              <label>Reforma</label>
+              <select id="prop-tiene-reforma" onchange="onPropReformaToggle()">
+                <option value="no">No</option>
+                <option value="si">Sí — añadir coste de reforma</option>
+              </select>
+            </div>
+            <div class="ef span6" id="prop-f-reforma" style="display:none;">
+              <label>Coste de reforma (€)</label>
+              <input type="number" id="prop-reforma" placeholder="0">
+            </div>
+
+            <div class="span12" id="prop-f-gastos-ded">
+              <div class="subbox">
+                <div class="subbox-hd">
+                  <span class="subbox-l">Gastos deducibles</span>
+                  <span class="subbox-r">Total anual: <strong id="prop-gastos-total">0 €</strong></span>
+                </div>
+                <div class="fgrid">
+                  <div class="ef span3"><label>IBI (€/año)</label><input type="number" id="prop-ibi" placeholder="0" oninput="updateGastosTotal()"></div>
+                  <div class="ef span3"><label>Seguro (€/año)</label><input type="number" id="prop-seguro" placeholder="0" oninput="updateGastosTotal()"></div>
+                  <div class="ef span3"><label>Comunidad (€/mes)</label><input type="number" id="prop-comunidad" placeholder="0" oninput="updateGastosTotal()"></div>
+                  <div class="ef span3"><label>Otros (€/año)</label><input type="number" id="prop-otrosGastos" placeholder="0" oninput="updateGastosTotal()"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ef span12">
+              <label>Financiación con hipoteca</label>
+              <select id="prop-tiene-hipoteca" onchange="onPropHipotecaToggle()">
+                <option value="no">No — pagada al 100% con capital propio</option>
+                <option value="si">Sí — hipoteca financiada</option>
+              </select>
+            </div>
+            <div class="span12" id="prop-f-hipoteca" style="display:none;">
+              <div class="subbox">
+                <div class="subbox-hd">
+                  <span class="subbox-l">Hipoteca — amortización francés</span>
+                  <span class="subbox-r mu">Datos de la financiación</span>
+                </div>
+                <div class="fgrid">
+                  <div class="ef span3"><label>% Entrada</label><input type="number" id="prop-pctEntrada" placeholder="20" step="0.1" oninput="updateHipoteca()"></div>
+                  <div class="ef span3"><label>Capital financiado (€)</label><input type="number" id="prop-capitalFin" placeholder="Auto" readonly></div>
+                  <div class="ef span3"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
+                  <div class="ef span3"><label>Plazo (años)</label><input type="number" id="prop-plazoAnios" placeholder="30" step="1" oninput="updateHipoteca()"></div>
+                  <div class="ef span3"><label>Cuota nº actual</label><input type="number" id="prop-cuotaNum" placeholder="1" step="1" min="1" oninput="updateHipoteca()"></div>
+                </div>
+                <div class="hip-grid" id="prop-hip-result" style="display:none;">
+                  <div class="hip-kpi"><div class="hip-l">Cuota/mes</div><div class="hip-v" id="prop-hip-cuota">—</div></div>
+                  <div class="hip-kpi"><div class="hip-l">Intereses/mes</div><div class="hip-v r" id="prop-hip-interes">—</div></div>
+                  <div class="hip-kpi"><div class="hip-l">Amort./mes</div><div class="hip-v g" id="prop-hip-amorti">—</div></div>
+                  <div class="hip-kpi"><div class="hip-l">Saldo pendiente</div><div class="hip-v ac" id="prop-hip-saldo">—</div></div>
+                </div>
+              </div>
             </div>
           </div>
+          <div class="btn-row" style="margin-top:14px;">
+            <button class="btn bp sm" onclick="saveProp()">Guardar propiedad</button>
+            <button class="btn ghost sm" onclick="cancelEditProp()">Cancelar</button>
+            <span class="flash" id="prop-flash"></span>
+          </div>
         </div>
-        <div class="btn-row">
-          <button class="btn bp bsm" onclick="saveConfig()">Guardar y actualizar</button>
-          <span class="flash-msg" id="cfg-flash"></span>
-        </div>
-      </div>
-      <div class="card config-section" style="display:none">
-        <h3>Supabase (sincronización en la nube)</h3>
-        <div class="fr">
-          <div class="ef"><label>URL del proyecto</label><input id="cfg-supaUrl" placeholder="https://xxx.supabase.co"></div>
-          <div class="ef"><label>Clave pública (anon key)</label><input id="cfg-supaKey" placeholder="eyJ..."></div>
-        </div>
-        <div class="btn-row">
-          <button class="btn bp bsm" onclick="saveSupaConfig()">Guardar credenciales</button>
-          <span class="flash-msg" id="supa-flash"></span>
-        </div>
-        <p class="lnote">La anon key es pública por diseño. Las RLS policies de Supabase son la protección real.</p>
-      </div>
-      <div class="card config-section">
-        <h3>Datos</h3>
-        <div class="btn-row">
-          <button class="btn ba bsm" onclick="exportData()">Exportar JSON</button>
-          <label class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);">
-            Importar JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)">
-          </label>
-        </div>
-      </div>
-      <div class="card danger-zone">
-        <h3 style="color:var(--r);">Zona peligrosa</h3>
-        <p style="font-size:.85rem;color:var(--mu);margin:10px 0 14px;">Esta acción borrará todos tus datos locales permanentemente.</p>
-        <button class="btn br2 bsm" onclick="borrarTodo()">Borrar todos los datos</button>
-      </div>
-    </div>
 
-  </div><!-- /content -->
-</div><!-- /main-app -->
+        <div id="prop-list"></div>
+      </div>
+
+      <!-- ============ LIQUIDEZ ============ -->
+      <div id="tab-liquido" class="tab-panel">
+        <div class="sec-hd">
+          <span class="sec-l">Liquidez</span>
+          <button class="btn bp sm" onclick="toggleAddLiq()">+ Nueva cuenta</button>
+        </div>
+
+        <div class="tile add-tile" id="add-liq-panel" style="display:none;">
+          <div class="add-hd">
+            <span class="add-title" id="liq-form-title">Nueva cuenta</span>
+            <button class="x-btn" onclick="cancelEditLiq()" aria-label="Cerrar">×</button>
+          </div>
+          <div class="fgrid">
+            <div class="ef span6"><label>Nombre</label><input id="liq-nombre" placeholder="Ej: Trade Republic, Efectivo..."></div>
+            <div class="ef span6"><label>Tipo</label>
+              <select id="liq-tipo" onchange="onLiqTipoChange()">
+                <option value="" disabled selected>Seleccionar...</option>
+                <option value="ahorro">Cuenta de ahorro</option>
+                <option value="corriente">Cuenta corriente</option>
+                <option value="efectivo">Efectivo</option>
+              </select>
+            </div>
+            <div class="ef span6" id="liq-f-saldo" style="display:none"><label>Saldo (€)</label><input type="number" id="liq-saldo" placeholder="0"></div>
+            <div class="ef span6" id="liq-f-tae" style="display:none"><label>TAE (%)</label><input type="number" id="liq-tae" placeholder="0.00" step="0.01"></div>
+          </div>
+          <div class="btn-row" id="liq-f-btns" style="display:none;margin-top:14px;">
+            <button class="btn bp sm" onclick="saveLiq()">Guardar cuenta</button>
+            <button class="btn ghost sm" onclick="cancelEditLiq()">Cancelar</button>
+            <span class="flash" id="liq-flash"></span>
+          </div>
+        </div>
+
+        <div class="bento" id="liq-kpis" style="margin-bottom:14px;"></div>
+        <div id="liq-list"></div>
+      </div>
+
+      <!-- ============ GRÁFICAS ============ -->
+      <div id="tab-graficas" class="tab-panel">
+        <div class="tile c-12" style="margin-bottom:14px;">
+          <div class="tile-hd">
+            <span class="tile-l">Evolución del patrimonio</span>
+            <span class="tile-aside">Snapshots guardados</span>
+          </div>
+          <div class="chart-wrap lg"><canvas id="main-chart"></canvas></div>
+        </div>
+        <div class="bento">
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Distribución por tipo</span></div>
+            <div class="chart-wrap"><canvas id="donut-chart2"></canvas></div>
+          </div>
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Cashflow neto mensual</span></div>
+            <div class="chart-wrap"><canvas id="activo-chart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ HISTÓRICO ============ -->
+      <div id="tab-historico" class="tab-panel">
+        <div class="tile" style="margin-bottom:14px;">
+          <div class="tile-hd"><span class="tile-l">Histórico de patrimonio</span></div>
+          <p class="tx2" style="font-size:.84rem;line-height:1.6;">Pulsa <strong class="ac">Snapshot</strong> en la barra superior para registrar el estado actual del patrimonio.</p>
+        </div>
+        <div id="snap-list"></div>
+      </div>
+
+      <!-- ============ CONFIG ============ -->
+      <div id="tab-config" class="tab-panel">
+        <div class="bento">
+          <div class="tile c-12">
+            <div class="tile-hd"><span class="tile-l">Perfil fiscal</span></div>
+            <div class="fgrid">
+              <div class="ef span6">
+                <label>Base IRPF previa (otros ingresos anuales €)</label>
+                <input type="number" id="cfg-baseIRPF" placeholder="0" oninput="previewIRPF()">
+                <p class="hint">Suma tus ingresos del trabajo u otras rentas. El IRPF del alquiler se calcula sobre el tramo que excede esta base.</p>
+              </div>
+              <div class="ef span6">
+                <label>&nbsp;</label>
+                <div class="subbox" style="min-height:74px;">
+                  <div class="subbox-l" style="margin-bottom:5px;">Tramo marginal sobre alquiler</div>
+                  <div id="cfg-irpf-tramo" class="mono" style="font-size:1.55rem;font-weight:800;color:var(--am);letter-spacing:-.4px;">—</div>
+                  <div id="cfg-irpf-desc" style="font-size:.74rem;color:var(--mu);margin-top:3px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:12px;">
+              <button class="btn bp sm" onclick="saveConfig()">Guardar y actualizar</button>
+              <span class="flash" id="cfg-flash"></span>
+            </div>
+          </div>
+
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Seguridad · PIN</span></div>
+            <p class="hint" style="margin-bottom:12px;">Tu PIN se guarda como hash SHA-256 en el navegador. Nadie (ni tú) puede recuperarlo: si lo olvidas, deberás resetear la app desde la zona peligrosa.</p>
+            <div class="btn-row">
+              <button class="btn ghost sm" onclick="changePINFlow()">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Cambiar PIN
+              </button>
+              <span class="flash" id="pin-flash"></span>
+            </div>
+          </div>
+
+          <div class="tile c-6">
+            <div class="tile-hd"><span class="tile-l">Almacenamiento remoto</span><span class="chip mu">Pendiente</span></div>
+            <p class="hint" style="margin-bottom:12px;">Cuando tengas servidor propio, introduce su URL aquí. Los datos seguirán cacheándose en el navegador con sincronización automática.</p>
+            <div class="fgrid">
+              <div class="ef span12">
+                <label>URL del servidor (REST)</label>
+                <input id="cfg-remoteUrl" placeholder="https://api.tu-dominio.com/portfolio">
+              </div>
+              <div class="ef span12">
+                <label>Token Bearer (opcional)</label>
+                <input id="cfg-remoteToken" type="password" placeholder="—">
+              </div>
+            </div>
+            <div class="btn-row" style="margin-top:12px;">
+              <button class="btn ghost sm" onclick="saveRemoteConfig()">Guardar</button>
+              <button class="btn ghost sm" onclick="clearRemoteConfig()">Quitar</button>
+              <span class="flash" id="remote-flash"></span>
+            </div>
+          </div>
+
+          <div class="tile c-12">
+            <div class="tile-hd"><span class="tile-l">Datos</span></div>
+            <div class="btn-row">
+              <button class="btn ba sm" onclick="exportData()">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Exportar JSON
+              </button>
+              <label class="btn ghost sm" style="cursor:pointer;">
+                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Importar JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)">
+              </label>
+            </div>
+          </div>
+
+          <div class="tile c-12" style="border-color:rgba(224,92,92,.28);">
+            <div class="tile-hd"><span class="tile-l r">Zona peligrosa</span></div>
+            <p class="hint" style="margin-bottom:12px;">Esta acción borrará todos tus datos locales y el PIN configurado. La app volverá a su estado inicial.</p>
+            <button class="btn br2 sm" onclick="borrarTodo()">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              Borrar todos los datos
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
 
 <div id="toast"></div>
 
-<div id="confirm-overlay">
-  <div id="confirm-box">
+<div id="confirm-ov">
+  <div id="confirm-bx">
     <div id="confirm-msg"></div>
     <div id="confirm-sub"></div>
     <div class="confirm-btns">
-      <button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="confirmCancel()">Cancelar</button>
-      <button class="btn br2 bsm" id="confirm-ok" onclick="confirmOk()">Eliminar</button>
+      <button class="btn ghost sm" onclick="confirmCancel()">Cancelar</button>
+      <button class="btn br2 sm" id="confirm-ok" onclick="confirmOk()">Eliminar</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============ CONFIG ============
-var SUPA_URL = 'https://zftcneehgfdtphqyftab.supabase.co';
-var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpmdGNuZWVoZ2ZkdHBocXlmdGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMzI0NDEsImV4cCI6MjA5MDYwODQ0MX0.-4O4-80qnveGYnOrcOSGk2uE99jAAjWdL1-NFi2TwMQ';
-var currentSession = null;
+/* ============================================================
+   STORE — capa abstracta de persistencia
+   - LocalStorage siempre activo (cache)
+   - Remote opcional preparado para servidor futuro
+   ============================================================ */
+var Store = (function(){
+  var DATA_KEY = 'pf_v8_data';
+  var REMOTE_KEY = 'pf_v8_remote';
+  var remote = null;
+  try { remote = JSON.parse(localStorage.getItem(REMOTE_KEY)) || null; } catch(e) { remote = null; }
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(DATA_KEY)) || null; } catch(e) { return null; }
+  }
+  function saveLocal(data) {
+    try { localStorage.setItem(DATA_KEY, JSON.stringify(data)); return true; } catch(e) { return false; }
+  }
+  function clearLocal() {
+    localStorage.removeItem(DATA_KEY);
+  }
+  function getRemote() { return remote; }
+  function setRemote(cfg) {
+    remote = cfg && cfg.url ? cfg : null;
+    if (remote) localStorage.setItem(REMOTE_KEY, JSON.stringify(remote));
+    else localStorage.removeItem(REMOTE_KEY);
+  }
+  async function syncRemote(data) {
+    if (!remote || !remote.url) return { ok: false, skipped: true };
+    try {
+      var hdrs = { 'Content-Type': 'application/json' };
+      if (remote.token) hdrs['Authorization'] = 'Bearer ' + remote.token;
+      var res = await fetch(remote.url, { method: 'PUT', headers: hdrs, body: JSON.stringify(data) });
+      return { ok: res.ok, status: res.status };
+    } catch(e) {
+      return { ok: false, error: e.message };
+    }
+  }
+  async function loadRemote() {
+    if (!remote || !remote.url) return null;
+    try {
+      var hdrs = {};
+      if (remote.token) hdrs['Authorization'] = 'Bearer ' + remote.token;
+      var res = await fetch(remote.url, { headers: hdrs });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch(e) { return null; }
+  }
+  return { load: load, saveLocal: saveLocal, clearLocal: clearLocal, getRemote: getRemote, setRemote: setRemote, syncRemote: syncRemote, loadRemote: loadRemote };
+})();
+
+/* ============================================================
+   AUTH — PIN propio con SHA-256 en cliente
+   ============================================================ */
+var Auth = (function(){
+  var PIN_KEY = 'pf_v8_pin';
+  var SESS_KEY = 'pf_v8_session';
+
+  async function hash(pin) {
+    var enc = new TextEncoder().encode(String(pin));
+    var buf = await crypto.subtle.digest('SHA-256', enc);
+    var arr = Array.from(new Uint8Array(buf));
+    return arr.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  }
+  function hasPIN() { return !!localStorage.getItem(PIN_KEY); }
+  async function setPIN(pin) {
+    var h = await hash(pin);
+    localStorage.setItem(PIN_KEY, h);
+  }
+  async function verify(pin) {
+    var stored = localStorage.getItem(PIN_KEY);
+    if (!stored) return false;
+    var h = await hash(pin);
+    return h === stored;
+  }
+  function clear() {
+    localStorage.removeItem(PIN_KEY);
+    localStorage.removeItem(SESS_KEY);
+  }
+  function login() { sessionStorage.setItem(SESS_KEY, '1'); }
+  function logout() { sessionStorage.removeItem(SESS_KEY); }
+  function isLogged() { return sessionStorage.getItem(SESS_KEY) === '1'; }
+  return { hash: hash, hasPIN: hasPIN, setPIN: setPIN, verify: verify, clear: clear, login: login, logout: logout, isLogged: isLogged };
+})();
+
+/* ============================================================
+   STATE & GLOBALS
+   ============================================================ */
 var saveTimer = null;
 var isLoading = false;
-var editInvId = null;
-var editPropId = null;
-var editLiqId = null;
+var editInvId = null, editPropId = null, editLiqId = null;
 var invFilter = 'todos';
-var mainChart = null, cfChart = null, donutChart = null, donutChart2 = null, activoChart = null;
+var mainChart = null, donutChart2 = null, activoChart = null;
 var simFondo = 3.5, simCrypto = 0;
 
-// ============ STATE ============
 var S = {
   inversiones: [],
   propiedades: [],
@@ -724,7 +1327,9 @@ var S = {
   _savedAt: 0
 };
 
-// ============ FISCAL ============
+/* ============================================================
+   FISCAL — escala IRPF España 2024
+   ============================================================ */
 function irpf(base) {
   if (base <= 0) return 0;
   var tramos = [[12450,19],[7600,24],[15150,30],[24800,37],[1e9,45]];
@@ -755,22 +1360,34 @@ function cfNetP2P(capital, tirBruta) {
   var interesAnual = capital * tirBruta / 100;
   return (interesAnual - irpfAhorro(interesAnual)) / 12;
 }
-
 function cfNetAcum(valor, tirAnual) {
   if (!tirAnual || !valor) return 0;
   var retiroAnual = valor * tirAnual / 100;
   var ganancia = retiroAnual * 0.6;
   return (retiroAnual - irpfAhorro(ganancia)) / 12;
 }
-
 function cfNetAhorro(saldo, tae) {
   var interesAnual = saldo * tae / 100;
   return (interesAnual - irpfAhorro(interesAnual)) / 12;
 }
-
 function tirNetaP2P(capital, tirBruta) {
   if (!capital) return 0;
   return cfNetP2P(capital, tirBruta) * 12 / capital * 100;
+}
+
+function calcAmortiFrances(capital, tinAnual, plazoAnios, cuotaNum) {
+  if (!capital || !tinAnual || !plazoAnios) return null;
+  var i = tinAnual / 100 / 12;
+  var n = Math.round(plazoAnios * 12);
+  var cuota = i > 0 ? capital * i * Math.pow(1+i,n) / (Math.pow(1+i,n)-1) : capital/n;
+  var m = Math.max(1, Math.min(Math.round(cuotaNum)||1, n));
+  var saldoAntes = i > 0
+    ? capital * Math.pow(1+i,m-1) - cuota * (Math.pow(1+i,m-1)-1) / i
+    : capital - cuota * (m-1);
+  var interesMes = saldoAntes * i;
+  var amortiMes = cuota - interesMes;
+  var saldoRest = Math.max(0, saldoAntes - amortiMes);
+  return { cuota:cuota, interesMes:interesMes, amortiMes:amortiMes, saldoRestante:saldoRest };
 }
 
 function calcProp(p) {
@@ -786,24 +1403,24 @@ function calcProp(p) {
     if (rf) { cuotaMensual = rf.cuota; interesesMensual = rf.interesMes; amortiMensual = rf.amortiMes; saldoPendiente = rf.saldoRestante; }
     else     { cuotaMensual = 0; interesesMensual = 0; amortiMensual = 0; }
   } else {
-    cuotaMensual    = nv(p.cuota);
-    var pctInt      = nv(p.pctInt)/100 || 0.3;
+    cuotaMensual = nv(p.cuota);
+    var pctInt = nv(p.pctInt)/100 || 0.3;
     interesesMensual = cuotaMensual * pctInt;
-    amortiMensual   = nv(p.amorti) ? nv(p.amorti)/12 : (cuotaMensual - interesesMensual);
+    amortiMensual = nv(p.amorti) ? nv(p.amorti)/12 : (cuotaMensual - interesesMensual);
   }
-  var cuotaAnual     = cuotaMensual * 12;
+  var cuotaAnual = cuotaMensual * 12;
   var interesesAnual = interesesMensual * 12;
-  var amortiAnual    = amortiMensual * 12;
+  var amortiAnual = amortiMensual * 12;
   var rendBruto = alqAnual - gastosDed - interesesAnual;
   var reduccion = rendBruto > 0 ? rendBruto * 0.6 : 0;
-  var rendNeto  = rendBruto - reduccion;
-  var impuesto  = irpf(BASE + Math.max(0, rendNeto)) - irpf(BASE);
+  var rendNeto = rendBruto - reduccion;
+  var impuesto = irpf(BASE + Math.max(0, rendNeto)) - irpf(BASE);
   var cfNetoAnual = alqAnual - gastosDed - cuotaAnual - impuesto;
-  var capPropio   = nv(p.entrada) + nv(p.gastos) + nv(p.reforma);
-  var roce     = capPropio > 0 ? (cfNetoAnual + amortiAnual) / capPropio : 0;
-  var yieldCF  = capPropio > 0 ? cfNetoAnual / capPropio : 0;
+  var capPropio = nv(p.entrada) + nv(p.gastos) + nv(p.reforma);
+  var roce = capPropio > 0 ? (cfNetoAnual + amortiAnual) / capPropio : 0;
+  var yieldCF = capPropio > 0 ? cfNetoAnual / capPropio : 0;
   var yieldBruto = nv(p.valor) > 0 ? alqAnual / nv(p.valor) : 0;
-  var yieldNeto  = nv(p.valor) > 0 ? (alqAnual - gastosDed - impuesto) / nv(p.valor) : 0;
+  var yieldNeto = nv(p.valor) > 0 ? (alqAnual - gastosDed - impuesto) / nv(p.valor) : 0;
   var equityProp = nv(p.valor) - saldoPendiente;
   return { cfNetoMensual: cfNetoAnual/12, cfNetoAnual: cfNetoAnual, amortiAnual: amortiAnual, amortiMensual: amortiMensual, interesesMensual: interesesMensual, cuotaMensual: cuotaMensual, roce: roce, yieldCF: yieldCF, yieldBruto: yieldBruto, yieldNeto: yieldNeto, impuesto: impuesto, capPropio: capPropio, saldoPendiente: saldoPendiente, equityProp: equityProp };
 }
@@ -814,13 +1431,11 @@ function getCFInv(inv) {
   if (tipo === 'fondo-dist' || tipo === 'etf') return cfNetP2P(nv(inv.valor), nv(inv.tir));
   return 0;
 }
-
 function getCFPotInv(inv) {
   var tipo = inv.tipo;
   if (tipo === 'fondo' || tipo === 'crypto') return cfNetAcum(nv(inv.valor), nv(inv.tir));
   return getCFInv(inv);
 }
-
 function getCFPotSim(inv) {
   var tipo = inv.tipo;
   if ((tipo === 'fondo' || tipo === 'etf') && simFondo > 0) return cfNetAcum(nv(inv.valor), simFondo);
@@ -828,8 +1443,10 @@ function getCFPotSim(inv) {
   return getCFPotInv(inv);
 }
 
-// ============ HELPERS ============
-function gv(id) { return parseFloat(document.getElementById(id).value) || 0; }
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function gv(id) { var el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
 function nv(v) { return parseFloat(v) || 0; }
 function eur(v) { return (nv(v)).toLocaleString('es-ES', {style:'currency', currency:'EUR', minimumFractionDigits:0, maximumFractionDigits:0}); }
 function eur2(v) { return (nv(v)).toLocaleString('es-ES', {style:'currency', currency:'EUR', minimumFractionDigits:2, maximumFractionDigits:2}); }
@@ -837,27 +1454,37 @@ function pct2(v) { return nv(v).toFixed(2) + '%'; }
 function pct1(v) { return nv(v).toFixed(1) + '%'; }
 function hoy() { return new Date().toLocaleDateString('es-ES'); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function colorVal(v) { return v > 0 ? 'var(--g)' : v < 0 ? 'var(--r)' : 'var(--mu)'; }
+function tipoLabel(t) {
+  var m = { 'fondo':'ETF/Fondo Acc','fondo-dist':'ETF/Fondo Dist','etf':'ETF','crypto':'Crypto','p2p':'P2P','inmo':'Inmueble','habitual':'Vivienda','ahorro':'Ahorro','corriente':'Corriente','efectivo':'Efectivo' };
+  return m[t] || t;
+}
+function pillHTML(tipo) {
+  return '<span class="pill ' + tipo + '">' + tipoLabel(tipo) + '</span>';
+}
 
 var _confirmCb = null;
-function confirmAction(msg, sub, cb) {
+function confirmAction(msg, sub, cb, okLabel) {
   _confirmCb = cb;
   document.getElementById('confirm-msg').textContent = msg;
   document.getElementById('confirm-sub').textContent = sub || '';
-  document.getElementById('confirm-overlay').classList.add('show');
+  if (okLabel) document.getElementById('confirm-ok').textContent = okLabel;
+  else document.getElementById('confirm-ok').textContent = 'Eliminar';
+  document.getElementById('confirm-ov').classList.add('show');
 }
 function confirmOk() {
-  document.getElementById('confirm-overlay').classList.remove('show');
+  document.getElementById('confirm-ov').classList.remove('show');
   if (_confirmCb) { _confirmCb(); _confirmCb = null; }
 }
 function confirmCancel() {
-  document.getElementById('confirm-overlay').classList.remove('show');
+  document.getElementById('confirm-ov').classList.remove('show');
   _confirmCb = null;
 }
 
-function flash(id, txt, color) {
+function flash(id, txt, level) {
   var el = document.getElementById(id);
   if (!el) return;
-  el.style.color = color || 'var(--g)';
+  el.className = 'flash' + (level ? ' ' + level : '');
   el.textContent = txt;
   setTimeout(function(){ el.textContent = ''; }, 2500);
 }
@@ -869,215 +1496,247 @@ function toast(txt) {
   setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
 
-function colorVal(v) {
-  return v > 0 ? 'var(--g)' : v < 0 ? 'var(--r)' : 'var(--mu)';
-}
-
-function tagHTML(tipo) {
-  var map = { 'fondo':'tf', 'fondo-dist':'tfd', 'etf':'tfd', 'crypto':'tc', 'p2p':'tp' };
-  var labels = { 'fondo':'ETF/Fondo Acc', 'fondo-dist':'ETF/Fondo Dist', 'etf':'ETF', 'crypto':'Crypto', 'p2p':'P2P' };
-  return '<span class="tag ' + (map[tipo]||'tf') + '">' + (labels[tipo]||tipo) + '</span>';
-}
-
-// ============ AUTH ============
-function switchAuth(panel) {
-  var panels = document.querySelectorAll('.auth-panel');
-  var tabs = document.querySelectorAll('.auth-tab');
-  panels.forEach(function(p) { p.classList.remove('active'); });
-  tabs.forEach(function(t) { t.classList.remove('active'); });
-  var el = document.getElementById('panel-' + panel);
-  if (el) el.classList.add('active');
-  if (panel === 'login') tabs[0].classList.add('active');
-  if (panel === 'register') tabs[1].classList.add('active');
-  // Clear errors
-  ['login-err','reg-err','recover-err','recover-ok'].forEach(function(id) {
-    var e = document.getElementById(id); if (e) e.textContent = '';
-  });
-}
-
-function togglePw(inputId, btn) {
-  var inp = document.getElementById(inputId);
-  var show = inp.type === 'password';
-  inp.type = show ? 'text' : 'password';
-  btn.innerHTML = show
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-}
-
-function checkPwStrength() {
-  var pw = document.getElementById('reg-pass').value;
-  var fill = document.getElementById('pw-str-fill');
-  var text = document.getElementById('pw-str-text');
-  var score = 0;
-  if (pw.length >= 8) score++;
-  if (pw.length >= 12) score++;
-  if (/[A-Z]/.test(pw)) score++;
-  if (/[0-9]/.test(pw)) score++;
-  if (/[^A-Za-z0-9]/.test(pw)) score++;
-  var levels = [
-    { w: '0%', c: 'var(--bd)', t: '' },
-    { w: '20%', c: 'var(--r)', t: 'Muy débil' },
-    { w: '40%', c: 'var(--r)', t: 'Débil' },
-    { w: '60%', c: 'var(--am)', t: 'Aceptable' },
-    { w: '80%', c: 'var(--am)', t: 'Buena' },
-    { w: '100%', c: 'var(--g)', t: 'Fuerte' }
-  ];
-  var l = levels[score];
-  fill.style.width = l.w;
-  fill.style.background = l.c;
-  text.textContent = pw.length > 0 ? l.t : '';
-  text.style.color = l.c;
-}
-
-function authHeaders() {
-  return { 'Content-Type': 'application/json', 'apikey': SUPA_KEY };
-}
-
-async function doLogin() {
-  var email = document.getElementById('login-email').value.trim();
-  var pass = document.getElementById('login-pass').value;
-  var err = document.getElementById('login-err');
-  err.textContent = '';
-  if (!email || !pass) { err.textContent = 'Introduce email y contraseña.'; return; }
-  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
-  try {
-    var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
-      method: 'POST', headers: authHeaders(),
-      body: JSON.stringify({ email: email, password: pass })
-    });
-    var data = await res.json();
-    if (data.error || data.error_description) {
-      var msg = data.error_description || data.error || '';
-      if (msg.toLowerCase().includes('invalid login')) msg = 'Email o contraseña incorrectos.';
-      if (msg.toLowerCase().includes('email not confirmed')) msg = 'Debes confirmar tu email antes de iniciar sesión. Revisa tu bandeja de entrada.';
-      err.textContent = msg; return;
-    }
-    currentSession = data;
-    localStorage.setItem('pf_session', JSON.stringify(currentSession));
-    showApp();
-  } catch(e) { err.textContent = 'Error de conexión. Inténtalo de nuevo.'; }
-}
-
-async function doRegister() {
-  var email = document.getElementById('reg-email').value.trim();
-  var pass = document.getElementById('reg-pass').value;
-  var pass2 = document.getElementById('reg-pass2').value;
-  var err = document.getElementById('reg-err');
-  err.textContent = '';
-  if (!email) { err.textContent = 'Introduce tu email.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'El formato del email no es válido.'; return; }
-  if (pass.length < 8) { err.textContent = 'La contraseña debe tener al menos 8 caracteres.'; return; }
-  if (pass !== pass2) { err.textContent = 'Las contraseñas no coinciden.'; return; }
-  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
-  try {
-    var res = await fetch(SUPA_URL + '/auth/v1/signup', {
-      method: 'POST', headers: authHeaders(),
-      body: JSON.stringify({ email: email, password: pass })
-    });
-    var data = await res.json();
-    if (data.error || data.error_description) {
-      var msg = data.error_description || data.error || '';
-      if (msg.toLowerCase().includes('already registered')) msg = 'Este email ya tiene una cuenta. Inicia sesión.';
-      err.textContent = msg; return;
-    }
-    // Si Supabase devuelve sesión directamente (confirmación desactivada)
-    if (data.access_token) {
-      currentSession = data;
-      localStorage.setItem('pf_session', JSON.stringify(currentSession));
-      showApp();
-    } else {
-      // Confirmación por email activada
-      document.getElementById('confirm-email-label').textContent = email;
-      switchAuth('confirm');
-    }
-  } catch(e) { err.textContent = 'Error de conexión. Inténtalo de nuevo.'; }
-}
-
-async function doRecover() {
-  var email = document.getElementById('recover-email').value.trim();
-  var err = document.getElementById('recover-err');
-  var ok = document.getElementById('recover-ok');
-  err.textContent = ''; ok.textContent = '';
-  if (!email) { err.textContent = 'Introduce tu email.'; return; }
-  if (!SUPA_URL || !SUPA_KEY) { err.textContent = 'Error de configuración.'; return; }
-  try {
-    var res = await fetch(SUPA_URL + '/auth/v1/recover', {
-      method: 'POST', headers: authHeaders(),
-      body: JSON.stringify({ email: email })
-    });
-    if (res.ok) {
-      ok.textContent = 'Si el email existe, recibirás un enlace para restablecer tu contraseña.';
-    } else {
-      var data = await res.json();
-      err.textContent = data.error_description || data.error || 'Error al enviar el enlace.';
-    }
-  } catch(e) { err.textContent = 'Error de conexión.'; }
-}
-
-function doLogout() {
-  if (!confirm('¿Salir de la cuenta?')) return;
-  currentSession = null;
-  localStorage.removeItem('pf_session');
-  document.getElementById('main-app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-async function restoreSession() {
-  var sess = localStorage.getItem('pf_session');
-  if (!sess) return;
-  try { currentSession = JSON.parse(sess); } catch(e) { return; }
-  if (!currentSession || !currentSession.user) { currentSession = null; return; }
-  // Refrescar token si tenemos refresh_token
-  if (currentSession.refresh_token && SUPA_URL && SUPA_KEY) {
-    try {
-      var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=refresh_token', {
-        method: 'POST', headers: authHeaders(),
-        body: JSON.stringify({ refresh_token: currentSession.refresh_token })
-      });
-      if (res.ok) {
-        var data = await res.json();
-        if (data.access_token) {
-          currentSession = data;
-          localStorage.setItem('pf_session', JSON.stringify(currentSession));
-        }
-      }
-    } catch(e) {}
+function setSyncStatus(st, text) {
+  var dot = document.getElementById('sync-dot');
+  var lbl = document.getElementById('sync-lbl');
+  var time = document.getElementById('sync-time');
+  if (!dot) return;
+  dot.className = 'dot ' + (st === 'idle' ? '' : st);
+  var labels = {
+    idle: Store.getRemote() ? 'Cloud · sync' : 'Local',
+    busy: 'Sincronizando…',
+    ok:   Store.getRemote() ? 'Cloud · OK' : 'Guardado',
+    err:  'Error sync'
+  };
+  if (lbl) lbl.textContent = text || labels[st] || '';
+  if (time && (st === 'ok' || st === 'idle')) {
+    var d = new Date();
+    time.textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
   }
-  showApp();
 }
 
-// ============ PERSISTENCE ============
-function storageKey() { return 'pf_v7_' + (currentSession && currentSession.user ? currentSession.user.id : 'local'); }
+/* ============================================================
+   PIN UI
+   ============================================================ */
+var pinMode = 'enter';    // 'enter' | 'setup-1' | 'setup-2' | 'change-old' | 'change-new1' | 'change-new2'
+var pinBuffer = '';
+var pinTmpNew = '';
 
+function pinRenderDots() {
+  var el = document.getElementById('pin-dots');
+  var max = 6;
+  var html = '';
+  for (var i = 0; i < max; i++) {
+    html += '<div class="pin-dot ' + (i < pinBuffer.length ? 'filled' : '') + '"></div>';
+  }
+  el.innerHTML = html;
+}
+
+function pinShake() {
+  var b = document.getElementById('pin-box');
+  b.classList.add('shake');
+  setTimeout(function(){ b.classList.remove('shake'); }, 450);
+}
+
+function pinSetMode(mode) {
+  pinMode = mode;
+  pinBuffer = '';
+  pinRenderDots();
+  document.getElementById('pin-err').textContent = '';
+  var eyebrow = document.getElementById('pin-eyebrow');
+  var sub = document.getElementById('pin-sub');
+  var hint = document.getElementById('pin-hint');
+  if (mode === 'setup-1') {
+    eyebrow.textContent = 'Configuración inicial';
+    sub.textContent = 'Crea un PIN de acceso';
+    hint.textContent = 'Elige 4 a 6 dígitos. Pulsa OK para continuar.';
+  } else if (mode === 'setup-2') {
+    eyebrow.textContent = 'Configuración inicial';
+    sub.textContent = 'Repite el PIN';
+    hint.textContent = 'Confirma el mismo PIN.';
+  } else if (mode === 'change-old') {
+    eyebrow.textContent = 'Cambiar PIN';
+    sub.textContent = 'PIN actual';
+    hint.textContent = 'Introduce tu PIN actual.';
+  } else if (mode === 'change-new1') {
+    eyebrow.textContent = 'Cambiar PIN';
+    sub.textContent = 'Nuevo PIN';
+    hint.textContent = 'Elige 4 a 6 dígitos.';
+  } else if (mode === 'change-new2') {
+    eyebrow.textContent = 'Cambiar PIN';
+    sub.textContent = 'Repite el nuevo PIN';
+    hint.textContent = 'Confirma el nuevo PIN.';
+  } else {
+    eyebrow.textContent = 'Acceso seguro';
+    sub.textContent = 'Introduce tu PIN para continuar';
+    hint.textContent = 'PIN de 4 a 6 dígitos';
+  }
+}
+
+function pinPress(d) {
+  if (pinBuffer.length >= 6) return;
+  pinBuffer += d;
+  pinRenderDots();
+  if (pinBuffer.length === 6) setTimeout(pinSubmit, 150);
+}
+function pinClear() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  pinRenderDots();
+  document.getElementById('pin-err').textContent = '';
+}
+async function pinSubmit() {
+  if (pinBuffer.length < 4) {
+    document.getElementById('pin-err').textContent = 'Mínimo 4 dígitos';
+    pinShake();
+    return;
+  }
+  var entered = pinBuffer;
+
+  if (pinMode === 'enter') {
+    var ok = await Auth.verify(entered);
+    if (ok) {
+      Auth.login();
+      enterApp();
+    } else {
+      document.getElementById('pin-err').textContent = 'PIN incorrecto';
+      pinShake();
+      pinBuffer = '';
+      pinRenderDots();
+    }
+  } else if (pinMode === 'setup-1') {
+    pinTmpNew = entered;
+    pinSetMode('setup-2');
+  } else if (pinMode === 'setup-2') {
+    if (entered !== pinTmpNew) {
+      document.getElementById('pin-err').textContent = 'Los PIN no coinciden';
+      pinShake();
+      pinBuffer = '';
+      pinRenderDots();
+      return;
+    }
+    await Auth.setPIN(pinTmpNew);
+    Auth.login();
+    pinTmpNew = '';
+    enterApp();
+  } else if (pinMode === 'change-old') {
+    var ok2 = await Auth.verify(entered);
+    if (!ok2) {
+      document.getElementById('pin-err').textContent = 'PIN actual incorrecto';
+      pinShake();
+      pinBuffer = '';
+      pinRenderDots();
+      return;
+    }
+    pinSetMode('change-new1');
+  } else if (pinMode === 'change-new1') {
+    pinTmpNew = entered;
+    pinSetMode('change-new2');
+  } else if (pinMode === 'change-new2') {
+    if (entered !== pinTmpNew) {
+      document.getElementById('pin-err').textContent = 'Los PIN no coinciden';
+      pinShake();
+      pinBuffer = '';
+      pinRenderDots();
+      return;
+    }
+    await Auth.setPIN(pinTmpNew);
+    pinTmpNew = '';
+    toast('PIN actualizado');
+    Auth.login();
+    enterApp();
+  }
+}
+
+function changePINFlow() {
+  document.getElementById('pin-screen').style.display = 'flex';
+  document.getElementById('main-app').classList.remove('show');
+  pinSetMode('change-old');
+}
+
+function lockApp() {
+  Auth.logout();
+  document.getElementById('pin-screen').style.display = 'flex';
+  document.getElementById('main-app').classList.remove('show');
+  pinSetMode('enter');
+}
+
+/* ============================================================
+   APP NAVIGATION
+   ============================================================ */
+var TAB_META = {
+  resumen:     { title:'Resumen',       eyebrow:'Vista general' },
+  inversiones: { title:'Inversiones',   eyebrow:'Cartera financiera' },
+  inmo:        { title:'Inmobiliario',  eyebrow:'Propiedades y alquileres' },
+  liquido:     { title:'Liquidez',      eyebrow:'Cuentas y efectivo' },
+  graficas:    { title:'Gráficas',      eyebrow:'Visualizaciones' },
+  historico:   { title:'Histórico',     eyebrow:'Snapshots guardados' },
+  config:      { title:'Configuración', eyebrow:'Ajustes de la app' }
+};
+
+async function enterApp() {
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('main-app').classList.add('show');
+  await tryLoad();
+  setSyncStatus('idle');
+}
+
+function showTab(name) {
+  var panels = document.querySelectorAll('.tab-panel');
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+  var panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+  var links = document.querySelectorAll('.sb-link');
+  for (var j = 0; j < links.length; j++) {
+    if (links[j].getAttribute('data-tab') === name) links[j].classList.add('active');
+    else links[j].classList.remove('active');
+  }
+  var meta = TAB_META[name];
+  if (meta) {
+    document.getElementById('tb-title').textContent = meta.title;
+    document.getElementById('tb-eyebrow').textContent = meta.eyebrow;
+  }
+  if (name === 'graficas') setTimeout(renderGraficas, 50);
+  if (name === 'config') loadConfigForm();
+  closeSidebar();
+}
+
+function openSidebar() {
+  document.getElementById('sb').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+/* ============================================================
+   PERSISTENCE
+   ============================================================ */
 function trySave() {
   S._savedAt = Date.now();
-  try { localStorage.setItem(storageKey(), JSON.stringify(S)); } catch(e) {}
-  setSyncStatus('saving');
+  Store.saveLocal(S);
+  setSyncStatus('busy');
   if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(function(){ syncToCloud(); }, 800);
+  saveTimer = setTimeout(async function(){
+    if (Store.getRemote()) {
+      var res = await Store.syncRemote(S);
+      setSyncStatus(res.ok ? 'ok' : (res.skipped ? 'idle' : 'err'));
+    } else {
+      setSyncStatus('ok');
+    }
+  }, 800);
 }
 
 async function tryLoad() {
   isLoading = true;
-  var local = null;
-  try { local = JSON.parse(localStorage.getItem(storageKey())); } catch(e) {}
+  var local = Store.load();
   if (local) mergeState(local);
-  if (SUPA_URL && SUPA_KEY && currentSession && currentSession.user && currentSession.user.id !== 'demo') {
-    try {
-      var uid = currentSession.user.id;
-      var token = currentSession.access_token || '';
-      var res = await fetch(SUPA_URL + '/rest/v1/portfolio?user_id=eq.' + uid + '&select=data', {
-        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token }
-      });
-      if (!res.ok) { console.error('Load failed:', res.status, await res.text()); }
-      else {
-        var rows = await res.json();
-        if (rows && rows[0] && rows[0].data) {
-          var cloud = typeof rows[0].data === 'string' ? JSON.parse(rows[0].data) : rows[0].data;
-          if (!local || (cloud._savedAt || 0) > (local._savedAt || 0)) mergeState(cloud);
-        }
-      }
-    } catch(e) { console.error('Load error:', e); }
+  if (Store.getRemote()) {
+    var cloud = await Store.loadRemote();
+    if (cloud && (!local || (cloud._savedAt || 0) > (local._savedAt || 0))) {
+      mergeState(cloud);
+      Store.saveLocal(S);
+    }
   }
   isLoading = false;
   renderAll();
@@ -1093,59 +1752,9 @@ function mergeState(data) {
   S._savedAt = data._savedAt || 0;
 }
 
-async function syncToCloud() {
-  if (!SUPA_URL || !SUPA_KEY || !currentSession || !currentSession.user || currentSession.user.id === 'demo') {
-    setSyncStatus('idle'); return;
-  }
-  try {
-    var uid = currentSession.user.id;
-    var token = currentSession.access_token || '';
-    var hdrs = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' };
-    var res = await fetch(SUPA_URL + '/rest/v1/portfolio?on_conflict=user_id', {
-      method: 'POST',
-      headers: hdrs,
-      body: JSON.stringify({ user_id: uid, data: S })
-    });
-    if (res.ok) { setSyncStatus('saved'); }
-    else { console.error('Sync failed:', res.status, await res.text()); setSyncStatus('error'); }
-  } catch(e) { console.error('Sync error:', e); setSyncStatus('error'); }
-}
-
-function setSyncStatus(st) {
-  var dot = document.getElementById('sync-dot');
-  if (!dot) return;
-  dot.className = 'sync-dot ' + st;
-  dot.title = { idle:'Sin cambios', saving:'Guardando...', saved:'Guardado', error:'Error al guardar' }[st] || '';
-}
-
-// ============ NAVIGATION ============
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('main-app').style.display = 'flex';
-  document.getElementById('main-app').style.flexDirection = 'column';
-  if (currentSession && currentSession.user) {
-    document.getElementById('user-email-label').textContent = currentSession.user.email || '';
-  }
-  var cfg = localStorage.getItem('pf_supa_cfg');
-  if (cfg) { try { var c = JSON.parse(cfg); if (c.url) SUPA_URL = c.url; if (c.key) SUPA_KEY = c.key; } catch(e) {} }
-  tryLoad();
-}
-
-function showTab(name) {
-  var panels = document.querySelectorAll('.tab-panel');
-  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
-  var tabs = document.querySelectorAll('.tab');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-  var panel = document.getElementById('tab-' + name);
-  if (panel) panel.classList.add('active');
-  var tabNames = ['resumen','inversiones','inmo','liquido','graficas','historico','config'];
-  var idx = tabNames.indexOf(name);
-  if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
-  if (name === 'graficas') setTimeout(renderGraficas, 50);
-  if (name === 'config') loadConfigForm();
-}
-
-// ============ RENDER ALL ============
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
 function renderAll() {
   renderResumen();
   renderInvList();
@@ -1154,7 +1763,9 @@ function renderAll() {
   renderHistorico();
 }
 
-// ============ RESUMEN ============
+/* ============================================================
+   RESUMEN
+   ============================================================ */
 function calcResumenTotales() {
   var totalInv = 0, totalProp = 0, totalPropHab = 0, capPropInv = 0, totalLiq = 0, cfReal = 0, cfPot = 0;
   S.inversiones.forEach(function(inv) {
@@ -1170,7 +1781,7 @@ function calcResumenTotales() {
       totalProp += c.equityProp;
       capPropInv += c.capPropio;
       cfReal += c.cfNetoMensual;
-      cfPot  += c.cfNetoMensual;
+      cfPot += c.cfNetoMensual;
     }
   });
   S.liquido.forEach(function(l) {
@@ -1201,21 +1812,68 @@ function renderResumenKPIs() {
   S.propiedades.forEach(function(p){ if (p.uso !== 'habitual') amortiMensual += calcProp(p).amortiMensual; });
 
   var patCF = t.totalInv + t.totalProp + t.totalLiq;
-  var patBadge = patCF !== totalPat ? {text: eur(patCF) + ' en inversión', bg:'rgba(136,136,153,.15)', fg:'var(--mu)'} : null;
-  document.getElementById('resumen-kpis').innerHTML =
-    kpiHTML('Patrimonio total', eur(totalPat), 'var(--tx)', '', patBadge) +
-    kpiHTML('Cashflow real / mes', eur(t.cfReal), 'var(--g)', '', {text: pct1(yieldReal) + ' yield anual', bg:'rgba(78,203,158,.18)', fg:'var(--g)'}) +
-    kpiHTML('Cashflow potencial / mes', eur(t.cfPot), 'var(--am)', simActiva ? 'Con simulación activa' : '', {text: pct1(yieldPot) + ' yield anual', bg:'rgba(247,164,64,.18)', fg:'var(--am)'}) +
-    kpiHTML('CF potencial + amortización', eur(t.cfPot + amortiMensual), 'var(--ac)', '', {text: eur(amortiMensual) + '/mes en amort.', bg:'rgba(124,111,255,.18)', fg:'var(--ac)'});
+  var patExtra = patCF !== totalPat ? '<span class="chip mu">' + eur(patCF) + ' en inversión</span>' : '';
 
-  var colorMap = {'fondo':'#7c6fff','fondo-dist':'#a78bfa','etf':'#a78bfa','crypto':'#f7a440','p2p':'#4ecb9e','inmo':'#a0a8ff','ahorro':'#4ecb9e','corriente':'#4ecb9e','efectivo':'#4ecb9e'};
+  var html = '';
+  // Hero: patrimonio total — c-6
+  html += '<div class="tile tile-hero c-6">';
+  html += '<div class="tile-hd"><span class="tile-l">Patrimonio total</span><span class="tile-aside">Inversiones + Inmuebles + Liquidez</span></div>';
+  html += '<div class="tile-v num">' + eur(totalPat) + '</div>';
+  html += '<div class="tile-s">' + S.inversiones.length + ' inversiones · ' + S.propiedades.length + ' propiedades · ' + S.liquido.length + ' cuentas</div>';
+  if (patExtra) html += '<div class="tile-foot">' + patExtra + '</div>';
+  html += '</div>';
+
+  // CF Real — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">CF real / mes</span></div>';
+  html += '<div class="tile-v g num">' + eur(t.cfReal) + '</div>';
+  html += '<div class="tile-foot"><span class="chip g">' + pct1(yieldReal) + ' anual</span><span>' + eur(t.cfReal * 12) + '/año</span></div>';
+  html += '</div>';
+
+  // CF Pot — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">CF potencial / mes</span>' + (simActiva ? '<span class="chip am">sim</span>' : '') + '</div>';
+  html += '<div class="tile-v am num">' + eur(t.cfPot) + '</div>';
+  html += '<div class="tile-foot"><span class="chip am">' + pct1(yieldPot) + ' anual</span><span>' + eur(t.cfPot * 12) + '/año</span></div>';
+  html += '</div>';
+
+  // Inversiones — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Inversiones</span></div>';
+  html += '<div class="tile-v num">' + eur(t.totalInv) + '</div>';
+  html += '<div class="tile-foot"><span class="chip ac">ETF · Crypto · P2P</span><span>' + S.inversiones.length + ' activos</span></div>';
+  html += '</div>';
+
+  // Inmobiliario — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Inmobiliario · equity</span></div>';
+  html += '<div class="tile-v num">' + eur(t.totalProp + t.totalPropHab) + '</div>';
+  html += '<div class="tile-foot"><span class="chip ac">' + eur(amortiMensual) + '/mes amortización</span><span>' + S.propiedades.length + ' inmuebles</span></div>';
+  html += '</div>';
+
+  // Liquidez — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Liquidez</span></div>';
+  html += '<div class="tile-v g num">' + eur(t.totalLiq) + '</div>';
+  html += '<div class="tile-foot"><span class="chip mu">' + S.liquido.length + ' cuentas</span></div>';
+  html += '</div>';
+
+  // CF + amort — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">CF pot. + amortización</span></div>';
+  html += '<div class="tile-v ac num">' + eur(t.cfPot + amortiMensual) + '</div>';
+  html += '<div class="tile-foot"><span class="chip ac">Equity-building</span><span>' + eur((t.cfPot + amortiMensual) * 12) + '/año</span></div>';
+  html += '</div>';
+
+  document.getElementById('resumen-bento').innerHTML = html;
+
+  // BARS
+  var colorMap = {'fondo':'#ff6b35','fondo-dist':'#ff9568','etf':'#ff9568','crypto':'#f7c648','p2p':'#4ecb9e','inmo':'#4fa6f7','ahorro':'#4ecb9e','corriente':'#4ecb9e','efectivo':'#4ecb9e'};
   function barRow(nombre, tipo, pct, valStr) {
     var col = colorMap[tipo] || 'var(--mu)';
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">' +
-      '<div style="width:110px;font-size:.75rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;">' + esc(nombre) + '</div>' +
-      '<div style="flex:1;background:var(--s2);border-radius:99px;height:6px;overflow:hidden;"><div style="width:' + pct.toFixed(1) + '%;height:6px;border-radius:99px;background:' + col + ';transition:width .4s;"></div></div>' +
-      '<div style="width:70px;text-align:right;font-size:.78rem;color:var(--tx);flex-shrink:0;">' + valStr + '</div>' +
-      '</div>';
+    return '<div class="bar"><div class="bar-n">' + esc(nombre) + '</div>' +
+      '<div class="bar-trk"><div class="bar-fll" style="width:' + pct.toFixed(1) + '%;background:' + col + ';box-shadow:0 0 8px ' + col + ';"></div></div>' +
+      '<div class="bar-v">' + valStr + '</div></div>';
   }
 
   var cfItems = [];
@@ -1239,85 +1897,41 @@ function renderResumenKPIs() {
     : patItems.map(function(a){ return barRow(a.nombre, a.tipo, a.val/maxPat*100, eur(a.val)); }).join('');
 }
 
-function renderResumen() {
-  renderResumenKPIs();
-}
+function renderResumen() { renderResumenKPIs(); }
 
-function kpiHTML(label, value, color, sub, badge) {
-  return '<div class="kpi"><div class="kpi-l">' + label + '</div><div class="kpi-v" style="color:' + color + '">' + value + '</div>' + (sub ? '<div class="kpi-s">' + sub + '</div>' : '') + (badge ? '<span class="kpi-badge" style="background:' + badge.bg + ';color:' + badge.fg + '">' + badge.text + '</span>' : '') + '</div>';
-}
-
-function renderDonut(inv, prop, liq) {
-  if (donutChart) { try { donutChart.destroy(); } catch(e) {} }
-  var ctx = document.getElementById('donut-chart');
-  if (!ctx) return;
-  donutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Inversiones', 'Inmobiliario', 'Liquidez'],
-      datasets: [{ data: [inv, prop, liq], backgroundColor: ['#7c6fff','#a0a8ff','#4ecb9e'], borderWidth: 0, hoverOffset: 6 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '65%',
-      plugins: { legend: { position: 'bottom', labels: { color: '#888899', font: { size: 11 }, padding: 16 } }, tooltip: { backgroundColor: '#22222e', borderColor: '#2e2e3e', borderWidth: 1, titleColor: '#e8e8f0', bodyColor: '#888899' } }
-    }
-  });
-}
-
-function renderCFChart() {
-  if (cfChart) { try { cfChart.destroy(); } catch(e) {} }
-  var ctx = document.getElementById('cf-chart');
-  if (!ctx) return;
-  var labels = [], vals = [];
-  S.propiedades.forEach(function(p) { if (p.uso !== 'habitual') { var c = calcProp(p); labels.push(p.nombre); vals.push(parseFloat(c.cfNetoMensual.toFixed(2))); } });
-  S.inversiones.forEach(function(inv) { var cf = getCFInv(inv); if (cf !== 0) { labels.push(inv.nombre); vals.push(parseFloat(cf.toFixed(2))); } });
-  S.liquido.forEach(function(l) { var cf = cfNetAhorro(nv(l.saldo),nv(l.tae)); if (cf > 0) { labels.push(l.nombre); vals.push(parseFloat(cf.toFixed(2))); } });
-  if (labels.length === 0) { labels = ['Sin datos']; vals = [0]; }
-  cfChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: labels, datasets: [{ data: vals, backgroundColor: vals.map(function(v){ return v >= 0 ? 'rgba(78,203,158,.7)' : 'rgba(224,92,92,.7)'; }), borderRadius: 6 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#22222e', borderColor: '#2e2e3e', borderWidth: 1, bodyColor: '#888899' } },
-      scales: { x: { grid: { color: 'rgba(46,46,62,.4)' }, ticks: { color: '#888899', font: { size: 10 } } }, y: { grid: { display: false }, ticks: { color: '#888899', font: { size: 10 } } } }
-    }
-  });
-}
-
-// ============ INVERSIONES ============
+/* ============================================================
+   INVERSIONES
+   ============================================================ */
 function toggleAddInv() {
   var p = document.getElementById('add-inv-panel');
   var open = p.style.display !== 'none';
   p.style.display = open ? 'none' : 'block';
   if (!open) {
     document.getElementById('inv-tipo').value = '';
-    ['inv-f-capital','inv-f-valor','inv-f-tir','inv-f-fecha','inv-f-notas','inv-f-btns'].forEach(function(id){
+    ['inv-f-valor','inv-f-tir','inv-f-fecha','inv-f-notas','inv-f-btns'].forEach(function(id){
       document.getElementById(id).style.display = 'none';
     });
     setTimeout(function(){ document.getElementById('inv-nombre').focus(); }, 50);
   }
 }
-
 function onInvTipoChange() {
   var tipo = document.getElementById('inv-tipo').value;
   if (!tipo) return;
-  var esFondo = tipo === 'fondo';
   ['inv-f-valor','inv-f-fecha','inv-f-notas','inv-f-btns'].forEach(function(id){
     document.getElementById(id).style.display = '';
   });
   var sinTir = tipo === 'fondo' || tipo === 'crypto';
   document.getElementById('inv-f-tir').style.display = sinTir ? 'none' : '';
 }
-
 function saveInv() {
   var nombre = document.getElementById('inv-nombre').value.trim();
-  if (!nombre) { flash('inv-flash', 'El nombre es obligatorio', 'var(--r)'); return; }
+  if (!nombre) { flash('inv-flash', 'El nombre es obligatorio', 'r'); return; }
   var tipo = document.getElementById('inv-tipo').value;
-  if (!tipo) { flash('inv-flash', 'Selecciona el tipo', 'var(--r)'); return; }
+  if (!tipo) { flash('inv-flash', 'Selecciona el tipo', 'r'); return; }
   var inv = {
     id: Date.now(),
     nombre: nombre,
-    tipo: document.getElementById('inv-tipo').value,
+    tipo: tipo,
     capital: gv('inv-valor'),
     valor: gv('inv-valor'),
     tir: gv('inv-tir'),
@@ -1327,12 +1941,11 @@ function saveInv() {
   S.inversiones.push(inv);
   trySave();
   ['inv-nombre','inv-valor','inv-tir','inv-fecha','inv-notas'].forEach(function(id){ document.getElementById(id).value = ''; });
-  document.getElementById('inv-tipo').value = 'fondo';
+  document.getElementById('inv-tipo').value = '';
   document.getElementById('add-inv-panel').style.display = 'none';
   renderAll();
   toast('Inversión añadida');
 }
-
 function saveEditInv(id) {
   var p = 'ie' + id;
   var nombre = document.getElementById(p + 'nombre').value.trim();
@@ -1350,22 +1963,17 @@ function saveEditInv(id) {
     notas: document.getElementById(p + 'notas').value.trim()
   };
   editInvId = null;
-  trySave();
-  renderAll();
+  trySave(); renderAll();
   toast('Inversión actualizada');
 }
-
 function editInv(id) {
   editInvId = (editInvId === id) ? null : id;
   renderInvList();
-  if (editInvId) {
-    setTimeout(function(){
-      var el = document.getElementById('ie' + id + 'nombre');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
-  }
+  if (editInvId) setTimeout(function(){
+    var el = document.getElementById('ie' + id + 'nombre');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 50);
 }
-
 function delInv(id) {
   var inv = S.inversiones.find(function(x){ return x.id === id; });
   var nombre = inv ? inv.nombre : 'esta inversión';
@@ -1374,11 +1982,7 @@ function delInv(id) {
     trySave(); renderAll(); toast('Inversión eliminada');
   });
 }
-
-function cancelEditInv() {
-  editInvId = null;
-  renderInvList();
-}
+function cancelEditInv() { editInvId = null; renderInvList(); }
 
 function quickEditInvValor(id) {
   var inv = S.inversiones.find(function(x){ return x.id === id; });
@@ -1388,8 +1992,7 @@ function quickEditInvValor(id) {
   var current = nv(inv.valor);
   el.innerHTML = '<input class="qedit-input" type="number" value="' + current + '" step="0.01">';
   var input = el.querySelector('input');
-  input.focus();
-  input.select();
+  input.focus(); input.select();
   var saved = false;
   function save() {
     if (saved) return;
@@ -1413,8 +2016,7 @@ function quickEditLiqSaldo(id) {
   var current = nv(liq.saldo);
   el.innerHTML = '<input class="qedit-input" type="number" value="' + current + '" step="0.01">';
   var input = el.querySelector('input');
-  input.focus();
-  input.select();
+  input.focus(); input.select();
   var saved = false;
   function save() {
     if (saved) return;
@@ -1444,7 +2046,7 @@ function invTipoSelect(pfx, selected) {
   return h + '</select>';
 }
 
-function toggleInvCard(id) {
+function toggleInvRow(id) {
   var el = document.getElementById('inv-' + id);
   if (el) el.classList.toggle('open');
 }
@@ -1473,102 +2075,75 @@ function renderInvList() {
   items.forEach(function(inv) {
     var p = 'ie' + inv.id;
     if (editInvId === inv.id) {
-      // ---- MODO EDICIÓN INLINE ----
-      html += '<div class="inv-card open" id="inv-' + inv.id + '" style="border-color:var(--ac);background:var(--s3)">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 16px">';
-      html += '<span style="font-size:.82rem;font-weight:700;color:var(--ac)">Editando</span>';
-      html += '<button class="btn br2 bsm" onclick="cancelEditInv()">Cancelar</button>';
+      html += '<div class="row open" id="inv-' + inv.id + '" style="border-color:var(--ac);">';
+      html += '<div class="row-l" style="grid-column:1/-1;"><span style="font-size:.74rem;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.5px;">Editando</span></div>';
+      html += '<div class="row-body" style="display:block;grid-column:1/-1;">';
+      html += '<div class="fgrid">';
+      html += '<div class="ef span6"><label>Nombre</label><input id="' + p + 'nombre" value="' + esc(inv.nombre) + '"></div>';
+      html += '<div class="ef span3"><label>Tipo</label>' + invTipoSelect(p, inv.tipo) + '</div>';
+      html += '<div class="ef span3"><label>Valor (€)</label><input type="number" id="' + p + 'valor" value="' + nv(inv.valor) + '"></div>';
+      if (inv.tipo !== 'fondo' && inv.tipo !== 'crypto') html += '<div class="ef span4"><label>TIR bruta anual (%)</label><input type="number" id="' + p + 'tir" value="' + nv(inv.tir) + '" step="0.01"></div>';
+      html += '<div class="ef span4"><label>Fecha entrada</label><input type="date" id="' + p + 'fecha" value="' + esc(inv.fecha || '') + '"></div>';
+      html += '<div class="ef span12"><label>Notas</label><input id="' + p + 'notas" value="' + esc(inv.notas || '') + '" placeholder="Opcional"></div>';
       html += '</div>';
-      html += '<div class="inv-card-body" style="display:block">';
-      html += '<div class="fr">';
-      html += '<div class="ef"><label>Nombre</label><input id="' + p + 'nombre" value="' + esc(inv.nombre) + '"></div>';
-      html += '<div class="ef"><label>Tipo</label>' + invTipoSelect(p, inv.tipo) + '</div>';
-      html += '<div class="ef"><label>Valor (€)</label><input type="number" id="' + p + 'valor" value="' + nv(inv.valor) + '"></div>';
-      if (inv.tipo !== 'fondo' && inv.tipo !== 'crypto') html += '<div class="ef"><label>TIR bruta anual (%)</label><input type="number" id="' + p + 'tir" value="' + nv(inv.tir) + '" step="0.01"></div>';
-      html += '<div class="ef"><label>Fecha entrada</label><input type="date" id="' + p + 'fecha" value="' + esc(inv.fecha || '') + '"></div>';
-      html += '</div>';
-      html += '<div class="ef" style="margin-top:12px"><label>Notas</label><input id="' + p + 'notas" value="' + esc(inv.notas || '') + '" placeholder="Opcional"></div>';
-      html += '<div class="btn-row" style="margin-top:14px">';
-      html += '<button class="btn bp bsm" onclick="saveEditInv(' + inv.id + ')">Guardar cambios</button>';
+      html += '<div class="btn-row" style="margin-top:14px;">';
+      html += '<button class="btn bp sm" onclick="saveEditInv(' + inv.id + ')">Guardar cambios</button>';
+      html += '<button class="btn ghost sm" onclick="cancelEditInv()">Cancelar</button>';
       html += '</div>';
       html += '</div></div>';
     } else {
-      // ---- MODO VISTA ----
       var valor = nv(inv.valor);
       var cfR = getCFInv(inv);
       var cfP = getCFPotSim(inv);
       var tirBruta = nv(inv.tir);
       var tirNeta = getInvRentNeta(inv);
       var cfLabel, cfVal, cfColor;
-      if (cfR > 0 && cfP > 0 && cfP !== cfR) {
-        cfLabel = 'CF real / pot.'; cfVal = eur2(cfR) + ' / ' + eur2(cfP); cfColor = 'var(--am)';
-      } else if (cfR > 0) {
-        cfLabel = 'CF neto/mes'; cfVal = eur2(cfR); cfColor = 'var(--g)';
-      } else if (cfP > 0) {
-        cfLabel = 'CF pot./mes'; cfVal = eur2(cfP); cfColor = 'var(--am)';
-      } else {
-        cfLabel = ''; cfVal = ''; cfColor = '';
-      }
+      if (cfR > 0 && cfP > 0 && cfP !== cfR) { cfLabel = 'CF real / pot.'; cfVal = eur2(cfR) + ' / ' + eur2(cfP); cfColor = 'var(--am)'; }
+      else if (cfR > 0) { cfLabel = 'CF neto/mes'; cfVal = eur2(cfR); cfColor = 'var(--g)'; }
+      else if (cfP > 0) { cfLabel = 'CF pot./mes'; cfVal = eur2(cfP); cfColor = 'var(--am)'; }
+      else { cfLabel = ''; cfVal = ''; cfColor = ''; }
 
-      html += '<div class="inv-card" id="inv-' + inv.id + '">';
-      // -- Summary row --
-      html += '<div class="inv-card-sum" onclick="toggleInvCard(' + inv.id + ')">';
-      html += '<div class="inv-card-left"><span class="inv-card-name">' + esc(inv.nombre) + '</span>' + tagHTML(inv.tipo) + '<span class="inv-card-dot">·</span><span class="inv-card-cap">' + eur(valor) + '</span></div>';
-      html += '<div class="inv-card-metrics">';
-      html += tirBruta > 0 ? '<div class="inv-card-m"><div class="inv-card-m-l">Rent. bruta</div><div class="inv-card-m-v" style="color:var(--am)">' + pct1(tirBruta) + '</div></div>' : '<div class="inv-card-m"></div>';
-      html += tirNeta > 0 ? '<div class="inv-card-m"><div class="inv-card-m-l">Rent. neta</div><div class="inv-card-m-v" style="color:var(--g)">' + pct1(tirNeta) + '</div></div>' : '<div class="inv-card-m"></div>';
-      html += cfVal ? '<div class="inv-card-m"><div class="inv-card-m-l">' + cfLabel + '</div><div class="inv-card-m-v" style="color:' + cfColor + '">' + cfVal + '</div></div>' : '<div class="inv-card-m"></div>';
-      html += '</div></div>';
-      // -- Expandable body --
-      html += '<div class="inv-card-body">';
-      html += '<div class="inv-card-top">';
+      html += '<div class="row" id="inv-' + inv.id + '" onclick="toggleInvRow(' + inv.id + ')">';
+      html += '<div class="row-l">' + pillHTML(inv.tipo) + '<span class="row-name">' + esc(inv.nombre) + '</span><span class="row-name sep">·</span><span class="row-cap">' + eur(valor) + '</span></div>';
+      html += '<div class="row-metrics">';
+      html += tirBruta > 0 ? '<div class="row-m"><div class="row-m-l">Rent. bruta</div><div class="row-m-v am">' + pct1(tirBruta) + '</div></div>' : '<div class="row-m"></div>';
+      html += tirNeta > 0 ? '<div class="row-m"><div class="row-m-l">Rent. neta</div><div class="row-m-v g">' + pct1(tirNeta) + '</div></div>' : '<div class="row-m"></div>';
+      html += cfVal ? '<div class="row-m"><div class="row-m-l">' + cfLabel + '</div><div class="row-m-v" style="color:' + cfColor + '">' + cfVal + '</div></div>' : '<div class="row-m"></div>';
+      html += '</div>';
+      html += '<div class="row-body" style="grid-column:1/-1;" onclick="event.stopPropagation();">';
+      html += '<div class="row-body-hd">';
       html += '<div></div>';
-      html += '<div class="inv-card-actions"><button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="editInv(' + inv.id + ')">Editar</button><button class="btn br2 bsm" onclick="delInv(' + inv.id + ')">×</button></div>';
+      html += '<div class="btn-row"><button class="btn ghost sm" onclick="editInv(' + inv.id + ')">Editar</button><button class="btn br2 sm icon" onclick="delInv(' + inv.id + ')" title="Eliminar">×</button></div>';
       html += '</div>';
-      html += '<div class="inv-kpis">';
-      html += '<div class="inv-kpi qedit" onclick="quickEditInvValor(' + inv.id + ')" title="Clic para editar"><div class="inv-kpi-l">Valor</div><div class="inv-kpi-v" id="qv-inv-' + inv.id + '">' + eur(valor) + '</div></div>';
-      if (inv.tipo !== 'fondo' && inv.tipo !== 'crypto') html += '<div class="inv-kpi"><div class="inv-kpi-l">TIR bruta</div><div class="inv-kpi-v" style="color:var(--am)">' + pct1(inv.tir) + '</div></div>';
-      if (tirNeta > 0) html += '<div class="inv-kpi"><div class="inv-kpi-l">TIR neta</div><div class="inv-kpi-v" style="color:var(--g)">' + pct1(tirNeta) + '</div></div>';
-      if (cfR > 0) html += '<div class="inv-kpi"><div class="inv-kpi-l">CF real neto/mes</div><div class="inv-kpi-v" style="color:var(--g)">' + eur2(cfR) + '</div></div>';
-      if (cfP > 0 && cfP !== cfR) html += '<div class="inv-kpi"><div class="inv-kpi-l">CF potencial/mes</div><div class="inv-kpi-v" style="color:var(--am)">' + eur2(cfP) + '</div></div>';
-      if (inv.fecha) html += '<div class="inv-kpi"><div class="inv-kpi-l">Desde</div><div class="inv-kpi-v" style="color:var(--mu)">' + inv.fecha + '</div></div>';
+      html += '<div class="kpis-grid">';
+      html += '<div class="minikpi click" onclick="quickEditInvValor(' + inv.id + ')" title="Clic para editar"><div class="mini-l">Valor</div><div class="mini-v" id="qv-inv-' + inv.id + '">' + eur(valor) + '</div></div>';
+      if (inv.tipo !== 'fondo' && inv.tipo !== 'crypto') html += '<div class="minikpi"><div class="mini-l">TIR bruta</div><div class="mini-v am">' + pct1(inv.tir) + '</div></div>';
+      if (tirNeta > 0) html += '<div class="minikpi"><div class="mini-l">TIR neta</div><div class="mini-v g">' + pct1(tirNeta) + '</div></div>';
+      if (cfR > 0) html += '<div class="minikpi"><div class="mini-l">CF real neto/mes</div><div class="mini-v g">' + eur2(cfR) + '</div></div>';
+      if (cfP > 0 && cfP !== cfR) html += '<div class="minikpi"><div class="mini-l">CF potencial/mes</div><div class="mini-v am">' + eur2(cfP) + '</div></div>';
+      if (inv.fecha) html += '<div class="minikpi"><div class="mini-l">Desde</div><div class="mini-v mu">' + esc(inv.fecha) + '</div></div>';
       html += '</div>';
-      if (inv.notas) html += '<div style="margin-top:10px;font-size:.8rem;color:var(--mu)">' + esc(inv.notas) + '</div>';
-      html += '</div></div>';
+      if (inv.notas) html += '<div style="margin-top:10px;font-size:.78rem;color:var(--mu);">' + esc(inv.notas) + '</div>';
+      html += '</div>';
+      html += '</div>';
     }
   });
   list.innerHTML = html;
 }
 
-// ============ INMOBILIARIO ============
-function calcAmortiFrances(capital, tinAnual, plazoAnios, cuotaNum) {
-  if (!capital || !tinAnual || !plazoAnios) return null;
-  var i = tinAnual / 100 / 12;
-  var n = Math.round(plazoAnios * 12);
-  var cuota = i > 0 ? capital * i * Math.pow(1+i,n) / (Math.pow(1+i,n)-1) : capital/n;
-  var m = Math.max(1, Math.min(Math.round(cuotaNum)||1, n));
-  var saldoAntes = i > 0
-    ? capital * Math.pow(1+i,m-1) - cuota * (Math.pow(1+i,m-1)-1) / i
-    : capital - cuota * (m-1);
-  var interesMes = saldoAntes * i;
-  var amortiMes = cuota - interesMes;
-  var saldoRest = Math.max(0, saldoAntes - amortiMes);
-  return { cuota:cuota, interesMes:interesMes, amortiMes:amortiMes, saldoRestante:saldoRest };
-}
-
+/* ============================================================
+   INMOBILIARIO
+   ============================================================ */
 function updateHipoteca() {
   var precio = gv('prop-precioCompra');
   var pctEnt = gv('prop-pctEntrada');
-  var tin    = gv('prop-tin');
-  var plazo  = gv('prop-plazoAnios');
-  var num    = gv('prop-cuotaNum') || 1;
+  var tin = gv('prop-tin');
+  var plazo = gv('prop-plazoAnios');
+  var num = gv('prop-cuotaNum') || 1;
   var capital = (precio > 0 && pctEnt >= 0) ? precio * (1 - pctEnt/100) : 0;
   document.getElementById('prop-capitalFin').value = capital > 0 ? Math.round(capital) : '';
   var res = document.getElementById('prop-hip-result');
-  if (!capital || !tin || !plazo) {
-    res.style.display = 'none';
-    return;
-  }
+  if (!capital || !tin || !plazo) { res.style.display = 'none'; return; }
   res.style.display = 'grid';
   var r = calcAmortiFrances(capital, tin, plazo, num);
   document.getElementById('prop-hip-cuota').textContent   = r ? eur(r.cuota)        : '—';
@@ -1576,39 +2151,33 @@ function updateHipoteca() {
   document.getElementById('prop-hip-amorti').textContent  = r ? eur(r.amortiMes)    : '—';
   document.getElementById('prop-hip-saldo').textContent   = r ? eur(r.saldoRestante): '—';
 }
-
 function updateGastosTotal() {
   var total = gv('prop-ibi') + gv('prop-seguro') + gv('prop-comunidad') * 12 + gv('prop-otrosGastos');
   var el = document.getElementById('prop-gastos-total');
   if (el) el.textContent = eur(total);
 }
-
 function updateGastosCompra() {
   var precio = gv('prop-precioCompra');
   var comision = document.getElementById('prop-tiene-comision').value === 'si' ? gv('prop-comisionInmo') : 0;
   var total = precio * 0.11 + comision;
   document.getElementById('prop-gastos').value = total > 0 ? Math.round(total) : '';
 }
-
 function onPropComisionToggle() {
   var tiene = document.getElementById('prop-tiene-comision').value === 'si';
   document.getElementById('prop-f-comision').style.display = tiene ? 'block' : 'none';
   if (!tiene) document.getElementById('prop-comisionInmo').value = '';
   updateGastosCompra();
 }
-
 function onPropReformaToggle() {
   var tiene = document.getElementById('prop-tiene-reforma').value === 'si';
   document.getElementById('prop-f-reforma').style.display = tiene ? 'block' : 'none';
   if (!tiene) document.getElementById('prop-reforma').value = '';
 }
-
 function onPropUsoChange() {
   var esHabitual = document.getElementById('prop-uso').value === 'habitual';
   document.getElementById('prop-f-alquiler').style.display    = esHabitual ? 'none' : '';
   document.getElementById('prop-f-gastos-ded').style.display  = esHabitual ? 'none' : '';
 }
-
 function onPropHipotecaToggle() {
   var tiene = document.getElementById('prop-tiene-hipoteca').value === 'si';
   document.getElementById('prop-f-hipoteca').style.display = tiene ? 'block' : 'none';
@@ -1617,22 +2186,19 @@ function onPropHipotecaToggle() {
     document.getElementById('prop-hip-result').style.display = 'none';
   }
 }
-
 function toggleProp(id) {
-  var el = document.querySelector('.prop-card[data-id="' + id + '"]');
+  var el = document.querySelector('.prop-row[data-id="' + id + '"]');
   if (el) el.classList.toggle('expanded');
 }
-
 function toggleAddProp() {
   var p = document.getElementById('add-prop-panel');
   var open = p.style.display !== 'none';
   p.style.display = open ? 'none' : 'block';
   if (!open) setTimeout(function(){ document.getElementById('prop-nombre').focus(); }, 50);
 }
-
 function saveProp() {
   var nombre = document.getElementById('prop-nombre').value.trim();
-  if (!nombre) { flash('prop-flash', 'El nombre es obligatorio', 'var(--r)'); return; }
+  if (!nombre) { flash('prop-flash', 'El nombre es obligatorio', 'r'); return; }
   var tieneHip = document.getElementById('prop-tiene-hipoteca').value === 'si';
   var precioCompra = gv('prop-precioCompra');
   var pctEntrada = tieneHip ? gv('prop-pctEntrada') : 100;
@@ -1668,7 +2234,6 @@ function saveProp() {
   trySave(); cancelEditProp(); renderAll();
   toast(msg);
 }
-
 function editProp(id) {
   var p = S.propiedades.find(function(x){ return x.id === id; });
   if (!p) return;
@@ -1708,7 +2273,6 @@ function editProp(id) {
   showTab('inmo');
   setTimeout(function(){ document.getElementById('add-prop-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 }
-
 function delProp(id) {
   var prop = S.propiedades.find(function(x){ return x.id === id; });
   var nombre = prop ? prop.nombre : 'esta propiedad';
@@ -1717,13 +2281,14 @@ function delProp(id) {
     trySave(); renderAll(); toast('Propiedad eliminada');
   });
 }
-
 function cancelEditProp() {
   editPropId = null;
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){ document.getElementById(id).value = ''; });
+  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
   document.getElementById('prop-tiene-comision').value = 'no';
   onPropComisionToggle();
   document.getElementById('prop-tiene-reforma').value = 'no';
@@ -1741,103 +2306,93 @@ function renderPropList() {
   S.propiedades.forEach(function(p) {
     var c = calcProp(p);
     var gastosTotal = (p.ibi !== undefined) ? nv(p.ibi)+nv(p.seguro)+nv(p.comunidad)+nv(p.otrosGastos) : nv(p.gastosDed);
-    html += '<div class="prop-card" data-id="' + p.id + '">';
-
     var esHabitual = p.uso === 'habitual';
 
-    /* ── RESUMEN (siempre visible) ── */
-    html += '<div class="prop-summary" onclick="toggleProp(' + p.id + ')">';
-    html += '<div class="prop-sum-left">';
-    html += '<div class="prop-name">' + esc(p.nombre) + '</div>';
-    html += '<span class="tag ' + (esHabitual ? 'thabitual' : 'tinmo') + '" style="margin-top:5px;display:inline-block;">' + (esHabitual ? 'Vivienda habitual' : 'Inmueble') + '</span>';
-    html += '</div>';
-
-    html += '<div class="prop-sum-kpis" style="justify-content:center;">';
+    html += '<div class="prop-row" data-id="' + p.id + '">';
+    html += '<div class="prop-sum" onclick="toggleProp(' + p.id + ')">';
+    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + '</div>';
+    html += '<div class="prop-kpis">';
     if (esHabitual) {
-      html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">Equity</div><div class="prop-sum-v" style="color:var(--ac)">' + eur(c.equityProp) + '</div></div>';
+      html += '<div class="prop-kpi"><div class="prop-kpi-l">Equity</div><div class="prop-kpi-v ac">' + eur(c.equityProp) + '</div></div>';
     } else {
-      html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">ROCE</div><div class="prop-sum-v" style="color:var(--am)">' + pct1(c.roce*100) + '</div></div>';
-      html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">Rent. capital</div><div class="prop-sum-v" style="color:' + colorVal(c.cfNetoAnual) + '">' + pct1(c.yieldCF*100) + '</div></div>';
-      html += '<div class="prop-sum-kpi" style="text-align:center;"><div class="prop-sum-l">Cashflow / mes</div><div class="prop-sum-v" style="color:' + colorVal(c.cfNetoMensual) + '">' + eur(c.cfNetoMensual) + '</div></div>';
+      html += '<div class="prop-kpi"><div class="prop-kpi-l">ROCE</div><div class="prop-kpi-v am">' + pct1(c.roce*100) + '</div></div>';
+      html += '<div class="prop-kpi"><div class="prop-kpi-l">Rent. capital</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoAnual) + '">' + pct1(c.yieldCF*100) + '</div></div>';
+      html += '<div class="prop-kpi"><div class="prop-kpi-l">CF / mes</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoMensual) + '">' + eur(c.cfNetoMensual) + '</div></div>';
     }
     html += '</div>';
-
-    html += '<div class="prop-sum-actions">';
-    html += '<button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="event.stopPropagation();editProp(' + p.id + ')">Editar</button>';
-    html += '<button class="btn br2 bsm" onclick="event.stopPropagation();delProp(' + p.id + ')">×</button>';
-    html += '<span class="prop-chevron">&#9660;</span>';
+    html += '<div class="prop-acts">';
+    html += '<button class="btn ghost sm" onclick="event.stopPropagation();editProp(' + p.id + ')">Editar</button>';
+    html += '<button class="btn br2 sm icon" onclick="event.stopPropagation();delProp(' + p.id + ')" title="Eliminar">×</button>';
+    html += '<span class="chev">&#9660;</span>';
     html += '</div>';
-    html += '</div>'; /* /prop-summary */
+    html += '</div>';
 
-    /* ── DETALLES (colapsados) ── */
-    html += '<div class="prop-details">';
-
+    html += '<div class="prop-det">';
     if (esHabitual) {
-      /* Vivienda habitual — solo patrimonio e hipoteca */
-      html += '<div class="roce-grid">';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Valor mercado</div><div class="roce-kpi-v" style="color:var(--tx)">' + eur(p.valor) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Equity real</div><div class="roce-kpi-v" style="color:var(--ac)">' + eur(c.equityProp) + '</div></div>';
+      html += '<div class="kpis-grid">';
+      html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
       if (c.saldoPendiente > 0) {
-        html += '<div class="roce-kpi"><div class="roce-kpi-l">Saldo hipoteca</div><div class="roce-kpi-v" style="color:var(--r)">' + eur(c.saldoPendiente) + '</div></div>';
-        html += '<div class="roce-kpi"><div class="roce-kpi-l">Amort./mes</div><div class="roce-kpi-v" style="color:var(--ac)">' + eur2(c.amortiMensual) + '</div></div>';
+        html += '<div class="minikpi"><div class="mini-l">Saldo hipoteca</div><div class="mini-v r">' + eur(c.saldoPendiente) + '</div></div>';
+        html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
       }
       html += '</div>';
-      html += '<div>';
+      html += '<div style="margin-top:14px;">';
       html += '<div class="frow"><span class="fl">Capital propio (entrada+gastos)</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
       if (c.cuotaMensual > 0) {
         html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
         if (nv(p.tin) && nv(p.plazoAnios)) {
-          html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Intereses/mes</span><span class="fv" style="color:var(--r)">' + eur(c.interesesMensual) + '</span></div>';
-          html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Amortización/mes</span><span class="fv" style="color:var(--ac)">' + eur(c.amortiMensual) + '</span></div>';
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
         }
       }
       html += '</div>';
-      html += '<p class="lnote">Vivienda habitual — computa en patrimonio total pero no genera cashflow de inversión.</p>';
+      html += '<p class="hint" style="margin-top:14px;">Vivienda habitual — computa en patrimonio total pero no genera cashflow de inversión.</p>';
     } else {
-      /* Inversión / alquiler */
-      html += '<div class="roce-grid">';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Valor mercado</div><div class="roce-kpi-v" style="color:var(--tx)">' + eur(p.valor) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Equity real</div><div class="roce-kpi-v" style="color:var(--ac)">' + eur(c.equityProp) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Amort./mes</div><div class="roce-kpi-v" style="color:var(--ac)">' + eur2(c.amortiMensual) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Yield bruto</div><div class="roce-kpi-v" style="color:var(--mu)">' + pct1(c.yieldBruto*100) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Yield neto</div><div class="roce-kpi-v" style="color:var(--g)">' + pct1(c.yieldNeto*100) + '</div></div>';
-      html += '<div class="roce-kpi"><div class="roce-kpi-l">Yield CF</div><div class="roce-kpi-v" style="color:var(--mu)">' + pct1(c.yieldCF*100) + '</div></div>';
+      html += '<div class="kpis-grid k6">';
+      html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Yield bruto</div><div class="mini-v mu">' + pct1(c.yieldBruto*100) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Yield neto</div><div class="mini-v g">' + pct1(c.yieldNeto*100) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Yield CF</div><div class="mini-v mu">' + pct1(c.yieldCF*100) + '</div></div>';
       html += '</div>';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">';
-      html += '<div>';
+      html += '<div class="fgrid" style="margin-top:14px;">';
+      html += '<div class="span6">';
       html += '<div class="frow"><span class="fl">Alquiler bruto/mes</span><span class="fv">' + eur(p.alquiler) + '</span></div>';
       var capLabel = nv(p.reforma) > 0 ? 'Capital propio (entrada+gastos+reforma)' : 'Capital propio (entrada+gastos)';
       html += '<div class="frow"><span class="fl">' + capLabel + '</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
-      if (nv(p.reforma) > 0) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Coste reforma</span><span class="fv" style="color:var(--mu)">' + eur(p.reforma) + '</span></div>';
+      if (nv(p.reforma) > 0) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Coste reforma</span><span class="fv mu">' + eur(p.reforma) + '</span></div>';
       html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
       if (nv(p.tin) && nv(p.plazoAnios)) {
-        html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Intereses/mes</span><span class="fv" style="color:var(--r)">' + eur(c.interesesMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Amortización/mes</span><span class="fv" style="color:var(--ac)">' + eur(c.amortiMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Saldo pendiente</span><span class="fv" style="color:var(--r)">' + eur(c.saldoPendiente) + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
       }
       html += '</div>';
-      html += '<div>';
+      html += '<div class="span6">';
       html += '<div class="frow"><span class="fl">Gastos ded. anuales</span><span class="fv">' + eur(gastosTotal) + '</span></div>';
       if (p.ibi !== undefined) {
-        if (nv(p.ibi)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">IBI</span><span class="fv" style="color:var(--mu)">' + eur(p.ibi) + '</span></div>';
-        if (nv(p.seguro)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Seguro</span><span class="fv" style="color:var(--mu)">' + eur(p.seguro) + '</span></div>';
-        if (nv(p.comunidad)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Comunidad</span><span class="fv" style="color:var(--mu)">' + eur(p.comunidad) + '</span></div>';
-        if (nv(p.otrosGastos)) html += '<div class="frow"><span class="fl" style="padding-left:10px;color:var(--mu)">Otros</span><span class="fv" style="color:var(--mu)">' + eur(p.otrosGastos) + '</span></div>';
+        if (nv(p.ibi)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">IBI</span><span class="fv mu">' + eur(p.ibi) + '</span></div>';
+        if (nv(p.seguro)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Seguro</span><span class="fv mu">' + eur(p.seguro) + '</span></div>';
+        if (nv(p.comunidad)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Comunidad</span><span class="fv mu">' + eur(p.comunidad) + '</span></div>';
+        if (nv(p.otrosGastos)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Otros</span><span class="fv mu">' + eur(p.otrosGastos) + '</span></div>';
       }
-      html += '<div class="frow"><span class="fl">IRPF estimado</span><span class="fv" style="color:var(--r)">' + eur(c.impuesto) + '</span></div>';
+      html += '<div class="frow"><span class="fl">IRPF estimado</span><span class="fv r">' + eur(c.impuesto) + '</span></div>';
       html += '<div class="frow"><span class="fl">CF neto anual</span><span class="fv" style="color:' + colorVal(c.cfNetoAnual) + '">' + eur(c.cfNetoAnual) + '</span></div>';
-      html += '</div></div>';
-      html += '<p class="lnote">IRPF calculado con escala general. Reducción 60% art.23.2 LIRPF aplicada si rendimiento neto positivo. BASE_IRPF configurada en ajustes.</p>';
+      html += '</div>';
+      html += '</div>';
+      html += '<p class="hint" style="margin-top:14px;">IRPF calculado con escala general. Reducción 60% art.23.2 LIRPF aplicada si rendimiento neto positivo. BASE_IRPF configurada en ajustes.</p>';
     }
-
-    html += '</div>'; /* /prop-details */
-
-    html += '</div>'; /* /prop-card */
+    html += '</div>';
+    html += '</div>';
   });
   list.innerHTML = html;
 }
 
-// ============ LIQUIDEZ ============
+/* ============================================================
+   LIQUIDEZ
+   ============================================================ */
 function toggleAddLiq() {
   var p = document.getElementById('add-liq-panel');
   var open = p.style.display !== 'none';
@@ -1848,7 +2403,6 @@ function toggleAddLiq() {
     setTimeout(function(){ document.getElementById('liq-nombre').focus(); }, 50);
   }
 }
-
 function onLiqTipoChange() {
   var tipo = document.getElementById('liq-tipo').value;
   if (!tipo) return;
@@ -1856,10 +2410,9 @@ function onLiqTipoChange() {
   document.getElementById('liq-f-tae').style.display = tipo === 'ahorro' ? '' : 'none';
   document.getElementById('liq-f-btns').style.display = '';
 }
-
 function saveLiq() {
   var nombre = document.getElementById('liq-nombre').value.trim();
-  if (!nombre) { flash('liq-flash', 'El nombre es obligatorio', 'var(--r)'); return; }
+  if (!nombre) { flash('liq-flash', 'El nombre es obligatorio', 'r'); return; }
   var liq = {
     id: editLiqId || Date.now(),
     nombre: nombre,
@@ -1878,7 +2431,6 @@ function saveLiq() {
   trySave(); cancelEditLiq(); renderAll();
   toast(msg);
 }
-
 function editLiq(id) {
   var l = S.liquido.find(function(x){ return x.id === id; });
   if (!l) return;
@@ -1894,7 +2446,6 @@ function editLiq(id) {
   document.getElementById('liq-f-btns').style.display = '';
   setTimeout(function(){ document.getElementById('add-liq-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 }
-
 function delLiq(id) {
   var liq = S.liquido.find(function(x){ return x.id === id; });
   var nombre = liq ? liq.nombre : 'esta cuenta';
@@ -1903,7 +2454,6 @@ function delLiq(id) {
     trySave(); renderAll(); toast('Cuenta eliminada');
   });
 }
-
 function cancelEditLiq() {
   editLiqId = null;
   document.getElementById('liq-form-title').textContent = 'Nueva cuenta';
@@ -1918,35 +2468,36 @@ function renderLiqList() {
   S.liquido.forEach(function(l) { totalSaldo += nv(l.saldo); totalCF += cfNetAhorro(nv(l.saldo),nv(l.tae)); });
   var kpis = document.getElementById('liq-kpis');
   kpis.innerHTML =
-    kpiHTML('Total liquidez', eur(totalSaldo), 'var(--g)', '') +
-    kpiHTML('Intereses netos/mes', eur2(totalCF), colorVal(totalCF), '') +
-    kpiHTML('Intereses netos/año', eur(totalCF*12), colorVal(totalCF*12), '');
+    '<div class="tile c-4"><div class="tile-hd"><span class="tile-l">Total liquidez</span></div><div class="tile-v g num">' + eur(totalSaldo) + '</div><div class="tile-s">' + S.liquido.length + ' cuentas</div></div>' +
+    '<div class="tile c-4"><div class="tile-hd"><span class="tile-l">Intereses netos/mes</span></div><div class="tile-v num" style="color:' + colorVal(totalCF) + '">' + eur2(totalCF) + '</div></div>' +
+    '<div class="tile c-4"><div class="tile-hd"><span class="tile-l">Intereses netos/año</span></div><div class="tile-v num" style="color:' + colorVal(totalCF*12) + '">' + eur(totalCF*12) + '</div></div>';
   var list = document.getElementById('liq-list');
   if (S.liquido.length === 0) { list.innerHTML = '<div class="empty">No hay cuentas. Añade la primera arriba.</div>'; return; }
   var html = '';
   S.liquido.forEach(function(l) {
     var cf = cfNetAhorro(nv(l.saldo), nv(l.tae));
     var cfAnual = cf * 12;
-    var tagCls = l.tipo === 'ahorro' ? 'tliq' : 'tliq';
-    var labels = { 'ahorro':'Ahorro', 'corriente':'Corriente', 'efectivo':'Efectivo' };
-    html += '<div class="card" style="margin-bottom:10px">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-    html += '<div><strong>' + esc(l.nombre) + '</strong>&nbsp;&nbsp;<span class="tag ' + tagCls + '">' + (labels[l.tipo]||l.tipo) + '</span></div>';
-    html += '<div style="display:flex;gap:6px"><button class="btn bsm" style="background:var(--s2);color:var(--mu);border:1px solid var(--bd);" onclick="editLiq(' + l.id + ')">Editar</button><button class="btn br2 bsm" onclick="delLiq(' + l.id + ')">×</button></div>';
+    html += '<div class="prop-row">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
+    html += '<div style="display:flex;align-items:center;gap:10px;"><strong style="font-size:.96rem;letter-spacing:-.2px;">' + esc(l.nombre) + '</strong>' + pillHTML(l.tipo) + '</div>';
+    html += '<div class="btn-row"><button class="btn ghost sm" onclick="editLiq(' + l.id + ')">Editar</button><button class="btn br2 sm icon" onclick="delLiq(' + l.id + ')" title="Eliminar">×</button></div>';
     html += '</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
-    html += '<div class="inv-kpi qedit" onclick="quickEditLiqSaldo(' + l.id + ')" title="Clic para editar"><div class="inv-kpi-l">Saldo</div><div class="inv-kpi-v" id="qv-liq-' + l.id + '">' + eur(l.saldo) + '</div></div>';
-    html += '<div class="inv-kpi"><div class="inv-kpi-l">TAE</div><div class="inv-kpi-v" style="color:var(--am)">' + pct1(l.tae) + '</div></div>';
-    html += '<div class="inv-kpi"><div class="inv-kpi-l">Intereses netos/mes</div><div class="inv-kpi-v" style="color:var(--g)">' + eur2(cf) + '</div></div>';
+    html += '<div class="kpis-grid k3">';
+    html += '<div class="minikpi click" onclick="quickEditLiqSaldo(' + l.id + ')" title="Clic para editar"><div class="mini-l">Saldo</div><div class="mini-v" id="qv-liq-' + l.id + '">' + eur(l.saldo) + '</div></div>';
+    html += '<div class="minikpi"><div class="mini-l">TAE</div><div class="mini-v am">' + pct1(l.tae) + '</div></div>';
+    html += '<div class="minikpi"><div class="mini-l">Intereses netos/mes</div><div class="mini-v g">' + eur2(cf) + '</div></div>';
     html += '</div>';
-    if (cfAnual > 0) html += '<div style="margin-top:10px;font-size:.82rem;color:var(--mu)">Intereses netos anuales: <strong style="color:var(--g)">' + eur2(cfAnual) + '</strong></div>';
+    if (cfAnual > 0) html += '<div style="margin-top:10px;font-size:.78rem;color:var(--mu)">Intereses netos anuales: <strong class="g">' + eur2(cfAnual) + '</strong></div>';
     html += '</div>';
   });
   list.innerHTML = html;
 }
 
-// ============ HISTÓRICO ============
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
 function saveSnap() {
+  if (!Auth.isLogged()) return;
   var totalInv = 0, totalProp = 0, totalLiq = 0, cfReal = 0, cfPot = 0;
   var activos = [];
   S.inversiones.forEach(function(inv) {
@@ -1959,10 +2510,7 @@ function saveSnap() {
   S.propiedades.forEach(function(p) {
     var c = calcProp(p);
     totalProp += c.equityProp;
-    if (p.uso !== 'habitual') {
-      cfReal += c.cfNetoMensual;
-      cfPot += c.cfNetoMensual;
-    }
+    if (p.uso !== 'habitual') { cfReal += c.cfNetoMensual; cfPot += c.cfNetoMensual; }
     activos.push({ id: 'prop_' + p.id, nombre: p.nombre, tipo: 'inmo', valor: c.equityProp });
   });
   S.liquido.forEach(function(l) {
@@ -1972,50 +2520,50 @@ function saveSnap() {
     cfPot += cfNetAhorro(v, nv(l.tae));
     activos.push({ id: 'liq_' + l.id, nombre: l.nombre, tipo: l.tipo, valor: v });
   });
-  S.snaps.push({
-    fecha: hoy(),
-    ts: Date.now(),
-    totalPat: totalInv + totalProp + totalLiq,
-    cfReal: cfReal,
-    cfPot: cfPot,
-    activos: activos
-  });
+  S.snaps.push({ fecha: hoy(), ts: Date.now(), totalPat: totalInv + totalProp + totalLiq, cfReal: cfReal, cfPot: cfPot, activos: activos });
   trySave(); renderHistorico();
-  toast('Estado guardado — ' + hoy());
+  toast('Snapshot guardado — ' + hoy());
 }
-
 function delSnap(ts) {
   S.snaps = S.snaps.filter(function(s){ return s.ts !== ts; });
   trySave(); renderHistorico();
   toast('Registro eliminado');
 }
-
 function renderHistorico() {
   var list = document.getElementById('snap-list');
-  if (S.snaps.length === 0) { list.innerHTML = '<div class="empty">Sin registros. Pulsa Guardar para empezar a ver la evolución.</div>'; return; }
+  if (S.snaps.length === 0) { list.innerHTML = '<div class="empty">Sin registros. Pulsa Snapshot para empezar a ver la evolución.</div>'; return; }
   var sorted = S.snaps.slice().sort(function(a,b){ return b.ts - a.ts; });
   var html = '';
   sorted.forEach(function(snap) {
-    html += '<div class="snap-item">';
-    html += '<div><div style="font-weight:700">' + esc(snap.fecha) + '</div><div class="snap-fecha">' + snap.activos.length + ' activos</div></div>';
+    html += '<div class="snap">';
+    html += '<div><div class="snap-d">' + esc(snap.fecha) + '</div><div class="snap-sub">' + snap.activos.length + ' activos</div></div>';
     html += '<div class="snap-vals">';
-    html += '<div class="snap-val"><div class="snap-val-l">Patrimonio</div><div class="snap-val-v">' + eur(snap.totalPat) + '</div></div>';
-    html += '<div class="snap-val"><div class="snap-val-l">CF real/mes</div><div class="snap-val-v" style="color:var(--g)">' + eur2(snap.cfReal) + '</div></div>';
-    html += '<div class="snap-val"><div class="snap-val-l">CF potencial/mes</div><div class="snap-val-v" style="color:var(--am)">' + eur2(snap.cfPot) + '</div></div>';
+    html += '<div class="snap-v"><div class="snap-v-l">Patrimonio</div><div class="snap-v-v">' + eur(snap.totalPat) + '</div></div>';
+    html += '<div class="snap-v"><div class="snap-v-l">CF real/mes</div><div class="snap-v-v g">' + eur2(snap.cfReal) + '</div></div>';
+    html += '<div class="snap-v"><div class="snap-v-l">CF pot./mes</div><div class="snap-v-v am">' + eur2(snap.cfPot) + '</div></div>';
     html += '</div>';
-    html += '<button class="btn br2 bsm" onclick="delSnap(' + snap.ts + ')">×</button>';
+    html += '<button class="btn br2 sm icon" onclick="delSnap(' + snap.ts + ')" title="Eliminar">×</button>';
     html += '</div>';
   });
   list.innerHTML = html;
 }
 
-// ============ GRÁFICAS ============
+/* ============================================================
+   GRÁFICAS
+   ============================================================ */
 function renderGraficas() {
   renderMainChart();
   renderDonut2();
   renderActivoChart();
 }
-
+function chartCommonOpts() {
+  return {
+    backgroundColor: 'rgba(34,34,46,.95)',
+    borderColor: 'rgba(255,255,255,.10)',
+    borderWidth: 1, padding: 10, cornerRadius: 8,
+    titleColor: '#e8e8f0', bodyColor: '#b8b8c8'
+  };
+}
 function renderMainChart() {
   if (mainChart) { try { mainChart.destroy(); } catch(e) {} }
   var ctx = document.getElementById('main-chart');
@@ -2024,28 +2572,27 @@ function renderMainChart() {
   var labels = sorted.map(function(s){ return s.fecha; });
   var patData = sorted.map(function(s){ return s.totalPat; });
   var cfData = sorted.map(function(s){ return s.cfReal; });
-  if (labels.length === 0) { ctx.parentElement.innerHTML = '<div class="empty">Sin registros. Pulsa Guardar en la barra superior para ver la evolución.</div>'; return; }
+  if (labels.length === 0) { ctx.parentElement.innerHTML = '<div class="empty">Sin registros. Pulsa Snapshot en la barra superior para ver la evolución.</div>'; return; }
   mainChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
       datasets: [
-        { label: 'Patrimonio', data: patData, borderColor: '#7c6fff', backgroundColor: 'rgba(124,111,255,.1)', tension: .3, fill: true, yAxisID: 'y' },
+        { label: 'Patrimonio', data: patData, borderColor: '#ff6b35', backgroundColor: 'rgba(255,107,53,.1)', tension: .3, fill: true, yAxisID: 'y' },
         { label: 'CF real/mes', data: cfData, borderColor: '#4ecb9e', backgroundColor: 'rgba(78,203,158,.08)', tension: .3, fill: false, yAxisID: 'y1' }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#888899', font: { size: 11 } } }, tooltip: { backgroundColor: '#22222e', borderColor: '#2e2e3e', borderWidth: 1 } },
+      plugins: { legend: { labels: { color: '#7a7a8a', font: { size: 11 } } }, tooltip: chartCommonOpts() },
       scales: {
-        x: { grid: { color: 'rgba(46,46,62,.4)' }, ticks: { color: '#888899' } },
-        y: { grid: { color: 'rgba(46,46,62,.4)' }, ticks: { color: '#888899' } },
+        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#7a7a8a' } },
+        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#7a7a8a' } },
         y1: { position: 'right', grid: { display: false }, ticks: { color: '#4ecb9e' } }
       }
     }
   });
 }
-
 function renderDonut2() {
   if (donutChart2) { try { donutChart2.destroy(); } catch(e) {} }
   var ctx = document.getElementById('donut-chart2');
@@ -2055,17 +2602,16 @@ function renderDonut2() {
   S.propiedades.forEach(function(p){ tipos['inmo'] += nv(p.valor); });
   S.liquido.forEach(function(l){ tipos[l.tipo] = (tipos[l.tipo]||0) + nv(l.saldo); });
   var labels = [], data = [], colors = [];
-  var colorMap = {'fondo':'#7c6fff','fondo-dist':'#a78bfa','etf':'#9d8cff','crypto':'#f7a440','p2p':'#4ecb9e','inmo':'#a0a8ff','ahorro':'#4ecb9e','corriente':'#6be0b8','efectivo':'#aeefd4'};
+  var colorMap = {'fondo':'#ff6b35','fondo-dist':'#ff9568','etf':'#ff7e4d','crypto':'#f7c648','p2p':'#4ecb9e','inmo':'#4fa6f7','ahorro':'#4ecb9e','corriente':'#6be0b8','efectivo':'#aeefd4'};
   var nameMap = {'fondo':'Fondo Acum','fondo-dist':'Fondo Dist','etf':'ETF','crypto':'Crypto','p2p':'P2P','inmo':'Inmobiliario','ahorro':'Ahorro','corriente':'Corriente','efectivo':'Efectivo'};
   Object.keys(tipos).forEach(function(k){ if(tipos[k]>0){labels.push(nameMap[k]||k);data.push(tipos[k]);colors.push(colorMap[k]||'#888899');} });
   if (data.length === 0) { ctx.parentElement.innerHTML = '<div class="empty">Sin datos</div>'; return; }
   donutChart2 = new Chart(ctx, {
     type: 'doughnut',
-    data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 0, hoverOffset: 6 }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { color: '#888899', font: { size: 11 }, padding: 12 } }, tooltip: { backgroundColor: '#22222e', borderColor: '#2e2e3e', borderWidth: 1 } } }
+    data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 2, borderColor: '#08080c', hoverOffset: 8, hoverBorderColor: '#13131c' }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { color: '#7a7a8a', font: { size: 11 }, padding: 12 } }, tooltip: chartCommonOpts() } }
   });
 }
-
 function renderActivoChart() {
   if (activoChart) { try { activoChart.destroy(); } catch(e) {} }
   var ctx = document.getElementById('activo-chart');
@@ -2081,7 +2627,7 @@ function renderActivoChart() {
     var c = calcProp(p);
     labels.push(p.nombre.substring(0,16));
     vals.push(parseFloat(c.cfNetoMensual.toFixed(2)));
-    colors.push(c.cfNetoMensual >= 0 ? 'rgba(160,168,255,.75)' : 'rgba(224,92,92,.75)');
+    colors.push(c.cfNetoMensual >= 0 ? 'rgba(79,166,247,.75)' : 'rgba(224,92,92,.75)');
   });
   S.liquido.forEach(function(l) {
     var cf = cfNetAhorro(nv(l.saldo),nv(l.tae));
@@ -2098,13 +2644,15 @@ function renderActivoChart() {
     data: { labels: labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 5 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#22222e', borderColor: '#2e2e3e', borderWidth: 1 } },
-      scales: { x: { grid: { display: false }, ticks: { color: '#888899', font: { size: 10 } } }, y: { grid: { color: 'rgba(46,46,62,.4)' }, ticks: { color: '#888899' } } }
+      plugins: { legend: { display: false }, tooltip: chartCommonOpts() },
+      scales: { x: { grid: { display: false }, ticks: { color: '#7a7a8a', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#7a7a8a' } } }
     }
   });
 }
 
-// ============ CONFIG ============
+/* ============================================================
+   CONFIG
+   ============================================================ */
 function tramoMarginal(base) {
   var tramos = [
     { hasta: 12450,  pct: 19, label: 'hasta 12.450 €' },
@@ -2113,14 +2661,11 @@ function tramoMarginal(base) {
     { hasta: 60000,  pct: 37, label: '35.200 – 60.000 €' },
     { hasta: Infinity, pct: 45, label: 'más de 60.000 €' }
   ];
-  var acum = 0;
   for (var i = 0; i < tramos.length; i++) {
-    acum += tramos[i].hasta === Infinity ? 0 : tramos[i].hasta - (i > 0 ? [0,12450,20050,35200,60000][i] : 0);
     if (base < (i === 0 ? 12450 : [12450,20050,35200,60000,Infinity][i])) return tramos[i];
   }
   return tramos[tramos.length - 1];
 }
-
 function previewIRPF() {
   var base = parseFloat(document.getElementById('cfg-baseIRPF').value) || 0;
   var tramo = tramoMarginal(base);
@@ -2129,29 +2674,34 @@ function previewIRPF() {
   var colors = { 19:'var(--g)', 24:'var(--g)', 30:'var(--am)', 37:'var(--am)', 45:'var(--r)' };
   document.getElementById('cfg-irpf-tramo').style.color = colors[tramo.pct] || 'var(--am)';
 }
-
 function loadConfigForm() {
   document.getElementById('cfg-baseIRPF').value = (S.config && S.config.baseIRPF) ? S.config.baseIRPF : '';
-  document.getElementById('cfg-supaUrl').value = SUPA_URL || '';
-  document.getElementById('cfg-supaKey').value = SUPA_KEY || '';
+  var rem = Store.getRemote();
+  document.getElementById('cfg-remoteUrl').value = rem && rem.url ? rem.url : '';
+  document.getElementById('cfg-remoteToken').value = rem && rem.token ? rem.token : '';
   previewIRPF();
 }
-
 function saveConfig() {
   if (!S.config) S.config = {};
   S.config.baseIRPF = gv('cfg-baseIRPF');
-  trySave();
-  renderAll();
+  trySave(); renderAll();
   flash('cfg-flash', 'Actualizado');
 }
-
-function saveSupaConfig() {
-  SUPA_URL = document.getElementById('cfg-supaUrl').value.trim();
-  SUPA_KEY = document.getElementById('cfg-supaKey').value.trim();
-  localStorage.setItem('pf_supa_cfg', JSON.stringify({ url: SUPA_URL, key: SUPA_KEY }));
-  flash('supa-flash', 'Credenciales guardadas');
+function saveRemoteConfig() {
+  var url = document.getElementById('cfg-remoteUrl').value.trim();
+  var token = document.getElementById('cfg-remoteToken').value.trim();
+  if (!url) { flash('remote-flash', 'Indica la URL del servidor', 'r'); return; }
+  Store.setRemote({ url: url, token: token });
+  flash('remote-flash', 'Servidor configurado');
+  setSyncStatus('idle');
 }
-
+function clearRemoteConfig() {
+  Store.setRemote(null);
+  document.getElementById('cfg-remoteUrl').value = '';
+  document.getElementById('cfg-remoteToken').value = '';
+  flash('remote-flash', 'Servidor remoto desactivado');
+  setSyncStatus('idle');
+}
 function exportData() {
   var json = JSON.stringify(S, null, 2);
   var blob = new Blob([json], { type: 'application/json' });
@@ -2162,7 +2712,6 @@ function exportData() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
 function importData(event) {
   var file = event.target.files[0];
   if (!file) return;
@@ -2170,30 +2719,50 @@ function importData(event) {
   reader.onload = function(e) {
     try {
       var data = JSON.parse(e.target.result);
-      if (!confirm('¿Importar datos? Esto reemplazará todos los datos actuales.')) return;
-      mergeState(data);
-      trySave(); renderAll();
-      toast('Datos importados correctamente');
+      confirmAction('¿Importar datos?', 'Se reemplazarán todos los datos actuales con los del archivo.', function() {
+        mergeState(data);
+        trySave(); renderAll();
+        toast('Datos importados correctamente');
+      }, 'Importar');
     } catch(err) { toast('Error: fichero inválido'); }
   };
   reader.readAsText(file);
+  event.target.value = '';
 }
-
 function borrarTodo() {
-  if (!confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) return;
-  if (!confirm('Confirma de nuevo: se borrarán todas las inversiones, propiedades y registros guardados.')) return;
-  S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, _savedAt: Date.now() };
-  trySave(); renderAll();
-  toast('Datos eliminados');
+  confirmAction('¿Borrar TODOS los datos?', 'Se eliminarán inversiones, propiedades, snapshots y el PIN configurado. Esta acción no se puede deshacer.', function() {
+    confirmAction('Confirmación final', 'Pulsa borrar para confirmar definitivamente.', function() {
+      S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, _savedAt: Date.now() };
+      Store.clearLocal();
+      Store.setRemote(null);
+      Auth.clear();
+      toast('Datos eliminados');
+      setTimeout(function(){ location.reload(); }, 700);
+    }, 'Borrar todo');
+  }, 'Continuar');
 }
 
-// ============ INIT ============
+/* ============================================================
+   INIT
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', function() {
-  // Enter key en login y registro
-  document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-  document.getElementById('reg-pass2').addEventListener('keydown', function(e){ if(e.key==='Enter') doRegister(); });
-  document.getElementById('recover-email').addEventListener('keydown', function(e){ if(e.key==='Enter') doRecover(); });
-  restoreSession();
+  // Keyboard support en PIN screen
+  document.addEventListener('keydown', function(e) {
+    if (document.getElementById('pin-screen').style.display === 'none') return;
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    else if (e.key === 'Backspace') pinClear();
+    else if (e.key === 'Enter') pinSubmit();
+  });
+
+  if (!Auth.hasPIN()) {
+    pinSetMode('setup-1');
+    document.getElementById('pin-screen').style.display = 'flex';
+  } else if (Auth.isLogged()) {
+    enterApp();
+  } else {
+    pinSetMode('enter');
+    document.getElementById('pin-screen').style.display = 'flex';
+  }
 });
 </script>
 </body>
