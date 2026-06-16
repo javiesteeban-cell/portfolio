@@ -2687,13 +2687,29 @@ function saveConfig() {
   trySave(); renderAll();
   flash('cfg-flash', 'Actualizado');
 }
-function saveRemoteConfig() {
+async function saveRemoteConfig() {
   var url = document.getElementById('cfg-remoteUrl').value.trim();
   var token = document.getElementById('cfg-remoteToken').value.trim();
   if (!url) { flash('remote-flash', 'Indica la URL del servidor', 'r'); return; }
   Store.setRemote({ url: url, token: token });
-  flash('remote-flash', 'Servidor configurado');
-  setSyncStatus('idle');
+  setSyncStatus('busy');
+  var cloud = await Store.loadRemote();
+  if (cloud === null) {
+    flash('remote-flash', 'No se pudo conectar al servidor', 'r');
+    setSyncStatus('err');
+    return;
+  }
+  if (cloud && cloud._savedAt) {
+    mergeState(cloud);
+    Store.saveLocal(S);
+    renderAll();
+    flash('remote-flash', 'Conectado · datos cargados desde la nube');
+  } else {
+    // KV vacío en el servidor: empujamos el estado local actual
+    await Store.syncRemote(S);
+    flash('remote-flash', 'Conectado · estado local sincronizado');
+  }
+  setSyncStatus('ok');
 }
 function clearRemoteConfig() {
   Store.setRemote(null);
