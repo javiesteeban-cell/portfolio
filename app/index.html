@@ -1149,36 +1149,9 @@ input[type=range].crypto::-moz-range-thumb{
             </div>
           </div>
 
-          <div class="tile c-6">
-            <div class="tile-hd"><span class="tile-l">Seguridad · PIN</span></div>
-            <p class="hint" style="margin-bottom:12px;">Tu PIN se guarda como hash SHA-256 en el navegador. Nadie (ni tú) puede recuperarlo: si lo olvidas, deberás resetear la app desde la zona peligrosa.</p>
-            <div class="btn-row">
-              <button class="btn ghost sm" onclick="changePINFlow()">
-                <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Cambiar PIN
-              </button>
-              <span class="flash" id="pin-flash"></span>
-            </div>
-          </div>
-
-          <div class="tile c-6">
-            <div class="tile-hd"><span class="tile-l">Almacenamiento remoto</span><span class="chip mu">Pendiente</span></div>
-            <p class="hint" style="margin-bottom:12px;">Cuando tengas servidor propio, introduce su URL aquí. Los datos seguirán cacheándose en el navegador con sincronización automática.</p>
-            <div class="fgrid">
-              <div class="ef span12">
-                <label>URL del servidor (REST)</label>
-                <input id="cfg-remoteUrl" placeholder="https://api.tu-dominio.com/portfolio">
-              </div>
-              <div class="ef span12">
-                <label>Token Bearer (opcional)</label>
-                <input id="cfg-remoteToken" type="password" placeholder="—">
-              </div>
-            </div>
-            <div class="btn-row" style="margin-top:12px;">
-              <button class="btn ghost sm" onclick="saveRemoteConfig()">Guardar</button>
-              <button class="btn ghost sm" onclick="clearRemoteConfig()">Quitar</button>
-              <span class="flash" id="remote-flash"></span>
-            </div>
+          <div class="tile c-12">
+            <div class="tile-hd"><span class="tile-l">Sincronización</span><span class="chip g">Cloud activo</span></div>
+            <p class="hint">Tus datos se sincronizan automáticamente con tu servidor Cloudflare. El PIN se valida contra el servidor — uno solo para todos los dispositivos. Para cambiarlo, edita la variable <code>AUTH_PIN_HASH</code> en el panel de Cloudflare.</p>
           </div>
 
           <div class="tile c-12">
@@ -1225,15 +1198,13 @@ input[type=range].crypto::-moz-range-thumb{
 
 <script>
 /* ============================================================
-   STORE — capa abstracta de persistencia
-   - LocalStorage siempre activo (cache)
-   - Remote opcional preparado para servidor futuro
+   STORE — capa de persistencia (cloud + cache local)
+   URL fija: location.origin + /api/state
+   Token Bearer = hash SHA-256 del PIN (lo gestiona Auth).
    ============================================================ */
 var Store = (function(){
   var DATA_KEY = 'pf_v8_data';
-  var REMOTE_KEY = 'pf_v8_remote';
-  var remote = null;
-  try { remote = JSON.parse(localStorage.getItem(REMOTE_KEY)) || null; } catch(e) { remote = null; }
+  var API_URL = location.origin + '/api/state';
 
   function load() {
     try { return JSON.parse(localStorage.getItem(DATA_KEY)) || null; } catch(e) { return null; }
@@ -1244,41 +1215,44 @@ var Store = (function(){
   function clearLocal() {
     localStorage.removeItem(DATA_KEY);
   }
-  function getRemote() { return remote; }
-  function setRemote(cfg) {
-    remote = cfg && cfg.url ? cfg : null;
-    if (remote) localStorage.setItem(REMOTE_KEY, JSON.stringify(remote));
-    else localStorage.removeItem(REMOTE_KEY);
+  function getURL() { return API_URL; }
+  function isCloudReady() {
+    // Cloud disponible si tenemos sesión y la app no corre en file://
+    return Auth.getToken() && location.protocol !== 'file:';
   }
   async function syncRemote(data) {
-    if (!remote || !remote.url) return { ok: false, skipped: true };
+    if (!isCloudReady()) return { ok: false, skipped: true };
     try {
-      var hdrs = { 'Content-Type': 'application/json' };
-      if (remote.token) hdrs['Authorization'] = 'Bearer ' + remote.token;
-      var res = await fetch(remote.url, { method: 'PUT', headers: hdrs, body: JSON.stringify(data) });
+      var res = await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + Auth.getToken() },
+        body: JSON.stringify(data)
+      });
       return { ok: res.ok, status: res.status };
     } catch(e) {
       return { ok: false, error: e.message };
     }
   }
   async function loadRemote() {
-    if (!remote || !remote.url) return null;
+    if (!isCloudReady()) return null;
     try {
-      var hdrs = {};
-      if (remote.token) hdrs['Authorization'] = 'Bearer ' + remote.token;
-      var res = await fetch(remote.url, { headers: hdrs });
+      var res = await fetch(API_URL, {
+        headers: { 'Authorization': 'Bearer ' + Auth.getToken() }
+      });
       if (!res.ok) return null;
       return await res.json();
     } catch(e) { return null; }
   }
-  return { load: load, saveLocal: saveLocal, clearLocal: clearLocal, getRemote: getRemote, setRemote: setRemote, syncRemote: syncRemote, loadRemote: loadRemote };
+  return { load: load, saveLocal: saveLocal, clearLocal: clearLocal, getURL: getURL, isCloudReady: isCloudReady, syncRemote: syncRemote, loadRemote: loadRemote };
 })();
 
 /* ============================================================
-   AUTH — PIN propio con SHA-256 en cliente
+   AUTH — PIN único, validado contra el servidor
+   El servidor guarda env.AUTH_PIN_HASH = hex(SHA-256(PIN)).
+   El cliente nunca almacena el PIN, solo su hash en sessionStorage
+   mientras dura la pestaña.
    ============================================================ */
 var Auth = (function(){
-  var PIN_KEY = 'pf_v8_pin';
   var SESS_KEY = 'pf_v8_session';
 
   async function hash(pin) {
@@ -1287,25 +1261,28 @@ var Auth = (function(){
     var arr = Array.from(new Uint8Array(buf));
     return arr.map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
   }
-  function hasPIN() { return !!localStorage.getItem(PIN_KEY); }
-  async function setPIN(pin) {
-    var h = await hash(pin);
-    localStorage.setItem(PIN_KEY, h);
-  }
+  // verify: prueba el PIN contra el servidor (GET /api/state con Bearer).
+  // Devuelve true si 200 OK; falso si 401; null si error de red (offline).
   async function verify(pin) {
-    var stored = localStorage.getItem(PIN_KEY);
-    if (!stored) return false;
     var h = await hash(pin);
-    return h === stored;
+    if (location.protocol === 'file:') return null;
+    try {
+      var res = await fetch(location.origin + '/api/state', {
+        headers: { 'Authorization': 'Bearer ' + h }
+      });
+      if (res.ok) {
+        sessionStorage.setItem(SESS_KEY, h);
+        return true;
+      }
+      return false;
+    } catch(e) {
+      return null;
+    }
   }
-  function clear() {
-    localStorage.removeItem(PIN_KEY);
-    localStorage.removeItem(SESS_KEY);
-  }
-  function login() { sessionStorage.setItem(SESS_KEY, '1'); }
   function logout() { sessionStorage.removeItem(SESS_KEY); }
-  function isLogged() { return sessionStorage.getItem(SESS_KEY) === '1'; }
-  return { hash: hash, hasPIN: hasPIN, setPIN: setPIN, verify: verify, clear: clear, login: login, logout: logout, isLogged: isLogged };
+  function isLogged() { return !!sessionStorage.getItem(SESS_KEY); }
+  function getToken() { return sessionStorage.getItem(SESS_KEY); }
+  return { hash: hash, verify: verify, logout: logout, isLogged: isLogged, getToken: getToken };
 })();
 
 /* ============================================================
@@ -1502,11 +1479,12 @@ function setSyncStatus(st, text) {
   var time = document.getElementById('sync-time');
   if (!dot) return;
   dot.className = 'dot ' + (st === 'idle' ? '' : st);
+  var cloud = Store.isCloudReady();
   var labels = {
-    idle: Store.getRemote() ? 'Cloud · sync' : 'Local',
+    idle: cloud ? 'Cloud' : 'Local',
     busy: 'Sincronizando…',
-    ok:   Store.getRemote() ? 'Cloud · OK' : 'Guardado',
-    err:  'Error sync'
+    ok:   cloud ? 'Cloud · OK' : 'Solo local',
+    err:  'Error de sync'
   };
   if (lbl) lbl.textContent = text || labels[st] || '';
   if (time && (st === 'ok' || st === 'idle')) {
@@ -1516,11 +1494,9 @@ function setSyncStatus(st, text) {
 }
 
 /* ============================================================
-   PIN UI
+   PIN UI — solo modo "enter" (PIN único validado contra servidor)
    ============================================================ */
-var pinMode = 'enter';    // 'enter' | 'setup-1' | 'setup-2' | 'change-old' | 'change-new1' | 'change-new2'
 var pinBuffer = '';
-var pinTmpNew = '';
 
 function pinRenderDots() {
   var el = document.getElementById('pin-dots');
@@ -1538,39 +1514,13 @@ function pinShake() {
   setTimeout(function(){ b.classList.remove('shake'); }, 450);
 }
 
-function pinSetMode(mode) {
-  pinMode = mode;
+function pinReset() {
   pinBuffer = '';
   pinRenderDots();
   document.getElementById('pin-err').textContent = '';
-  var eyebrow = document.getElementById('pin-eyebrow');
-  var sub = document.getElementById('pin-sub');
-  var hint = document.getElementById('pin-hint');
-  if (mode === 'setup-1') {
-    eyebrow.textContent = 'Configuración inicial';
-    sub.textContent = 'Crea un PIN de acceso';
-    hint.textContent = 'Elige 4 a 6 dígitos. Pulsa OK para continuar.';
-  } else if (mode === 'setup-2') {
-    eyebrow.textContent = 'Configuración inicial';
-    sub.textContent = 'Repite el PIN';
-    hint.textContent = 'Confirma el mismo PIN.';
-  } else if (mode === 'change-old') {
-    eyebrow.textContent = 'Cambiar PIN';
-    sub.textContent = 'PIN actual';
-    hint.textContent = 'Introduce tu PIN actual.';
-  } else if (mode === 'change-new1') {
-    eyebrow.textContent = 'Cambiar PIN';
-    sub.textContent = 'Nuevo PIN';
-    hint.textContent = 'Elige 4 a 6 dígitos.';
-  } else if (mode === 'change-new2') {
-    eyebrow.textContent = 'Cambiar PIN';
-    sub.textContent = 'Repite el nuevo PIN';
-    hint.textContent = 'Confirma el nuevo PIN.';
-  } else {
-    eyebrow.textContent = 'Acceso seguro';
-    sub.textContent = 'Introduce tu PIN para continuar';
-    hint.textContent = 'PIN de 4 a 6 dígitos';
-  }
+  document.getElementById('pin-eyebrow').textContent = 'Acceso seguro';
+  document.getElementById('pin-sub').textContent = 'Introduce tu PIN para continuar';
+  document.getElementById('pin-hint').textContent = 'PIN de 4 a 6 dígitos';
 }
 
 function pinPress(d) {
@@ -1591,73 +1541,26 @@ async function pinSubmit() {
     return;
   }
   var entered = pinBuffer;
-
-  if (pinMode === 'enter') {
-    var ok = await Auth.verify(entered);
-    if (ok) {
-      Auth.login();
-      enterApp();
-    } else {
-      document.getElementById('pin-err').textContent = 'PIN incorrecto';
-      pinShake();
-      pinBuffer = '';
-      pinRenderDots();
-    }
-  } else if (pinMode === 'setup-1') {
-    pinTmpNew = entered;
-    pinSetMode('setup-2');
-  } else if (pinMode === 'setup-2') {
-    if (entered !== pinTmpNew) {
-      document.getElementById('pin-err').textContent = 'Los PIN no coinciden';
-      pinShake();
-      pinBuffer = '';
-      pinRenderDots();
-      return;
-    }
-    await Auth.setPIN(pinTmpNew);
-    Auth.login();
-    pinTmpNew = '';
+  document.getElementById('pin-err').textContent = 'Comprobando…';
+  var result = await Auth.verify(entered);
+  if (result === true) {
     enterApp();
-  } else if (pinMode === 'change-old') {
-    var ok2 = await Auth.verify(entered);
-    if (!ok2) {
-      document.getElementById('pin-err').textContent = 'PIN actual incorrecto';
-      pinShake();
-      pinBuffer = '';
-      pinRenderDots();
-      return;
-    }
-    pinSetMode('change-new1');
-  } else if (pinMode === 'change-new1') {
-    pinTmpNew = entered;
-    pinSetMode('change-new2');
-  } else if (pinMode === 'change-new2') {
-    if (entered !== pinTmpNew) {
-      document.getElementById('pin-err').textContent = 'Los PIN no coinciden';
-      pinShake();
-      pinBuffer = '';
-      pinRenderDots();
-      return;
-    }
-    await Auth.setPIN(pinTmpNew);
-    pinTmpNew = '';
-    toast('PIN actualizado');
-    Auth.login();
-    enterApp();
+  } else if (result === null) {
+    document.getElementById('pin-err').textContent = 'Sin conexión al servidor';
+    pinShake();
+    pinBuffer = ''; pinRenderDots();
+  } else {
+    document.getElementById('pin-err').textContent = 'PIN incorrecto';
+    pinShake();
+    pinBuffer = ''; pinRenderDots();
   }
-}
-
-function changePINFlow() {
-  document.getElementById('pin-screen').style.display = 'flex';
-  document.getElementById('main-app').classList.remove('show');
-  pinSetMode('change-old');
 }
 
 function lockApp() {
   Auth.logout();
-  document.getElementById('pin-screen').style.display = 'flex';
   document.getElementById('main-app').classList.remove('show');
-  pinSetMode('enter');
+  document.getElementById('pin-screen').style.display = 'flex';
+  pinReset();
 }
 
 /* ============================================================
@@ -1677,7 +1580,6 @@ async function enterApp() {
   document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('main-app').classList.add('show');
   await tryLoad();
-  setSyncStatus('idle');
 }
 
 function showTab(name) {
@@ -1718,9 +1620,9 @@ function trySave() {
   setSyncStatus('busy');
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(async function(){
-    if (Store.getRemote()) {
+    if (Store.isCloudReady()) {
       var res = await Store.syncRemote(S);
-      setSyncStatus(res.ok ? 'ok' : (res.skipped ? 'idle' : 'err'));
+      setSyncStatus(res.ok ? 'ok' : 'err');
     } else {
       setSyncStatus('ok');
     }
@@ -1729,14 +1631,18 @@ function trySave() {
 
 async function tryLoad() {
   isLoading = true;
+  setSyncStatus('busy');
   var local = Store.load();
   if (local) mergeState(local);
-  if (Store.getRemote()) {
+  if (Store.isCloudReady()) {
     var cloud = await Store.loadRemote();
-    if (cloud && (!local || (cloud._savedAt || 0) > (local._savedAt || 0))) {
+    if (cloud && (cloud._savedAt || 0) > (local && local._savedAt || 0)) {
       mergeState(cloud);
       Store.saveLocal(S);
     }
+    setSyncStatus('ok');
+  } else {
+    setSyncStatus('ok');
   }
   isLoading = false;
   renderAll();
@@ -2676,9 +2582,6 @@ function previewIRPF() {
 }
 function loadConfigForm() {
   document.getElementById('cfg-baseIRPF').value = (S.config && S.config.baseIRPF) ? S.config.baseIRPF : '';
-  var rem = Store.getRemote();
-  document.getElementById('cfg-remoteUrl').value = rem && rem.url ? rem.url : '';
-  document.getElementById('cfg-remoteToken').value = rem && rem.token ? rem.token : '';
   previewIRPF();
 }
 function saveConfig() {
@@ -2686,37 +2589,6 @@ function saveConfig() {
   S.config.baseIRPF = gv('cfg-baseIRPF');
   trySave(); renderAll();
   flash('cfg-flash', 'Actualizado');
-}
-async function saveRemoteConfig() {
-  var url = document.getElementById('cfg-remoteUrl').value.trim();
-  var token = document.getElementById('cfg-remoteToken').value.trim();
-  if (!url) { flash('remote-flash', 'Indica la URL del servidor', 'r'); return; }
-  Store.setRemote({ url: url, token: token });
-  setSyncStatus('busy');
-  var cloud = await Store.loadRemote();
-  if (cloud === null) {
-    flash('remote-flash', 'No se pudo conectar al servidor', 'r');
-    setSyncStatus('err');
-    return;
-  }
-  if (cloud && cloud._savedAt) {
-    mergeState(cloud);
-    Store.saveLocal(S);
-    renderAll();
-    flash('remote-flash', 'Conectado · datos cargados desde la nube');
-  } else {
-    // KV vacío en el servidor: empujamos el estado local actual
-    await Store.syncRemote(S);
-    flash('remote-flash', 'Conectado · estado local sincronizado');
-  }
-  setSyncStatus('ok');
-}
-function clearRemoteConfig() {
-  Store.setRemote(null);
-  document.getElementById('cfg-remoteUrl').value = '';
-  document.getElementById('cfg-remoteToken').value = '';
-  flash('remote-flash', 'Servidor remoto desactivado');
-  setSyncStatus('idle');
 }
 function exportData() {
   var json = JSON.stringify(S, null, 2);
@@ -2746,12 +2618,12 @@ function importData(event) {
   event.target.value = '';
 }
 function borrarTodo() {
-  confirmAction('¿Borrar TODOS los datos?', 'Se eliminarán inversiones, propiedades, snapshots y el PIN configurado. Esta acción no se puede deshacer.', function() {
+  confirmAction('¿Borrar TODOS los datos?', 'Se eliminarán inversiones, propiedades, snapshots y la copia local. Los datos del servidor se borrarán en el próximo guardado. Esta acción no se puede deshacer.', function() {
     confirmAction('Confirmación final', 'Pulsa borrar para confirmar definitivamente.', function() {
       S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, _savedAt: Date.now() };
       Store.clearLocal();
-      Store.setRemote(null);
-      Auth.clear();
+      trySave();
+      Auth.logout();
       toast('Datos eliminados');
       setTimeout(function(){ location.reload(); }, 700);
     }, 'Borrar todo');
@@ -2770,13 +2642,10 @@ document.addEventListener('DOMContentLoaded', function() {
     else if (e.key === 'Enter') pinSubmit();
   });
 
-  if (!Auth.hasPIN()) {
-    pinSetMode('setup-1');
-    document.getElementById('pin-screen').style.display = 'flex';
-  } else if (Auth.isLogged()) {
+  if (Auth.isLogged()) {
     enterApp();
   } else {
-    pinSetMode('enter');
+    pinReset();
     document.getElementById('pin-screen').style.display = 'flex';
   }
 });

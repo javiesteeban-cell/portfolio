@@ -1,8 +1,9 @@
 // Cloudflare Pages Function — sincronización de estado del portfolio.
 // GET  /api/state  → devuelve el JSON guardado (o {} si vacío).
 // PUT  /api/state  → guarda el body JSON como nuevo estado.
-// Auth: header  Authorization: Bearer <env.AUTH_TOKEN>
-// Storage:      KV binding  env.PORTFOLIO_KV
+// Auth: header  Authorization: Bearer <sha256(PIN)>
+// Server compara con env.AUTH_PIN_HASH (hex SHA-256 del PIN, configurado en Cloudflare).
+// Storage: KV binding env.PORTFOLIO_KV
 
 const STATE_KEY = 'state';
 
@@ -25,10 +26,11 @@ function json(data, status, extra) {
 }
 
 function checkAuth(request, env) {
-  if (!env.AUTH_TOKEN) return { ok: false, code: 500, msg: 'AUTH_TOKEN not configured' };
+  if (!env.AUTH_PIN_HASH) return { ok: false, code: 500, msg: 'AUTH_PIN_HASH not configured' };
   const hdr = request.headers.get('Authorization') || '';
-  const token = hdr.replace(/^Bearer\s+/i, '').trim();
-  if (!token || token !== env.AUTH_TOKEN) return { ok: false, code: 401, msg: 'Unauthorized' };
+  const token = hdr.replace(/^Bearer\s+/i, '').trim().toLowerCase();
+  const expected = env.AUTH_PIN_HASH.trim().toLowerCase();
+  if (!token || token !== expected) return { ok: false, code: 401, msg: 'Unauthorized' };
   return { ok: true };
 }
 
