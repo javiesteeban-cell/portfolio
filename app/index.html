@@ -1061,11 +1061,16 @@ input[type=range].crypto::-moz-range-thumb{
                   <span class="subbox-r" id="prop-tabla-status">Sin tabla cargada</span>
                 </div>
                 <div class="fgrid">
-                  <div class="ef span6">
-                    <label>Fecha primera cuota</label>
+                  <div class="ef span4">
+                    <label>Fecha 1ª cuota de la tabla</label>
                     <input type="date" id="prop-fechaPrimeraCuota">
                   </div>
-                  <div class="ef span6">
+                  <div class="ef span4">
+                    <label>Cuotas ya pagadas</label>
+                    <input type="number" id="prop-cuotasPagadas" placeholder="0" min="0" step="1">
+                    <p class="hint">Cuotas anteriores a la tabla. Si la tabla empieza en la cuota 49 del préstamo, pon <strong>48</strong>.</p>
+                  </div>
+                  <div class="ef span4">
                     <label>Cuotas detectadas</label>
                     <input id="prop-tabla-count" readonly placeholder="—">
                   </div>
@@ -1414,15 +1419,20 @@ function calcProp(p) {
   var tieneTabla = p.amortiTable && p.amortiTable.length && p.fechaPrimeraCuota;
 
   if (tieneTabla) {
-    var n = cuotaActualDesdeFecha(p.fechaPrimeraCuota, p.amortiTable.length);
-    var row = p.amortiTable[n - 1];
+    var nLocal = cuotaActualDesdeFecha(p.fechaPrimeraCuota, p.amortiTable.length);
+    var row = p.amortiTable[nLocal - 1];
+    var pagadas = Math.max(0, Math.floor(nv(p.cuotasPagadas)));
     cuotaMensual = nv(row.cuota);
     interesesMensual = nv(row.interes);
     amortiMensual = nv(row.amorti);
     // Si el banco proporciona "base de cálculo" (saldo antes de pagar esta cuota), lo usamos
     // como saldo pendiente actual; si no, usamos el saldo posterior estándar.
     saldoPendiente = row.base !== undefined ? nv(row.base) : nv(row.saldo);
-    cuotaActualInfo = { n: n, total: p.amortiTable.length };
+    cuotaActualInfo = {
+      n: pagadas + nLocal,
+      total: pagadas + p.amortiTable.length,
+      fecha: row.fecha || ''
+    };
   } else if (nv(p.tin) && nv(p.plazoAnios)) {
     var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
     var rf = calcAmortiFrances(capitalFin, nv(p.tin), nv(p.plazoAnios), nv(p.cuotaNum)||1);
@@ -2320,6 +2330,7 @@ function saveProp() {
     cuotaNum: tieneHip && !usaTabla ? (gv('prop-cuotaNum') || 1) : 1,
     modoHipoteca: modoHip,
     fechaPrimeraCuota: usaTabla ? document.getElementById('prop-fechaPrimeraCuota').value : '',
+    cuotasPagadas: usaTabla ? (gv('prop-cuotasPagadas') || 0) : 0,
     amortiTable: usaTabla ? _tempAmortiTable : null
   };
   if (editPropId) {
@@ -2371,6 +2382,7 @@ function editProp(id) {
     if (tieneTabla) {
       _tempAmortiTable = p.amortiTable;
       document.getElementById('prop-fechaPrimeraCuota').value = p.fechaPrimeraCuota || '';
+      document.getElementById('prop-cuotasPagadas').value = p.cuotasPagadas || '';
       document.getElementById('prop-tabla-count').value = p.amortiTable.length + ' cuotas';
       document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + p.amortiTable.length + ' cuotas';
       document.getElementById('prop-tabla-raw').value = '';
@@ -2397,7 +2409,7 @@ function cancelEditProp() {
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum','prop-fechaPrimeraCuota','prop-tabla-raw','prop-tabla-count'].forEach(function(id){
+  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum','prop-fechaPrimeraCuota','prop-cuotasPagadas','prop-tabla-raw','prop-tabla-count'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('prop-tiene-comision').value = 'no';
@@ -2425,8 +2437,7 @@ function renderPropList() {
 
     html += '<div class="prop-row" data-id="' + p.id + '">';
     html += '<div class="prop-sum" onclick="toggleProp(' + p.id + ')">';
-    var tablaChip = c.cuotaActualInfo ? '<span class="chip ac" style="margin-left:6px;">tabla · ' + c.cuotaActualInfo.n + '/' + c.cuotaActualInfo.total + '</span>' : '';
-    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + tablaChip + '</div>';
+    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + '</div>';
     html += '<div class="prop-kpis">';
     if (esHabitual) {
       html += '<div class="prop-kpi"><div class="prop-kpi-l">Equity</div><div class="prop-kpi-v ac">' + eur(c.equityProp) + '</div></div>';
@@ -2458,7 +2469,8 @@ function renderPropList() {
       if (c.cuotaMensual > 0) {
         html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
         if (c.cuotaActualInfo) {
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + '</span></div>';
+          var fechaTxtH = c.cuotaActualInfo.fecha ? ' · ' + esc(c.cuotaActualInfo.fecha) : '';
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + fechaTxtH + '</span></div>';
           html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
           html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
         } else if (nv(p.tin) && nv(p.plazoAnios)) {
@@ -2485,7 +2497,8 @@ function renderPropList() {
       if (nv(p.reforma) > 0) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Coste reforma</span><span class="fv mu">' + eur(p.reforma) + '</span></div>';
       html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
       if (c.cuotaActualInfo) {
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + '</span></div>';
+        var fechaTxt = c.cuotaActualInfo.fecha ? ' · ' + esc(c.cuotaActualInfo.fecha) : '';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + fechaTxt + '</span></div>';
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
