@@ -1028,21 +1028,57 @@ input[type=range].crypto::-moz-range-thumb{
             <div class="span12" id="prop-f-hipoteca" style="display:none;">
               <div class="subbox">
                 <div class="subbox-hd">
-                  <span class="subbox-l">Hipoteca — amortización francés</span>
+                  <span class="subbox-l">Hipoteca</span>
                   <span class="subbox-r mu">Datos de la financiación</span>
                 </div>
                 <div class="fgrid">
+                  <div class="ef span12">
+                    <label>Modo de cálculo</label>
+                    <select id="prop-hip-modo" onchange="onPropHipModoChange()">
+                      <option value="auto">Automático (modelo francés)</option>
+                      <option value="tabla">Tabla del banco (hipoteca mixta/variable)</option>
+                    </select>
+                  </div>
                   <div class="ef span3"><label>% Entrada</label><input type="number" id="prop-pctEntrada" placeholder="20" step="0.1" oninput="updateHipoteca()"></div>
                   <div class="ef span3"><label>Capital financiado (€)</label><input type="number" id="prop-capitalFin" placeholder="Auto" readonly></div>
-                  <div class="ef span3"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
+                  <div class="ef span3" id="prop-f-tin"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
                   <div class="ef span3"><label>Plazo (años)</label><input type="number" id="prop-plazoAnios" placeholder="30" step="1" oninput="updateHipoteca()"></div>
-                  <div class="ef span3"><label>Cuota nº actual</label><input type="number" id="prop-cuotaNum" placeholder="1" step="1" min="1" oninput="updateHipoteca()"></div>
+                  <div class="ef span3" id="prop-f-cuotaNum"><label>Cuota nº actual</label><input type="number" id="prop-cuotaNum" placeholder="1" step="1" min="1" oninput="updateHipoteca()"></div>
                 </div>
                 <div class="hip-grid" id="prop-hip-result" style="display:none;">
                   <div class="hip-kpi"><div class="hip-l">Cuota/mes</div><div class="hip-v" id="prop-hip-cuota">—</div></div>
                   <div class="hip-kpi"><div class="hip-l">Intereses/mes</div><div class="hip-v r" id="prop-hip-interes">—</div></div>
                   <div class="hip-kpi"><div class="hip-l">Amort./mes</div><div class="hip-v g" id="prop-hip-amorti">—</div></div>
                   <div class="hip-kpi"><div class="hip-l">Saldo pendiente</div><div class="hip-v ac" id="prop-hip-saldo">—</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="span12" id="prop-f-tabla" style="display:none;">
+              <div class="subbox">
+                <div class="subbox-hd">
+                  <span class="subbox-l">Tabla de amortización</span>
+                  <span class="subbox-r" id="prop-tabla-status">Sin tabla cargada</span>
+                </div>
+                <div class="fgrid">
+                  <div class="ef span6">
+                    <label>Fecha primera cuota</label>
+                    <input type="date" id="prop-fechaPrimeraCuota">
+                  </div>
+                  <div class="ef span6">
+                    <label>Cuotas detectadas</label>
+                    <input id="prop-tabla-count" readonly placeholder="—">
+                  </div>
+                  <div class="ef span12">
+                    <label>Pega la tabla del banco</label>
+                    <textarea id="prop-tabla-raw" rows="7" placeholder="Formato: 5 columnas (nº cuota, cuota mensual, intereses, amortización, saldo). Separador tab, coma o espacios. Ejemplo:&#10;1   850.34   416.67   433.67   199566.33&#10;2   850.34   415.76   434.58   199131.75&#10;..." style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.5;min-height:140px;resize:vertical;"></textarea>
+                    <p class="hint">Acepta números en formato europeo (1.234,56) o anglosajón (1,234.56). Las cabeceras se saltan automáticamente.</p>
+                  </div>
+                </div>
+                <div class="btn-row" style="margin-top:10px;">
+                  <button class="btn ghost sm" onclick="applyAmortiTable()">Procesar tabla</button>
+                  <button class="btn ghost sm" onclick="clearAmortiTable()">Vaciar</button>
+                  <span class="flash" id="tabla-flash"></span>
                 </div>
               </div>
             </div>
@@ -1374,7 +1410,18 @@ function calcProp(p) {
     ? nv(p.ibi) + nv(p.seguro) + nv(p.comunidad) + nv(p.otrosGastos)
     : nv(p.gastosDed);
   var cuotaMensual, interesesMensual, amortiMensual, saldoPendiente = 0;
-  if (nv(p.tin) && nv(p.plazoAnios)) {
+  var cuotaActualInfo = null; // {n, total} si usa tabla
+  var tieneTabla = p.amortiTable && p.amortiTable.length && p.fechaPrimeraCuota;
+
+  if (tieneTabla) {
+    var n = cuotaActualDesdeFecha(p.fechaPrimeraCuota, p.amortiTable.length);
+    var row = p.amortiTable[n - 1];
+    cuotaMensual = nv(row.cuota);
+    interesesMensual = nv(row.interes);
+    amortiMensual = nv(row.amorti);
+    saldoPendiente = nv(row.saldo);
+    cuotaActualInfo = { n: n, total: p.amortiTable.length };
+  } else if (nv(p.tin) && nv(p.plazoAnios)) {
     var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
     var rf = calcAmortiFrances(capitalFin, nv(p.tin), nv(p.plazoAnios), nv(p.cuotaNum)||1);
     if (rf) { cuotaMensual = rf.cuota; interesesMensual = rf.interesMes; amortiMensual = rf.amortiMes; saldoPendiente = rf.saldoRestante; }
@@ -1399,7 +1446,7 @@ function calcProp(p) {
   var yieldBruto = nv(p.valor) > 0 ? alqAnual / nv(p.valor) : 0;
   var yieldNeto = nv(p.valor) > 0 ? (alqAnual - gastosDed - impuesto) / nv(p.valor) : 0;
   var equityProp = nv(p.valor) - saldoPendiente;
-  return { cfNetoMensual: cfNetoAnual/12, cfNetoAnual: cfNetoAnual, amortiAnual: amortiAnual, amortiMensual: amortiMensual, interesesMensual: interesesMensual, cuotaMensual: cuotaMensual, roce: roce, yieldCF: yieldCF, yieldBruto: yieldBruto, yieldNeto: yieldNeto, impuesto: impuesto, capPropio: capPropio, saldoPendiente: saldoPendiente, equityProp: equityProp };
+  return { cfNetoMensual: cfNetoAnual/12, cfNetoAnual: cfNetoAnual, amortiAnual: amortiAnual, amortiMensual: amortiMensual, interesesMensual: interesesMensual, cuotaMensual: cuotaMensual, roce: roce, yieldCF: yieldCF, yieldBruto: yieldBruto, yieldNeto: yieldNeto, impuesto: impuesto, capPropio: capPropio, saldoPendiente: saldoPendiente, equityProp: equityProp, cuotaActualInfo: cuotaActualInfo };
 }
 
 function getCFInv(inv) {
@@ -2096,6 +2143,100 @@ function toggleProp(id) {
   var el = document.querySelector('.prop-row[data-id="' + id + '"]');
   if (el) el.classList.toggle('expanded');
 }
+
+/* ----- Tabla de amortización ----- */
+var _tempAmortiTable = null;
+
+function onPropHipModoChange() {
+  var modo = document.getElementById('prop-hip-modo').value;
+  var esTabla = modo === 'tabla';
+  document.getElementById('prop-f-tabla').style.display = esTabla ? 'block' : 'none';
+  // En modo tabla, TIN y cuota nº actual se ocultan (los infiere la tabla)
+  document.getElementById('prop-f-tin').style.display = esTabla ? 'none' : '';
+  document.getElementById('prop-f-cuotaNum').style.display = esTabla ? 'none' : '';
+  // Si pasamos a auto, recalcular con francés
+  if (!esTabla) updateHipoteca();
+}
+
+function parseNumberFlexible(s) {
+  if (s === null || s === undefined) return NaN;
+  s = String(s).trim().replace(/[€$\s]/g, '');
+  if (!s) return NaN;
+  var hasComma = s.indexOf(',') >= 0;
+  var hasDot = s.indexOf('.') >= 0;
+  if (hasComma && hasDot) {
+    var lastComma = s.lastIndexOf(',');
+    var lastDot = s.lastIndexOf('.');
+    if (lastComma > lastDot) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else {
+      s = s.replace(/,/g, '');
+    }
+  } else if (hasComma) {
+    var parts = s.split(',');
+    if (parts.length === 2 && parts[1].length <= 2) s = s.replace(',', '.');
+    else s = s.replace(/,/g, '');
+  }
+  return parseFloat(s);
+}
+
+function parseAmortiTable(text) {
+  if (!text) return { rows: [], skipped: 0 };
+  var lines = text.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
+  var rows = [], skipped = 0;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var parts;
+    if (line.indexOf('\t') >= 0) parts = line.split(/\t+/);
+    else if (line.indexOf(';') >= 0) parts = line.split(/;+/);
+    else {
+      // Detectar si coma es separador (decimal vs separador de columnas)
+      var commaCount = (line.match(/,/g) || []).length;
+      var spaceCount = (line.match(/\s+/g) || []).length;
+      if (commaCount >= 4 && /,\s*\d/.test(line)) parts = line.split(/,/);
+      else parts = line.split(/\s{2,}|\t+|\s+/);
+    }
+    parts = parts.map(function(p){ return p.trim(); }).filter(Boolean);
+    if (parts.length < 5) { skipped++; continue; }
+    var nums = parts.slice(0, 5).map(parseNumberFlexible);
+    if (!isFinite(nums[0]) || nums[0] !== Math.floor(nums[0]) || nums[0] < 1 || nums[0] > 720) { skipped++; continue; }
+    if (!isFinite(nums[1]) || !isFinite(nums[2]) || !isFinite(nums[3]) || !isFinite(nums[4])) { skipped++; continue; }
+    rows.push({ n: nums[0], cuota: nums[1], interes: nums[2], amorti: nums[3], saldo: nums[4] });
+  }
+  rows.sort(function(a,b){ return a.n - b.n; });
+  return { rows: rows, skipped: skipped };
+}
+
+function applyAmortiTable() {
+  var text = document.getElementById('prop-tabla-raw').value;
+  var fecha = document.getElementById('prop-fechaPrimeraCuota').value;
+  if (!fecha) { flash('tabla-flash', 'Indica la fecha de la primera cuota', 'r'); return; }
+  var parsed = parseAmortiTable(text);
+  if (!parsed.rows.length) { flash('tabla-flash', 'No se detectaron filas válidas. Revisa el formato.', 'r'); return; }
+  _tempAmortiTable = parsed.rows;
+  document.getElementById('prop-tabla-count').value = parsed.rows.length + (parsed.skipped ? ' (saltadas: ' + parsed.skipped + ')' : '');
+  document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + parsed.rows.length + ' cuotas';
+  flash('tabla-flash', 'OK · ' + parsed.rows.length + ' cuotas procesadas');
+}
+
+function clearAmortiTable() {
+  _tempAmortiTable = null;
+  document.getElementById('prop-tabla-raw').value = '';
+  document.getElementById('prop-tabla-count').value = '';
+  document.getElementById('prop-tabla-status').textContent = 'Sin tabla cargada';
+}
+
+function cuotaActualDesdeFecha(fechaStr, maxCuotas) {
+  if (!fechaStr) return 1;
+  var inicio = new Date(fechaStr + 'T00:00:00');
+  if (isNaN(inicio.getTime())) return 1;
+  var hoy = new Date();
+  var meses = (hoy.getFullYear() - inicio.getFullYear()) * 12 + (hoy.getMonth() - inicio.getMonth());
+  var n = meses + 1;
+  if (n < 1) n = 1;
+  if (maxCuotas && n > maxCuotas) n = maxCuotas;
+  return n;
+}
 function toggleAddProp() {
   var p = document.getElementById('add-prop-panel');
   var open = p.style.display !== 'none';
@@ -2109,6 +2250,8 @@ function saveProp() {
   var precioCompra = gv('prop-precioCompra');
   var pctEntrada = tieneHip ? gv('prop-pctEntrada') : 100;
   var entrada = tieneHip ? precioCompra * pctEntrada / 100 : precioCompra;
+  var modoHip = tieneHip ? (document.getElementById('prop-hip-modo').value || 'auto') : 'auto';
+  var usaTabla = tieneHip && modoHip === 'tabla' && _tempAmortiTable && _tempAmortiTable.length;
   var prop = {
     id: editPropId || Date.now(),
     uso: document.getElementById('prop-uso').value || 'alquiler',
@@ -2125,9 +2268,12 @@ function saveProp() {
     otrosGastos: gv('prop-otrosGastos'),
     precioCompra: precioCompra,
     pctEntrada: pctEntrada,
-    tin: tieneHip ? gv('prop-tin') : 0,
+    tin: tieneHip && !usaTabla ? gv('prop-tin') : 0,
     plazoAnios: tieneHip ? gv('prop-plazoAnios') : 0,
-    cuotaNum: tieneHip ? (gv('prop-cuotaNum') || 1) : 1
+    cuotaNum: tieneHip && !usaTabla ? (gv('prop-cuotaNum') || 1) : 1,
+    modoHipoteca: modoHip,
+    fechaPrimeraCuota: usaTabla ? document.getElementById('prop-fechaPrimeraCuota').value : '',
+    amortiTable: usaTabla ? _tempAmortiTable : null
   };
   if (editPropId) {
     var idx = S.propiedades.findIndex(function(x){ return x.id === editPropId; });
@@ -2165,15 +2311,27 @@ function editProp(id) {
   document.getElementById('prop-reforma').value = tieneRef ? p.reforma : '';
   onPropReformaToggle();
   document.getElementById('prop-gastos').value = p.gastos || '';
-  var tieneHip = !!(nv(p.tin) && nv(p.plazoAnios));
+  var tieneTabla = !!(p.amortiTable && p.amortiTable.length && p.fechaPrimeraCuota);
+  var tieneHip = !!(nv(p.tin) && nv(p.plazoAnios)) || tieneTabla;
   document.getElementById('prop-tiene-hipoteca').value = tieneHip ? 'si' : 'no';
   onPropHipotecaToggle();
   if (tieneHip) {
     document.getElementById('prop-pctEntrada').value = p.pctEntrada || '';
-    document.getElementById('prop-tin').value        = p.tin        || '';
     document.getElementById('prop-plazoAnios').value = p.plazoAnios || '';
-    document.getElementById('prop-cuotaNum').value   = p.cuotaNum   || '';
-    updateHipoteca();
+    var modo = tieneTabla ? 'tabla' : (p.modoHipoteca || 'auto');
+    document.getElementById('prop-hip-modo').value = modo;
+    onPropHipModoChange();
+    if (tieneTabla) {
+      _tempAmortiTable = p.amortiTable;
+      document.getElementById('prop-fechaPrimeraCuota').value = p.fechaPrimeraCuota || '';
+      document.getElementById('prop-tabla-count').value = p.amortiTable.length + ' cuotas';
+      document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + p.amortiTable.length + ' cuotas';
+      document.getElementById('prop-tabla-raw').value = '';
+    } else {
+      document.getElementById('prop-tin').value      = p.tin        || '';
+      document.getElementById('prop-cuotaNum').value = p.cuotaNum   || '';
+      updateHipoteca();
+    }
   }
   document.getElementById('add-prop-panel').style.display = 'block';
   showTab('inmo');
@@ -2192,7 +2350,7 @@ function cancelEditProp() {
   document.getElementById('prop-form-title').textContent = 'Nueva propiedad';
   document.getElementById('prop-uso').value = 'alquiler';
   onPropUsoChange();
-  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum'].forEach(function(id){
+  ['prop-nombre','prop-valor','prop-gastos','prop-comisionInmo','prop-reforma','prop-alquiler','prop-ibi','prop-seguro','prop-comunidad','prop-otrosGastos','prop-precioCompra','prop-pctEntrada','prop-capitalFin','prop-tin','prop-plazoAnios','prop-cuotaNum','prop-fechaPrimeraCuota','prop-tabla-raw','prop-tabla-count'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('prop-tiene-comision').value = 'no';
@@ -2201,6 +2359,10 @@ function cancelEditProp() {
   onPropReformaToggle();
   document.getElementById('prop-tiene-hipoteca').value = 'no';
   onPropHipotecaToggle();
+  document.getElementById('prop-hip-modo').value = 'auto';
+  onPropHipModoChange();
+  document.getElementById('prop-tabla-status').textContent = 'Sin tabla cargada';
+  _tempAmortiTable = null;
   document.getElementById('prop-gastos-total').textContent = '0 €';
   document.getElementById('add-prop-panel').style.display = 'none';
 }
@@ -2216,7 +2378,8 @@ function renderPropList() {
 
     html += '<div class="prop-row" data-id="' + p.id + '">';
     html += '<div class="prop-sum" onclick="toggleProp(' + p.id + ')">';
-    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + '</div>';
+    var tablaChip = c.cuotaActualInfo ? '<span class="chip ac" style="margin-left:6px;">tabla · ' + c.cuotaActualInfo.n + '/' + c.cuotaActualInfo.total + '</span>' : '';
+    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + tablaChip + '</div>';
     html += '<div class="prop-kpis">';
     if (esHabitual) {
       html += '<div class="prop-kpi"><div class="prop-kpi-l">Equity</div><div class="prop-kpi-v ac">' + eur(c.equityProp) + '</div></div>';
@@ -2247,7 +2410,11 @@ function renderPropList() {
       html += '<div class="frow"><span class="fl">Capital propio (entrada+gastos)</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
       if (c.cuotaMensual > 0) {
         html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
-        if (nv(p.tin) && nv(p.plazoAnios)) {
+        if (c.cuotaActualInfo) {
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + '</span></div>';
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
+          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
+        } else if (nv(p.tin) && nv(p.plazoAnios)) {
           html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
           html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
         }
@@ -2270,7 +2437,12 @@ function renderPropList() {
       html += '<div class="frow"><span class="fl">' + capLabel + '</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
       if (nv(p.reforma) > 0) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Coste reforma</span><span class="fv mu">' + eur(p.reforma) + '</span></div>';
       html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
-      if (nv(p.tin) && nv(p.plazoAnios)) {
+      if (c.cuotaActualInfo) {
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
+        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
+      } else if (nv(p.tin) && nv(p.plazoAnios)) {
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
         html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
