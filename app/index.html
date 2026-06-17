@@ -1071,8 +1071,8 @@ input[type=range].crypto::-moz-range-thumb{
                   </div>
                   <div class="ef span12">
                     <label>Pega la tabla del banco</label>
-                    <textarea id="prop-tabla-raw" rows="7" placeholder="Formato: 5 columnas (nº cuota, cuota mensual, intereses, amortización, saldo). Separador tab, coma o espacios. Ejemplo:&#10;1   850.34   416.67   433.67   199566.33&#10;2   850.34   415.76   434.58   199131.75&#10;..." style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.5;min-height:140px;resize:vertical;"></textarea>
-                    <p class="hint">Acepta números en formato europeo (1.234,56) o anglosajón (1,234.56). Las cabeceras se saltan automáticamente.</p>
+                    <textarea id="prop-tabla-raw" rows="7" placeholder="Acepta dos formatos:&#10;&#10;A) BANCO — 6 columnas:  fecha | base | amortización | intereses | total pago | saldo posterior&#10;30/06/2026   71.948,67 €   258,20 €   110,92 €   369,12 €   71.690,47 €&#10;&#10;B) SIMPLE — 5 columnas:  nº cuota, cuota, intereses, amortización, saldo&#10;1   850.34   416.67   433.67   199566.33" style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.5;min-height:140px;resize:vertical;"></textarea>
+                    <p class="hint">Acepta separadores tab, coma, punto y coma o pipe (|). Formato europeo (1.234,56 €) o anglosajón. La fecha de la primera cuota se autocompleta desde la tabla.</p>
                   </div>
                 </div>
                 <div class="btn-row" style="margin-top:10px;">
@@ -1419,7 +1419,9 @@ function calcProp(p) {
     cuotaMensual = nv(row.cuota);
     interesesMensual = nv(row.interes);
     amortiMensual = nv(row.amorti);
-    saldoPendiente = nv(row.saldo);
+    // Si el banco proporciona "base de cálculo" (saldo antes de pagar esta cuota), lo usamos
+    // como saldo pendiente actual; si no, usamos el saldo posterior estándar.
+    saldoPendiente = row.base !== undefined ? nv(row.base) : nv(row.saldo);
     cuotaActualInfo = { n: n, total: p.amortiTable.length };
   } else if (nv(p.tin) && nv(p.plazoAnios)) {
     var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
@@ -2162,6 +2164,7 @@ function parseNumberFlexible(s) {
   if (s === null || s === undefined) return NaN;
   s = String(s).trim().replace(/[€$\s]/g, '');
   if (!s) return NaN;
+  if (s === '-' || s === '—' || s === '–') return 0;
   var hasComma = s.indexOf(',') >= 0;
   var hasDot = s.indexOf('.') >= 0;
   if (hasComma && hasDot) {
@@ -2180,42 +2183,86 @@ function parseNumberFlexible(s) {
   return parseFloat(s);
 }
 
+function isFechaES(s) {
+  return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(s||'').trim());
+}
+function parseFechaES(s) {
+  var m = String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  var d = new Date(parseInt(m[3],10), parseInt(m[2],10) - 1, parseInt(m[1],10));
+  return isNaN(d.getTime()) ? null : d;
+}
+function fechaISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 function parseAmortiTable(text) {
-  if (!text) return { rows: [], skipped: 0 };
+  if (!text) return { rows: [], skipped: 0, format: null };
   var lines = text.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean);
-  var rows = [], skipped = 0;
+  var rows = [], skipped = 0, format = null;
   for (var i = 0; i < lines.length; i++) {
     var line = lines[i];
     var parts;
-    if (line.indexOf('\t') >= 0) parts = line.split(/\t+/);
+    if (line.indexOf('|') >= 0) parts = line.split(/\|/);
+    else if (line.indexOf('\t') >= 0) parts = line.split(/\t+/);
     else if (line.indexOf(';') >= 0) parts = line.split(/;+/);
     else {
-      // Detectar si coma es separador (decimal vs separador de columnas)
       var commaCount = (line.match(/,/g) || []).length;
-      var spaceCount = (line.match(/\s+/g) || []).length;
-      if (commaCount >= 4 && /,\s*\d/.test(line)) parts = line.split(/,/);
-      else parts = line.split(/\s{2,}|\t+|\s+/);
+      if (commaCount >= 5 && /,\s*\d/.test(line)) parts = line.split(/,/);
+      else parts = line.split(/\s{2,}|\t+/);
     }
-    parts = parts.map(function(p){ return p.trim(); }).filter(Boolean);
+    parts = parts.map(function(p){ return p.trim(); }).filter(function(p){ return p !== ''; });
     if (parts.length < 5) { skipped++; continue; }
-    var nums = parts.slice(0, 5).map(parseNumberFlexible);
-    if (!isFinite(nums[0]) || nums[0] !== Math.floor(nums[0]) || nums[0] < 1 || nums[0] > 720) { skipped++; continue; }
-    if (!isFinite(nums[1]) || !isFinite(nums[2]) || !isFinite(nums[3]) || !isFinite(nums[4])) { skipped++; continue; }
-    rows.push({ n: nums[0], cuota: nums[1], interes: nums[2], amorti: nums[3], saldo: nums[4] });
+
+    // Detectar formato: fecha en col 1 = banco; número entero en col 1 = simple
+    var firstIsDate = isFechaES(parts[0]);
+
+    if (firstIsDate && parts.length >= 6) {
+      // Banco: fecha | base | amortización | intereses | total pago | saldo posterior
+      var nums = parts.slice(1, 6).map(parseNumberFlexible);
+      if (!nums.every(isFinite)) { skipped++; continue; }
+      rows.push({
+        n: rows.length + 1,
+        fecha: parts[0],
+        base: nums[0],
+        amorti: nums[1],
+        interes: nums[2],
+        cuota: nums[3],
+        saldo: nums[4]
+      });
+      format = 'banco';
+    } else if (!firstIsDate) {
+      // Simple: nº | cuota | intereses | amortización | saldo
+      var nNum = parseNumberFlexible(parts[0]);
+      if (!isFinite(nNum) || nNum !== Math.floor(nNum) || nNum < 1 || nNum > 720) { skipped++; continue; }
+      var nums2 = parts.slice(1, 5).map(parseNumberFlexible);
+      if (!nums2.every(isFinite)) { skipped++; continue; }
+      rows.push({ n: nNum, cuota: nums2[0], interes: nums2[1], amorti: nums2[2], saldo: nums2[3] });
+      format = format || 'simple';
+    } else {
+      skipped++;
+    }
   }
-  rows.sort(function(a,b){ return a.n - b.n; });
-  return { rows: rows, skipped: skipped };
+  // Formato simple necesita sort por n; banco viene en orden cronológico
+  if (format === 'simple') rows.sort(function(a,b){ return a.n - b.n; });
+  return { rows: rows, skipped: skipped, format: format };
 }
 
 function applyAmortiTable() {
   var text = document.getElementById('prop-tabla-raw').value;
-  var fecha = document.getElementById('prop-fechaPrimeraCuota').value;
-  if (!fecha) { flash('tabla-flash', 'Indica la fecha de la primera cuota', 'r'); return; }
+  var fechaInput = document.getElementById('prop-fechaPrimeraCuota');
   var parsed = parseAmortiTable(text);
   if (!parsed.rows.length) { flash('tabla-flash', 'No se detectaron filas válidas. Revisa el formato.', 'r'); return; }
+  // Si la tabla trae fechas (formato banco) y el input está vacío, lo autorrellenamos
+  if (parsed.format === 'banco' && parsed.rows[0].fecha) {
+    var d = parseFechaES(parsed.rows[0].fecha);
+    if (d && !fechaInput.value) fechaInput.value = fechaISO(d);
+  }
+  if (!fechaInput.value) { flash('tabla-flash', 'Indica la fecha de la primera cuota', 'r'); return; }
   _tempAmortiTable = parsed.rows;
-  document.getElementById('prop-tabla-count').value = parsed.rows.length + (parsed.skipped ? ' (saltadas: ' + parsed.skipped + ')' : '');
-  document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + parsed.rows.length + ' cuotas';
+  var label = parsed.rows.length + ' cuotas' + (parsed.format === 'banco' ? ' · banco' : '') + (parsed.skipped ? ' · saltadas: ' + parsed.skipped : '');
+  document.getElementById('prop-tabla-count').value = label;
+  document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + label;
   flash('tabla-flash', 'OK · ' + parsed.rows.length + ' cuotas procesadas');
 }
 
