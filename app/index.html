@@ -81,6 +81,7 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+  .ring{transition:none!important;}
 }
 
 /* ============ PIN LOGIN ============ */
@@ -340,6 +341,9 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
   padding-bottom:4px;
 }
 .tile-hero .tile-l{color:var(--tx2);}
+.tile-obj{cursor:pointer;}
+.tile-obj:hover{border-color:var(--ac);}
+.tile-obj:focus-visible{outline:2px solid var(--ac);outline-offset:3px;}
 
 /* Delta chip */
 .chip{
@@ -707,6 +711,56 @@ input[type=range].crypto::-moz-range-thumb{
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;}
 .sb-overlay.show{display:block;}
 
+/* ============ OBJETIVO ============ */
+@property --p{syntax:'<number>';inherits:false;initial-value:0;}
+.ring{
+  --ring-size:120px; --p:0; --ring-col:var(--ac);
+  width:var(--ring-size);height:var(--ring-size);
+  flex-shrink:0;position:relative;border-radius:50%;
+  display:grid;place-items:center;
+  background:conic-gradient(var(--ring-col) calc(var(--p) * 1%),var(--s3) 0);
+  transition:--p .9s cubic-bezier(.16,1,.3,1);
+}
+.ring::before{
+  content:'';position:absolute;inset:10px;border-radius:50%;
+  background:var(--s0);border:1px solid var(--bd);
+}
+.ring-in{position:relative;text-align:center;line-height:1.05;padding:0 6px;}
+.ring-v{font-size:1.4rem;font-weight:800;letter-spacing:-.6px;}
+.ring-l{font-size:.56rem;color:var(--mu);font-weight:700;letter-spacing:.9px;text-transform:uppercase;margin-top:4px;}
+.ring-obj.ring{--ring-size:72px;}
+
+.ob-hero{display:flex;align-items:center;gap:22px;flex-wrap:wrap;position:relative;z-index:1;}
+.ob-hero-txt{flex:1;min-width:180px;}
+.ob-hero-h{font-size:1.1rem;font-weight:800;letter-spacing:-.35px;line-height:1.3;}
+.ob-hero-s{font-size:.8rem;color:var(--mu);margin-top:7px;line-height:1.55;}
+.ob-hero-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+
+.ob-list{display:flex;flex-direction:column;gap:8px;}
+.ob-row{
+  background:var(--s1);border:1px solid var(--bd);
+  border-radius:var(--rr);padding:12px 14px;
+  transition:border-color var(--tf);
+}
+.ob-row:hover{border-color:var(--bd-h);}
+.ob-row.editing{border-color:var(--bd-a);}
+.ob-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.ob-info{min-width:0;}
+.ob-name{font-size:.9rem;font-weight:700;letter-spacing:-.15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ob-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:5px;font-size:.75rem;color:var(--mu);}
+.ob-meta .num{color:var(--tx2);font-weight:700;}
+.ob-acts{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.ob-prog{display:flex;align-items:center;gap:10px;margin-top:11px;}
+.ob-prog .bar-trk{flex:1;min-width:0;}
+.ob-prog .chip{flex-shrink:0;}
+.ob-edit{margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd);}
+.ob-form{margin-top:16px;padding-top:14px;border-top:1px dashed var(--bd);}
+.ob-fuentes .bar{grid-template-columns:minmax(0,1fr) 1.5fr 106px;}
+.ob-fuentes .bar-n{color:var(--tx2);}
+.ob-fuentes .bar-v{line-height:1.3;}
+.ob-bar-sub{font-size:.65rem;color:var(--mu);font-weight:600;}
+.btn:disabled{opacity:.3;pointer-events:none;}
+
 /* ====== RESPONSIVE ====== */
 @media(max-width:1100px){
   .c-2,.c-3,.c-4{grid-column:span 6;}
@@ -747,6 +801,15 @@ input[type=range].crypto::-moz-range-thumb{
   .chart-wrap.lg{height:260px;}
   .bar{grid-template-columns:100px 1fr 80px;}
   input,select,textarea{font-size:16px;}
+  #tab-objetivo input[type=number]{font-size:16px;}
+  .ring{--ring-size:96px;}
+  .ring-v{font-size:1.2rem;}
+  .ob-hero{gap:18px;}
+  .ob-top{flex-direction:column;align-items:stretch;}
+  .ob-acts{justify-content:flex-end;}
+  .ob-acts .btn{min-height:38px;padding:9px 14px;}
+  .ob-acts .btn.icon{min-width:38px;padding:9px;}
+  .ob-fuentes .bar{grid-template-columns:minmax(0,1fr) 1fr 96px;}
 }
 @media(max-width:520px){
   .content{padding:14px 12px 40px;}
@@ -754,9 +817,17 @@ input[type=range].crypto::-moz-range-thumb{
   .tile{padding:14px 15px;}
   .tile-v{font-size:1.4rem;}
   .tile-hero .tile-v{font-size:1.8rem;}
+  .tile-hero .tile-aside{display:none;}
+  .ring-obj.ring{--ring-size:64px;}
   .row,.prop-row,.snap{padding:14px;}
   .fgrid > .ef,.fgrid > .span3,.fgrid > .span4,.fgrid > .span6{grid-column:span 12;}
   .kpis-grid,.kpis-grid.k6,.hip-grid{grid-template-columns:1fr 1fr;}
+  .ring{--ring-size:88px;}
+  .ring-v{font-size:1.05rem;}
+  .ob-hero{gap:14px;}
+  .ob-hero-h{font-size:1rem;}
+  .ob-row{padding:11px 12px;}
+  .ob-fuentes .bar{grid-template-columns:minmax(0,1fr) 1fr 84px;}
 }
 </style>
 </head>
@@ -820,6 +891,10 @@ input[type=range].crypto::-moz-range-thumb{
     </div>
 
     <div class="sb-section">Analítica</div>
+    <div class="sb-link" data-tab="objetivo" onclick="showTab('objetivo')">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg>
+      Objetivo
+    </div>
     <div class="sb-link" data-tab="graficas" onclick="showTab('graficas')">
       <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Gráficas
@@ -1135,6 +1210,45 @@ input[type=range].crypto::-moz-range-thumb{
         <div id="liq-list"></div>
       </div>
 
+      <!-- ============ OBJETIVO ============ -->
+      <div id="tab-objetivo" class="tab-panel">
+        <div class="bento" id="obj-bento"></div>
+
+        <div class="bento" style="margin-top:14px;">
+          <div class="tile c-6">
+            <div class="tile-hd">
+              <span class="tile-l">Partidas de gasto</span>
+              <span class="tile-aside" id="obj-part-aside"></span>
+            </div>
+            <div class="ob-list" id="obj-partidas"></div>
+            <div class="ob-form">
+              <div class="fgrid">
+                <div class="ef span6"><label>Concepto</label><input id="obj-nombre" placeholder="Ej: Vivienda, Alimentación" maxlength="60" onkeydown="objFormKey(event)"></div>
+                <div class="ef span3"><label>Importe (€)</label><input type="number" id="obj-importe" placeholder="0" min="0" step="0.01" onkeydown="objFormKey(event)"></div>
+                <div class="ef span3"><label>Periodicidad</label>
+                  <select id="obj-periodicidad" onkeydown="objFormKey(event)">
+                    <option value="mensual" selected>Mensual</option>
+                    <option value="anual">Anual</option>
+                  </select>
+                </div>
+              </div>
+              <div class="btn-row" style="margin-top:12px;">
+                <button class="btn bp sm" onclick="addPartida()">Añadir partida</button>
+                <span class="flash" id="obj-flash"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tile c-6" style="align-self:start;">
+            <div class="tile-hd">
+              <span class="tile-l">Quién cubre tus gastos</span>
+              <span class="tile-aside">Cashflow neto por activo</span>
+            </div>
+            <div class="bars ob-fuentes" id="obj-fuentes"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- ============ GRÁFICAS ============ -->
       <div id="tab-graficas" class="tab-panel">
         <div class="tile c-12" style="margin-bottom:14px;">
@@ -1343,6 +1457,7 @@ var S = {
   snaps: [],
   liquido: [],
   config: { baseIRPF: 0 },
+  objetivo: { partidas: [] },
   _savedAt: 0
 };
 
@@ -1631,6 +1746,7 @@ var TAB_META = {
   inversiones: { title:'Inversiones',   eyebrow:'Cartera financiera' },
   inmo:        { title:'Inmobiliario',  eyebrow:'Propiedades y alquileres' },
   liquido:     { title:'Liquidez',      eyebrow:'Cuentas y efectivo' },
+  objetivo:    { title:'Objetivo',      eyebrow:'Cobertura de gastos' },
   graficas:    { title:'Gráficas',      eyebrow:'Visualizaciones' },
   historico:   { title:'Histórico',     eyebrow:'Snapshots guardados' },
   config:      { title:'Configuración', eyebrow:'Ajustes de la app' }
@@ -1657,6 +1773,7 @@ function showTab(name) {
     document.getElementById('tb-title').textContent = meta.title;
     document.getElementById('tb-eyebrow').textContent = meta.eyebrow;
   }
+  if (name === 'objetivo') renderObjetivo();
   if (name === 'graficas') setTimeout(renderGraficas, 50);
   if (name === 'config') loadConfigForm();
   closeSidebar();
@@ -1715,7 +1832,27 @@ function mergeState(data) {
   S.snaps = data.snaps || [];
   S.liquido = data.liquido || [];
   S.config = data.config || { baseIRPF: 0 };
+  S.objetivo = sanitizeObjetivo(data.objetivo);
   S._savedAt = data._savedAt || 0;
+}
+
+// Sanea la rama `objetivo` venga de donde venga (local, cloud o import JSON).
+function sanitizeObjetivo(o) {
+  var out = { partidas: [] };
+  if (!o || typeof o !== 'object' || !Array.isArray(o.partidas)) return out;
+  o.partidas.forEach(function(p, i) {
+    if (!p || typeof p !== 'object') return;
+    var imp = nv(p.importe);
+    var ord = parseFloat(p.orden);
+    out.partidas.push({
+      id: nv(p.id) || (Date.now() + i),
+      nombre: String(p.nombre == null ? '' : p.nombre),
+      importe: imp > 0 ? imp : 0,
+      periodicidad: p.periodicidad === 'anual' ? 'anual' : 'mensual',
+      orden: isNaN(ord) ? i : ord
+    });
+  });
+  return out;
 }
 
 /* ============================================================
@@ -1726,6 +1863,7 @@ function renderAll() {
   renderInvList();
   renderPropList();
   renderLiqList();
+  renderObjetivo();
   renderHistorico();
 }
 
@@ -1780,6 +1918,20 @@ function renderResumenKPIs() {
   var patCF = t.totalInv + t.totalProp + t.totalLiq;
   var patExtra = patCF !== totalPat ? '<span class="chip mu">' + eur(patCF) + ' en inversión</span>' : '';
 
+  var o = calcObjetivo();
+  var oCob = o.cobReal;
+  var oRingPct = oCob === null ? 0 : Math.max(0, Math.min(100, oCob));
+  var oCol = oCob === null ? 'var(--mu2)' : (oCob >= 100 ? 'var(--g)' : (oCob < 50 ? 'var(--r)' : 'var(--am)'));
+  var oCls = oCob === null ? 'mu' : (oCob >= 100 ? 'g' : (oCob < 50 ? 'r' : 'am'));
+  var oSupport;
+  if (oCob === null) {
+    oSupport = 'Añade tus gastos en la pestaña Objetivo';
+  } else if (oCob >= 100) {
+    oSupport = '<span class="g">Objetivo cubierto</span> · excedente ' + eur(o.excedente) + '/mes';
+  } else {
+    oSupport = 'Faltan <span class="' + oCls + '">' + eur(o.gapMes) + '/mes</span>';
+  }
+
   var html = '';
   // Hero: patrimonio total — c-6
   html += '<div class="tile tile-hero c-6">';
@@ -1789,46 +1941,54 @@ function renderResumenKPIs() {
   if (patExtra) html += '<div class="tile-foot">' + patExtra + '</div>';
   html += '</div>';
 
-  // CF Real — c-3
-  html += '<div class="tile c-3">';
+  // Objetivo: cobertura de gastos — c-6, clicable a la pestaña Objetivo
+  html += '<div class="tile tile-obj c-6" onclick="showTab(\'objetivo\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showTab(\'objetivo\');}" role="button" tabindex="0">';
+  html += '<div class="tile-hd"><span class="tile-l">Objetivo · cobertura de gastos</span></div>';
+  html += '<div class="ob-hero">';
+  html += '<div class="ring ring-obj" style="--p:' + oRingPct.toFixed(1) + ';--ring-col:' + oCol + ';"><div class="ring-in"></div></div>';
+  html += '<div class="ob-hero-txt"><div class="tile-v ' + oCls + ' num">' + (oCob === null ? '—' : pct1(Math.max(0, oCob))) + '</div><div class="tile-s">' + oSupport + '</div></div>';
+  html += '</div></div>';
+
+  // CF Real — c-4
+  html += '<div class="tile c-4">';
   html += '<div class="tile-hd"><span class="tile-l">CF real / mes</span></div>';
   html += '<div class="tile-v g num">' + eur(t.cfReal) + '</div>';
   html += '<div class="tile-foot"><span class="chip g">' + pct1(yieldReal) + ' anual</span><span>' + eur(t.cfReal * 12) + '/año</span></div>';
   html += '</div>';
 
-  // CF Pot — c-3
-  html += '<div class="tile c-3">';
+  // CF Pot — c-4
+  html += '<div class="tile c-4">';
   html += '<div class="tile-hd"><span class="tile-l">CF potencial / mes</span>' + (simActiva ? '<span class="chip am">sim</span>' : '') + '</div>';
   html += '<div class="tile-v am num">' + eur(t.cfPot) + '</div>';
   html += '<div class="tile-foot"><span class="chip am">' + pct1(yieldPot) + ' anual</span><span>' + eur(t.cfPot * 12) + '/año</span></div>';
   html += '</div>';
 
-  // Inversiones — c-3
-  html += '<div class="tile c-3">';
+  // CF + amort — c-4
+  html += '<div class="tile c-4">';
+  html += '<div class="tile-hd"><span class="tile-l">CF pot. + amortización</span></div>';
+  html += '<div class="tile-v ac num">' + eur(t.cfPot + amortiMensual) + '</div>';
+  html += '<div class="tile-foot"><span class="chip ac">Equity-building</span><span>' + eur((t.cfPot + amortiMensual) * 12) + '/año</span></div>';
+  html += '</div>';
+
+  // Inversiones — c-4
+  html += '<div class="tile c-4">';
   html += '<div class="tile-hd"><span class="tile-l">Inversiones</span></div>';
   html += '<div class="tile-v num">' + eur(t.totalInv) + '</div>';
   html += '<div class="tile-foot"><span class="chip ac">ETF · Crypto · P2P</span><span>' + S.inversiones.length + ' activos</span></div>';
   html += '</div>';
 
-  // Inmobiliario — c-3
-  html += '<div class="tile c-3">';
+  // Inmobiliario — c-4
+  html += '<div class="tile c-4">';
   html += '<div class="tile-hd"><span class="tile-l">Inmobiliario · equity</span></div>';
   html += '<div class="tile-v num">' + eur(t.totalProp + t.totalPropHab) + '</div>';
   html += '<div class="tile-foot"><span class="chip ac">' + eur(amortiMensual) + '/mes amortización</span><span>' + S.propiedades.length + ' inmuebles</span></div>';
   html += '</div>';
 
-  // Liquidez — c-3
-  html += '<div class="tile c-3">';
+  // Liquidez — c-4
+  html += '<div class="tile c-4">';
   html += '<div class="tile-hd"><span class="tile-l">Liquidez</span></div>';
   html += '<div class="tile-v g num">' + eur(t.totalLiq) + '</div>';
   html += '<div class="tile-foot"><span class="chip mu">' + S.liquido.length + ' cuentas</span></div>';
-  html += '</div>';
-
-  // CF + amort — c-3
-  html += '<div class="tile c-3">';
-  html += '<div class="tile-hd"><span class="tile-l">CF pot. + amortización</span></div>';
-  html += '<div class="tile-v ac num">' + eur(t.cfPot + amortiMensual) + '</div>';
-  html += '<div class="tile-foot"><span class="chip ac">Equity-building</span><span>' + eur((t.cfPot + amortiMensual) * 12) + '/año</span></div>';
   html += '</div>';
 
   document.getElementById('resumen-bento').innerHTML = html;
@@ -2633,6 +2793,384 @@ function renderLiqList() {
 }
 
 /* ============================================================
+   OBJETIVO — cobertura de gastos con cashflow
+   ============================================================ */
+var editPartidaId = null;
+var PARTIDAS_PLANTILLA = ['Vivienda', 'Alimentación', 'Suministros', 'Transporte', 'Seguros', 'Ocio y otros'];
+var OBJ_TIPO_COLOR = {
+  'fondo':'var(--c-fondo)', 'fondo-dist':'var(--c-fondo-dist)', 'etf':'var(--c-fondo-dist)',
+  'crypto':'var(--c-crypto)', 'p2p':'var(--c-p2p)', 'inmo':'var(--c-inmo)',
+  'ahorro':'var(--c-liq)', 'corriente':'var(--c-liq)', 'efectivo':'var(--c-liq)'
+};
+
+function ensureObjetivo() {
+  if (!S.objetivo || typeof S.objetivo !== 'object') S.objetivo = { partidas: [] };
+  if (!Array.isArray(S.objetivo.partidas)) S.objetivo.partidas = [];
+  return S.objetivo;
+}
+// Importe llevado a base mensual (las partidas anuales se reparten entre 12).
+function partidaMensual(p) {
+  var imp = nv(p.importe);
+  if (imp < 0) imp = 0;
+  return p.periodicidad === 'anual' ? imp / 12 : imp;
+}
+// Copia ordenada por `orden` (las referencias son las mismas del estado).
+function getPartidas() {
+  var arr = ensureObjetivo().partidas.slice();
+  arr.sort(function(a, b){ return nv(a.orden) - nv(b.orden); });
+  return arr;
+}
+function reordenarPartidas(arr) {
+  arr.forEach(function(p, i){ p.orden = i; });
+  ensureObjetivo().partidas = arr;
+}
+
+/* Cálculo puro de la cobertura de gastos. Reutilizable desde cualquier vista. */
+function calcObjetivo() {
+  var partidas = getPartidas();
+  var activas = partidas.filter(function(p){ return partidaMensual(p) > 0; });
+  var gastosMes = 0;
+  activas.forEach(function(p){ gastosMes += partidaMensual(p); });
+  var gastosAnual = gastosMes * 12;
+
+  var t = calcResumenTotales();
+  var cfReal = t.cfReal, cfPot = t.cfPot, totalLiq = t.totalLiq;
+
+  var cobReal = gastosMes > 0 ? (cfReal / gastosMes * 100) : null;
+  var cobPot  = gastosMes > 0 ? (cfPot  / gastosMes * 100) : null;
+  var gapMes = Math.max(0, gastosMes - cfReal);
+  var excedente = Math.max(0, cfReal - gastosMes);
+  var diaMes = cobReal === null ? 0 : (cobReal >= 100 ? 30 : Math.max(0, Math.floor(cobReal / 100 * 30)));
+
+  // Capital que hoy produce cashflow real (base del rendimiento de referencia).
+  var capitalProductivo = 0;
+  S.inversiones.forEach(function(inv){ if (getCFInv(inv) > 0) capitalProductivo += nv(inv.valor); });
+  S.propiedades.forEach(function(p){ if (p.uso !== 'habitual') { var cp = calcProp(p); if (cp.cfNetoMensual > 0) capitalProductivo += cp.capPropio; } });
+  S.liquido.forEach(function(l){ if (nv(l.tae) > 0) capitalProductivo += nv(l.saldo); });
+  // yieldRef en tanto por uno (0.045 = 4,5% neto anual); yieldRefPct para mostrar.
+  var yieldRef = (capitalProductivo > 0 && cfReal > 0) ? (cfReal * 12 / capitalProductivo) : null;
+  var capitalNecesario = yieldRef ? (gapMes * 12 / yieldRef) : null;
+  var colchonMeses = gastosMes > 0 ? (totalLiq / gastosMes) : null;
+
+  // Escalera: el cashflow va cubriendo partidas en orden hasta agotarse.
+  var restante = Math.max(cfReal, 0);
+  var escalera = activas.map(function(p) {
+    var mensual = partidaMensual(p);
+    var cubierto = Math.min(mensual, restante);
+    restante -= cubierto;
+    var pct = mensual > 0 ? (cubierto / mensual * 100) : 0;
+    var estado = pct >= 99.5 ? 'cubierto' : (pct > 0 ? 'parcial' : 'pendiente');
+    return { id: p.id, nombre: p.nombre, periodicidad: p.periodicidad, importe: nv(p.importe),
+             mensual: mensual, cubierto: cubierto, pct: pct, estado: estado };
+  });
+
+  // Fuentes: activos con cashflow real distinto de cero (redondeo a céntimos).
+  var fuentes = [];
+  function addFuente(id, nombre, tipo, cf) {
+    if (Math.abs(cf) < 0.005) return;
+    fuentes.push({ id: id, nombre: nombre, tipo: tipo, cf: cf,
+                   pctGastos: gastosMes > 0 ? (cf / gastosMes * 100) : null });
+  }
+  S.inversiones.forEach(function(inv){ addFuente(inv.id, inv.nombre, inv.tipo, getCFInv(inv)); });
+  S.propiedades.forEach(function(p){
+    if (p.uso === 'habitual') return;
+    addFuente('prop_' + p.id, p.nombre, 'inmo', calcProp(p).cfNetoMensual);
+  });
+  S.liquido.forEach(function(l){ addFuente('liq_' + l.id, l.nombre, l.tipo, cfNetAhorro(nv(l.saldo), nv(l.tae))); });
+  fuentes.sort(function(a, b){ return b.cf - a.cf; });
+
+  return {
+    partidas: partidas, nPartidas: activas.length, nPartidasTotal: partidas.length,
+    gastosMes: gastosMes, gastosAnual: gastosAnual,
+    cfReal: cfReal, cfPot: cfPot, totalLiq: totalLiq,
+    cobReal: cobReal, cobPot: cobPot,
+    gapMes: gapMes, excedente: excedente, diaMes: diaMes,
+    yieldRef: yieldRef, yieldRefPct: yieldRef === null ? null : yieldRef * 100,
+    capitalProductivo: capitalProductivo, capitalNecesario: capitalNecesario,
+    colchonMeses: colchonMeses,
+    escalera: escalera, fuentes: fuentes
+  };
+}
+
+function objEstadoChip(estado) {
+  if (estado === 'cubierto') return '<span class="chip g">Cubierto</span>';
+  if (estado === 'parcial')  return '<span class="chip am">Parcial</span>';
+  if (estado === 'sin-importe') return '<span class="chip mu">Sin importe</span>';
+  return '<span class="chip mu">Pendiente</span>';
+}
+function objEstadoColor(estado) {
+  if (estado === 'cubierto') return 'var(--g)';
+  if (estado === 'parcial')  return 'var(--am)';
+  return 'var(--mu3)';
+}
+function objMeses(v) {
+  var s = v.toLocaleString('es-ES', { minimumFractionDigits:0, maximumFractionDigits:1 });
+  return s + (s === '1' ? ' mes' : ' meses');
+}
+function objNPartidas(n) { return n === 1 ? '1 partida' : n + ' partidas'; }
+
+function renderObjetivo() {
+  var bento = document.getElementById('obj-bento');
+  if (!bento) return;
+  var o = calcObjetivo();
+  var cob = o.cobReal;
+
+  /* ---- Fila 1: anillo + gastos + gap ---- */
+  var ringPct = cob === null ? 0 : Math.max(0, Math.min(100, cob));
+  var ringCol = cob === null ? 'var(--mu2)' : (cob >= 100 ? 'var(--g)' : (cob < 50 ? 'var(--r)' : 'var(--am)'));
+  var titulo, subtitulo;
+  if (cob === null) {
+    titulo = 'Añade tus gastos para calcular la cobertura';
+    subtitulo = 'Registra abajo tus partidas y verás qué parte del mes pagan ya tus inversiones.';
+  } else if (cob >= 100) {
+    titulo = 'Tus inversiones cubren todo el mes';
+    subtitulo = eur(o.cfReal) + ' de cashflow neto frente a ' + eur(o.gastosMes) + ' de gasto mensual.';
+  } else {
+    titulo = o.diaMes < 1 ? 'Tus inversiones aún no cubren el primer día del mes' : 'Tus inversiones pagan hasta el día ' + o.diaMes + ' del mes';
+    subtitulo = eur(o.cfReal) + ' de cashflow neto frente a ' + eur(o.gastosMes) + ' de gasto mensual.';
+  }
+  var chips = '';
+  if (o.cobPot !== null && cob !== null && Math.abs(o.cobPot - cob) > 0.05) {
+    chips += '<span class="chip ac">Potencial ' + pct1(o.cobPot) + '</span>';
+  }
+  if (cob !== null && cob >= 100) chips += '<span class="chip g">Excedente ' + eur(o.excedente) + '/mes</span>';
+
+  var html = '';
+  html += '<div class="tile tile-hero c-6">';
+  html += '<div class="tile-hd"><span class="tile-l">Cobertura de gastos</span><span class="tile-aside">Cashflow neto real</span></div>';
+  html += '<div class="ob-hero">';
+  html += '<div class="ring" id="obj-ring" style="--p:0;--ring-col:' + ringCol + ';">';
+  html += '<div class="ring-in"><div class="ring-v num" style="color:' + ringCol + '">' + (cob === null ? '—' : pct1(Math.max(0, cob))) + '</div><div class="ring-l">Cubierto</div></div>';
+  html += '</div>';
+  html += '<div class="ob-hero-txt"><div class="ob-hero-h">' + titulo + '</div><div class="ob-hero-s">' + subtitulo + '</div>';
+  if (chips) html += '<div class="ob-hero-chips">' + chips + '</div>';
+  html += '</div></div></div>';
+
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Gastos mensuales</span></div>';
+  html += '<div class="tile-v num">' + eur(o.gastosMes) + '</div>';
+  html += '<div class="tile-s">' + eur(o.gastosAnual) + ' al año</div>';
+  html += '<div class="tile-foot"><span class="chip mu">' + objNPartidas(o.nPartidas) + '</span>';
+  if (o.nPartidasTotal > o.nPartidas) html += '<span>' + (o.nPartidasTotal - o.nPartidas) + ' sin importe</span>';
+  html += '</div></div>';
+
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Faltan al mes</span></div>';
+  if (cob === null) {
+    html += '<div class="tile-v mu num">—</div><div class="tile-s">' + (o.nPartidasTotal > 0 ? 'Sin importes asignados' : 'Sin partidas de gasto') + '</div>';
+  } else if (cob >= 100) {
+    html += '<div class="tile-v g" style="font-size:1.15rem;letter-spacing:-.3px;">Objetivo cubierto</div>';
+    html += '<div class="tile-s">Excedente de <strong class="g">' + eur(o.excedente) + '</strong> al mes</div>';
+  } else {
+    html += '<div class="tile-v num" style="color:' + (cob < 50 ? 'var(--r)' : 'var(--am)') + '">' + eur(o.gapMes) + '</div>';
+    html += '<div class="tile-s">' + eur(o.gapMes * 12) + ' al año</div>';
+  }
+  html += '</div>';
+
+  /* ---- Fila 2: cuatro métricas ---- */
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Cashflow real / mes</span></div>';
+  html += '<div class="tile-v num" style="color:' + colorVal(o.cfReal) + '">' + eur(o.cfReal) + '</div>';
+  html += '<div class="tile-s">' + eur(o.cfReal * 12) + ' al año</div>';
+  html += '</div>';
+
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Cobertura potencial</span></div>';
+  html += '<div class="tile-v ac num">' + (o.cobPot === null ? '—' : pct1(o.cobPot)) + '</div>';
+  html += '<div class="tile-s">Si retiras de fondos y crypto</div>';
+  html += '</div>';
+
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Capital necesario</span></div>';
+  if (o.gastosMes <= 0) {
+    html += '<div class="tile-v mu num">—</div><div class="tile-s">' + (o.nPartidasTotal > 0 ? 'Sin importes asignados' : 'Sin partidas de gasto') + '</div>';
+  } else if (o.capitalNecesario === null) {
+    html += '<div class="tile-v mu num">—</div><div class="tile-s">Sin rendimiento de referencia</div>';
+  } else if (o.gapMes <= 0) {
+    html += '<div class="tile-v g num">' + eur(0) + '</div><div class="tile-s">Objetivo ya cubierto</div>';
+  } else {
+    html += '<div class="tile-v num">' + eur(o.capitalNecesario) + '</div>';
+    html += '<div class="tile-s">Al ' + pct1(o.yieldRefPct) + ' neto actual</div>';
+  }
+  html += '</div>';
+
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">Colchón de liquidez</span></div>';
+  html += '<div class="tile-v num" style="color:' + (o.colchonMeses === null ? 'var(--mu)' : (o.colchonMeses >= 6 ? 'var(--g)' : (o.colchonMeses >= 3 ? 'var(--am)' : 'var(--r)'))) + '">' + (o.colchonMeses === null ? '—' : objMeses(o.colchonMeses)) + '</div>';
+  html += '<div class="tile-s">' + eur(o.totalLiq) + ' disponibles</div>';
+  html += '</div>';
+
+  bento.innerHTML = html;
+
+  // El anillo arranca en 0 y se anima al valor real tras el pintado.
+  var ring = document.getElementById('obj-ring');
+  if (ring) requestAnimationFrame(function(){ ring.style.setProperty('--p', ringPct.toFixed(1)); });
+
+  /* ---- Partidas ---- */
+  var aside = document.getElementById('obj-part-aside');
+  if (aside) aside.textContent = o.gastosMes > 0 ? eur(o.gastosMes) + ' / mes' : 'Sin importes';
+
+  var mapEsc = {};
+  o.escalera.forEach(function(e){ mapEsc[e.id] = e; });
+  var lista = document.getElementById('obj-partidas');
+  if (o.partidas.length === 0) {
+    lista.innerHTML = '<div class="empty">Aún no hay partidas de gasto. Añade las tuyas abajo o empieza con una plantilla.' +
+      '<div class="btn-row" style="justify-content:center;margin-top:14px;"><button class="btn bp sm" onclick="cargarPlantillaPartidas()">Cargar plantilla</button></div></div>';
+  } else {
+    var ph = '';
+    var total = o.partidas.length;
+    o.partidas.forEach(function(p, i) {
+      var e = mapEsc[p.id];
+      var estado = e ? e.estado : 'sin-importe';
+      var pct = e ? Math.max(0, Math.min(100, e.pct)) : 0;
+      var anual = p.periodicidad === 'anual';
+      var mensual = partidaMensual(p);
+      var editando = editPartidaId === p.id;
+
+      ph += '<div class="ob-row' + (editando ? ' editing' : '') + '">';
+      ph += '<div class="ob-top"><div class="ob-info">';
+      ph += '<div class="ob-name" title="' + esc(p.nombre) + '">' + esc(p.nombre) + '</div>';
+      ph += '<div class="ob-meta"><span class="num">' + eur2(mensual) + '</span> al mes';
+      if (anual) ph += '<span class="num">' + eur(nv(p.importe)) + '/año</span>';
+      ph += '<span class="chip mu">' + (anual ? 'Anual' : 'Mensual') + '</span></div>';
+      ph += '</div>';
+      ph += '<div class="ob-acts">';
+      ph += '<button class="btn ghost sm icon" onclick="movePartida(' + p.id + ',-1)" title="Subir" aria-label="Subir"' + (i === 0 ? ' disabled' : '') + '><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></button>';
+      ph += '<button class="btn ghost sm icon" onclick="movePartida(' + p.id + ',1)" title="Bajar" aria-label="Bajar"' + (i === total - 1 ? ' disabled' : '') + '><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></button>';
+      ph += '<button class="btn ghost sm" onclick="editPartida(' + p.id + ')">' + (editando ? 'Cerrar' : 'Editar') + '</button>';
+      ph += '<button class="btn br2 sm icon" onclick="delPartida(' + p.id + ')" title="Eliminar" aria-label="Eliminar">×</button>';
+      ph += '</div></div>';
+
+      ph += '<div class="ob-prog"><div class="bar-trk"><div class="bar-fll" style="width:' + pct.toFixed(1) + '%;background:' + objEstadoColor(estado) + ';"></div></div>' + objEstadoChip(estado) + '</div>';
+
+      if (editando) {
+        var pf = 'pe' + p.id;
+        ph += '<div class="ob-edit"><div class="fgrid">';
+        ph += '<div class="ef span6"><label>Concepto</label><input id="' + pf + 'nombre" value="' + esc(p.nombre) + '" maxlength="60" onkeydown="objEditKey(event,' + p.id + ')"></div>';
+        ph += '<div class="ef span3"><label>Importe (€)</label><input type="number" id="' + pf + 'importe" value="' + nv(p.importe) + '" min="0" step="0.01" onkeydown="objEditKey(event,' + p.id + ')"></div>';
+        ph += '<div class="ef span3"><label>Periodicidad</label><select id="' + pf + 'per" onkeydown="objEditKey(event,' + p.id + ')">';
+        ph += '<option value="mensual"' + (anual ? '' : ' selected') + '>Mensual</option>';
+        ph += '<option value="anual"' + (anual ? ' selected' : '') + '>Anual</option></select></div>';
+        ph += '</div><div class="btn-row" style="margin-top:12px;">';
+        ph += '<button class="btn bp sm" onclick="saveEditPartida(' + p.id + ')">Guardar</button>';
+        ph += '<button class="btn ghost sm" onclick="cancelEditPartida()">Cancelar</button>';
+        ph += '<span class="flash" id="' + pf + 'flash"></span></div></div>';
+      }
+      ph += '</div>';
+    });
+    lista.innerHTML = ph;
+    if (editPartidaId !== null) {
+      var foco = document.getElementById('pe' + editPartidaId + 'nombre');
+      if (foco) { foco.focus(); foco.select(); }
+    }
+  }
+
+  /* ---- Fuentes de cashflow ---- */
+  var cont = document.getElementById('obj-fuentes');
+  if (o.fuentes.length === 0) {
+    cont.innerHTML = '<div class="empty">Todavía no hay activos que generen cashflow.</div>';
+  } else {
+    var maxAbs = o.fuentes.reduce(function(m, a){ return Math.max(m, Math.abs(a.cf)); }, 0.01);
+    cont.innerHTML = o.fuentes.map(function(a) {
+      var col = a.cf < 0 ? 'var(--r)' : (Object.prototype.hasOwnProperty.call(OBJ_TIPO_COLOR, a.tipo) ? OBJ_TIPO_COLOR[a.tipo] : 'var(--mu)');
+      var w = Math.abs(a.cf) / maxAbs * 100;
+      var sub = a.pctGastos === null ? '' : '<div class="ob-bar-sub">' + pct1(a.pctGastos) + ' del gasto</div>';
+      return '<div class="bar"><div class="bar-n" title="' + esc(a.nombre) + '">' + esc(a.nombre) + '</div>' +
+        '<div class="bar-trk"><div class="bar-fll" style="width:' + w.toFixed(1) + '%;background:' + col + ';box-shadow:0 0 8px ' + col + ';"></div></div>' +
+        '<div class="bar-v"><span style="color:' + colorVal(a.cf) + '">' + eur2(a.cf) + '</span>/mes' +
+        sub + '</div></div>';
+    }).join('');
+  }
+}
+
+/* ---- Mutaciones ---- */
+function addPartida() {
+  var elN = document.getElementById('obj-nombre');
+  var nombre = elN.value.trim();
+  if (!nombre) { flash('obj-flash', 'El concepto es obligatorio', 'r'); elN.focus(); return; }
+  var importe = gv('obj-importe');
+  if (!(importe > 0)) { flash('obj-flash', 'Introduce un importe mayor que 0', 'r'); document.getElementById('obj-importe').focus(); return; }
+  var per = document.getElementById('obj-periodicidad').value === 'anual' ? 'anual' : 'mensual';
+  var arr = getPartidas();
+  arr.push({ id: Date.now(), nombre: nombre, importe: importe, periodicidad: per, orden: arr.length });
+  reordenarPartidas(arr);
+  trySave();
+  elN.value = '';
+  document.getElementById('obj-importe').value = '';
+  document.getElementById('obj-periodicidad').value = 'mensual';
+  renderObjetivo();
+  elN.focus();
+  toast('Partida añadida');
+}
+
+function cargarPlantillaPartidas() {
+  var arr = getPartidas();
+  var base = Date.now();
+  PARTIDAS_PLANTILLA.forEach(function(n, i) {
+    arr.push({ id: base + i, nombre: n, importe: 0, periodicidad: 'mensual', orden: arr.length + i });
+  });
+  reordenarPartidas(arr);
+  trySave(); renderObjetivo();
+  toast('Plantilla cargada — edita los importes');
+}
+
+function editPartida(id) {
+  editPartidaId = (editPartidaId === id) ? null : id;
+  renderObjetivo();
+}
+function cancelEditPartida() { editPartidaId = null; renderObjetivo(); }
+
+function saveEditPartida(id) {
+  var pf = 'pe' + id;
+  var elN = document.getElementById(pf + 'nombre');
+  if (!elN) return;
+  var nombre = elN.value.trim();
+  if (!nombre) { flash(pf + 'flash', 'El concepto es obligatorio', 'r'); elN.focus(); return; }
+  var importe = parseFloat(document.getElementById(pf + 'importe').value) || 0;
+  if (importe < 0) importe = 0;
+  var per = document.getElementById(pf + 'per').value === 'anual' ? 'anual' : 'mensual';
+  var arr = ensureObjetivo().partidas;
+  var idx = arr.findIndex(function(x){ return x.id === id; });
+  if (idx < 0) return;
+  arr[idx].nombre = nombre;
+  arr[idx].importe = importe;
+  arr[idx].periodicidad = per;
+  editPartidaId = null;
+  trySave(); renderObjetivo();
+  toast('Partida actualizada');
+}
+
+function delPartida(id) {
+  var p = ensureObjetivo().partidas.find(function(x){ return x.id === id; });
+  var nombre = p ? p.nombre : 'esta partida';
+  confirmAction('¿Eliminar partida?', nombre + ' dejará de contar en tus gastos.', function() {
+    if (editPartidaId === id) editPartidaId = null;
+    var arr = getPartidas().filter(function(x){ return x.id !== id; });
+    reordenarPartidas(arr);
+    trySave(); renderObjetivo();
+    toast('Partida eliminada');
+  });
+}
+
+function movePartida(id, dir) {
+  var arr = getPartidas();
+  var i = arr.findIndex(function(x){ return x.id === id; });
+  var j = i + dir;
+  if (i < 0 || j < 0 || j >= arr.length) return;
+  var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+  reordenarPartidas(arr);
+  trySave(); renderObjetivo();
+}
+
+function objFormKey(e) {
+  if (e.key === 'Enter') { e.preventDefault(); addPartida(); }
+}
+function objEditKey(e, id) {
+  if (e.key === 'Enter') { e.preventDefault(); saveEditPartida(id); }
+  else if (e.key === 'Escape') { e.preventDefault(); cancelEditPartida(); }
+}
+
+/* ============================================================
    HISTÓRICO
    ============================================================ */
 function saveSnap() {
@@ -2853,7 +3391,7 @@ function importData(event) {
 function borrarTodo() {
   confirmAction('¿Borrar TODOS los datos?', 'Se eliminarán inversiones, propiedades, snapshots y la copia local. Los datos del servidor se borrarán en el próximo guardado. Esta acción no se puede deshacer.', function() {
     confirmAction('Confirmación final', 'Pulsa borrar para confirmar definitivamente.', function() {
-      S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, _savedAt: Date.now() };
+      S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, objetivo:{ partidas:[] }, _savedAt: Date.now() };
       Store.clearLocal();
       trySave();
       Auth.logout();
