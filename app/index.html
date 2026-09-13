@@ -309,7 +309,8 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 .tile-s{font-size:.78rem;color:var(--mu);margin-top:6px;}
 .tile-foot{
   margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd);
-  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  display:flex;justify-content:space-between;align-items:center;
+  gap:8px;flex-wrap:wrap;
   font-size:.74rem;color:var(--mu);
 }
 
@@ -596,6 +597,63 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 .prop-det{display:none;padding-top:16px;margin-top:16px;border-top:1px solid var(--bd);}
 .prop-row.expanded .prop-det{display:block;animation:slide .25s ease-out;}
 
+/* ====== INMO: subpestañas, facturas, hipoteca y renta ====== */
+.inmo-tabs{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.yr-tabs .ftab{padding:5px 11px;min-height:28px;font-size:.72rem;}
+.inmo-sec{margin:16px 0 8px;}
+.fact-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.fact-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.fact-row{background:var(--s1);border:1px solid var(--bd);border-radius:var(--rr);padding:11px 13px;transition:border-color var(--tf);}
+.fact-row:hover{border-color:var(--bd-h);}
+.fact-row.editing{border-color:var(--bd-a);}
+.fact-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.fact-info{min-width:0;flex:1;}
+.fact-cn{font-size:.88rem;font-weight:700;letter-spacing:-.15px;overflow-wrap:anywhere;}
+.fact-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:5px;font-size:.74rem;color:var(--mu);}
+.fact-meta .num{color:var(--tx2);font-weight:700;}
+.fact-notas{font-size:.74rem;color:var(--mu);margin-top:6px;line-height:1.45;overflow-wrap:anywhere;}
+.fact-side{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+.fact-imp{font-size:.9rem;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.fact-edit{margin-top:12px;padding-top:12px;border-top:1px dashed var(--bd);}
+.fact-form{margin-top:16px;padding-top:14px;border-top:1px dashed var(--bd);}
+.fact-foto:empty,.fact-foto-slot:empty{display:none;}
+.fact-foto{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.fact-foto-kb{font-size:.68rem;color:var(--mu);white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+/* Control de foto (alta y edición de factura) */
+.foto-ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.foto-thumb{width:64px;height:64px;object-fit:cover;border-radius:var(--rr);border:1px solid var(--bd);background:var(--s2);flex-shrink:0;display:block;}
+.foto-info{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.72rem;color:var(--mu);}
+.foto-nm{color:var(--tx2);font-weight:600;overflow-wrap:anywhere;}
+.foto-est{font-size:.72rem;color:var(--mu);font-weight:600;}
+.foto-est.r{color:var(--r);}
+.foto-est.g{color:var(--g);}
+
+/* Visor de foto a pantalla completa */
+.foto-ov{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;}
+.foto-ov[hidden]{display:none;}
+.foto-ov::before{content:'';position:fixed;inset:0;background:var(--bg);opacity:.96;}
+.foto-ov-bar{position:relative;z-index:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 14px;border-bottom:1px solid var(--bd);}
+.foto-ov-body{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;padding:14px;}
+.foto-ov-msg{font-size:.82rem;color:var(--mu);text-align:center;font-weight:600;}
+.foto-ov-msg.r{color:var(--r);}
+.foto-ov-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--rr);display:block;}
+.foto-ov.zoom .foto-ov-body{align-items:flex-start;justify-content:flex-start;}
+.foto-ov.zoom .foto-ov-img{max-width:none;max-height:none;width:auto;height:auto;object-fit:none;border-radius:0;}
+.amort-list{margin-top:10px;}
+.amort-row{display:grid;grid-template-columns:98px repeat(4,minmax(0,1fr));gap:8px;padding:7px 4px;border-bottom:1px solid var(--bd);font-size:.76rem;font-variant-numeric:tabular-nums;border-radius:6px;}
+.amort-row:last-child{border-bottom:none;}
+.amort-row.hd{font-size:.6rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.amort-row.now{background:var(--ac-g);color:var(--tx);font-weight:700;}
+.amort-c{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.amort-c.l{text-align:left;}
+.renta-row{display:grid;grid-template-columns:minmax(110px,1.6fr) repeat(6,minmax(0,1fr));gap:10px;padding:9px 4px;border-bottom:1px solid var(--bd);font-size:.78rem;align-items:center;}
+.renta-row.hd{font-size:.6rem;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.renta-n{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.renta-c{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.renta-avisos{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px;}
+.renta-avisos .chip{max-width:100%;}
+
 /* CHART wrap */
 .chart-wrap{position:relative;height:260px;}
 .chart-wrap.lg{height:320px;}
@@ -806,7 +864,17 @@ input[type=range].crypto::-moz-range-thumb{
   .chart-wrap.lg{height:260px;}
   .bar{grid-template-columns:100px 1fr 80px;}
   input,select,textarea{font-size:16px;}
-  #tab-objetivo input[type=number]{font-size:16px;}
+  #tab-objetivo input[type=number],#tab-inmo input[type=number]{font-size:16px;}
+  #tab-inmo .kpis-grid.k3{grid-template-columns:repeat(2,1fr);}
+  .inmo-tabs{align-items:flex-start;}
+  .amort-row{grid-template-columns:1fr 1fr;gap:4px 10px;padding:9px 4px;}
+  .amort-row.hd{display:none;}
+  .amort-c.l{grid-column:1/-1;color:var(--tx2);font-weight:700;}
+  .amort-c[data-l]::before{content:attr(data-l);float:left;color:var(--mu);font-weight:600;}
+  .renta-row{grid-template-columns:1fr 1fr;gap:4px 10px;}
+  .renta-row.hd{display:none;}
+  .renta-n{grid-column:1/-1;white-space:normal;}
+  .renta-c[data-l]::before{content:attr(data-l);float:left;color:var(--mu);font-weight:600;}
   .ring{--ring-size:96px;}
   .ring-v{font-size:1.2rem;}
   .ob-hero{gap:18px;}
@@ -815,6 +883,8 @@ input[type=range].crypto::-moz-range-thumb{
   .ob-acts .btn{min-height:38px;padding:9px 14px;}
   .ob-acts .btn.icon{min-width:38px;padding:9px;}
   .ob-fuentes .bar{grid-template-columns:minmax(0,1fr) 1fr 96px;}
+  .fact-foto .btn,.foto-ctl .btn,.foto-ov-bar .btn{min-height:38px;padding:9px 14px;}
+  .foto-ov-body{padding:10px;}
 }
 @media(max-width:520px){
   .content{padding:14px 12px 40px;}
@@ -835,6 +905,11 @@ input[type=range].crypto::-moz-range-thumb{
   .ob-hero-h{font-size:1rem;}
   .ob-row{padding:11px 12px;}
   .ob-fuentes .bar{grid-template-columns:minmax(0,1fr) 1fr 84px;}
+  .fact-top{flex-direction:column;align-items:stretch;}
+  .fact-side{justify-content:space-between;}
+  .foto-ctl{gap:8px;}
+  .foto-ctl .btn,.fact-foto .btn{flex:1 1 auto;justify-content:center;}
+  .amort-row,.renta-row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -1127,6 +1202,11 @@ input[type=range].crypto::-moz-range-thumb{
                   <div class="ef span3" id="prop-f-tin"><label>TIN anual (%)</label><input type="number" id="prop-tin" placeholder="3.50" step="0.01" oninput="updateHipoteca()"></div>
                   <div class="ef span3"><label>Plazo (años)</label><input type="number" id="prop-plazoAnios" placeholder="30" step="1" oninput="updateHipoteca()"></div>
                   <div class="ef span3" id="prop-f-cuotaNum"><label>Cuota nº actual</label><input type="number" id="prop-cuotaNum" placeholder="1" step="1" min="1" oninput="updateHipoteca()"></div>
+                  <div class="ef span6">
+                    <label>Fecha de la 1ª cuota</label>
+                    <input type="date" id="prop-fechaPrimeraCuota">
+                    <p class="hint">Necesaria para calcular los intereses reales de cada ejercicio. En modo tabla se autocompleta al procesarla.</p>
+                  </div>
                 </div>
                 <div class="hip-grid" id="prop-hip-result" style="display:none;">
                   <div class="hip-kpi"><div class="hip-l">Cuota/mes</div><div class="hip-v" id="prop-hip-cuota">—</div></div>
@@ -1144,16 +1224,12 @@ input[type=range].crypto::-moz-range-thumb{
                   <span class="subbox-r" id="prop-tabla-status">Sin tabla cargada</span>
                 </div>
                 <div class="fgrid">
-                  <div class="ef span4">
-                    <label>Fecha 1ª cuota de la tabla</label>
-                    <input type="date" id="prop-fechaPrimeraCuota">
-                  </div>
-                  <div class="ef span4">
+                  <div class="ef span6">
                     <label>Cuotas ya pagadas</label>
                     <input type="number" id="prop-cuotasPagadas" placeholder="0" min="0" step="1">
                     <p class="hint">Cuotas anteriores a la tabla. Si la tabla empieza en la cuota 49 del préstamo, pon <strong>48</strong>.</p>
                   </div>
-                  <div class="ef span4">
+                  <div class="ef span6">
                     <label>Cuotas detectadas</label>
                     <input id="prop-tabla-count" readonly placeholder="—">
                   </div>
@@ -1177,6 +1253,8 @@ input[type=range].crypto::-moz-range-thumb{
             <span class="flash" id="prop-flash"></span>
           </div>
         </div>
+
+        <div id="renta-block"></div>
 
         <div id="prop-list"></div>
       </div>
@@ -1304,6 +1382,14 @@ input[type=range].crypto::-moz-range-thumb{
                   <div id="cfg-irpf-tramo" class="mono" style="font-size:1.55rem;font-weight:800;color:var(--am);letter-spacing:-.4px;">—</div>
                   <div id="cfg-irpf-desc" style="font-size:.74rem;color:var(--mu);margin-top:3px;"></div>
                 </div>
+              </div>
+              <div class="ef span6">
+                <label>Cashflow de inmuebles en Resumen y Objetivo</label>
+                <select id="cfg-cfInmoModo">
+                  <option value="anio">Año en curso (incluye facturas)</option>
+                  <option value="estructural">Estructural (gastos recurrentes)</option>
+                </select>
+                <p class="hint">El modo anual usa los ingresos, las facturas y los intereses reales del ejercicio. El estructural ignora las facturas puntuales y muestra el cashflow recurrente.</p>
               </div>
             </div>
             <div class="btn-row" style="margin-top:12px;">
@@ -1449,6 +1535,160 @@ var Auth = (function(){
 })();
 
 /* ============================================================
+   FOTO — fotos de facturas contra /api/foto/:id
+   Mismo Bearer que /api/state (Auth.getToken).
+   Comprime en el cliente antes de subir: lado mayor 1600 px,
+   JPEG calidad 0,82. El servidor acepta jpeg/png/webp hasta 6 MB.
+   ============================================================ */
+var Foto = (function(){
+  var BASE = location.origin + '/api/foto/';
+  var ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
+  var MAX_LADO = 1600;
+  var CALIDAD = 0.82;
+  var MAX_BYTES = 6 * 1024 * 1024;
+  var TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp'];
+  var cache = new Map();   // id -> blob: URL ya descargada
+
+  function validId(id) { return typeof id === 'string' && ID_RE.test(id); }
+  function nuevoId() {
+    return 'f' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+  function headers(tipo) {
+    var h = { 'Authorization': 'Bearer ' + (Auth.getToken() || '') };
+    if (tipo) h['Content-Type'] = tipo;
+    return h;
+  }
+
+  // Decodifica el fichero a algo dibujable en <canvas>.
+  // createImageBitmap respeta la orientación EXIF; si no existe (o falla)
+  // se cae a <img> + object URL.
+  function decodificar(file) {
+    if (typeof createImageBitmap === 'function') {
+      try {
+        return createImageBitmap(file, { imageOrientation: 'from-image' })
+          .catch(function(){ return porImg(file); });
+      } catch(e) { return porImg(file); }
+    }
+    return porImg(file);
+  }
+  function porImg(file) {
+    return new Promise(function(resolve, reject) {
+      var url;
+      try { url = URL.createObjectURL(file); }
+      catch(e) { reject(new Error('No se pudo leer la imagen')); return; }
+      var img = new Image();
+      img._objUrl = url;
+      img.onload = function(){ resolve(img); };
+      img.onerror = function(){
+        try { URL.revokeObjectURL(url); } catch(e2) {}
+        reject(new Error('No se pudo leer la imagen'));
+      };
+      img.src = url;
+    });
+  }
+
+  // Devuelve un Blob listo para subir (o el propio fichero si ya pesa menos).
+  async function comprimir(file) {
+    if (!file) throw new Error('No se ha seleccionado ninguna imagen');
+    var tipo = String(file.type || '').toLowerCase().split(';')[0].trim();
+    if (tipo.indexOf('image/') !== 0) throw new Error('El fichero seleccionado no es una imagen');
+    var src = await decodificar(file);
+    try {
+      var w = src.width || src.naturalWidth || 0;
+      var h = src.height || src.naturalHeight || 0;
+      if (!w || !h) throw new Error('No se pudo leer la imagen');
+      var k = Math.min(1, MAX_LADO / Math.max(w, h));
+      var cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
+      var cv = document.createElement('canvas');
+      cv.width = cw; cv.height = ch;
+      var cx = cv.getContext ? cv.getContext('2d') : null;
+      if (!cx) throw new Error('El navegador no permite procesar la imagen');
+      cx.drawImage(src, 0, 0, cw, ch);
+      var blob = await new Promise(function(resolve) {
+        if (cv.toBlob) cv.toBlob(function(b){ resolve(b); }, 'image/jpeg', CALIDAD);
+        else resolve(null);
+      });
+      if (!blob || !blob.size) throw new Error('No se pudo comprimir la imagen');
+      // El original gana si ya es un tipo admitido, pesa menos y cabe.
+      if (TIPOS_OK.indexOf(tipo) >= 0 && file.size > 0 && file.size <= blob.size && file.size <= MAX_BYTES) return file;
+      if (blob.size > MAX_BYTES) throw new Error('La foto supera el tamaño permitido');
+      return blob;
+    } finally {
+      if (src && src.close) { try { src.close(); } catch(e) {} }
+      if (src && src._objUrl) { try { URL.revokeObjectURL(src._objUrl); } catch(e) {} }
+    }
+  }
+
+  function olvidar(id) {
+    if (!cache.has(id)) return;
+    var url = cache.get(id);
+    cache['delete'](id);
+    try { URL.revokeObjectURL(url); } catch(e) {}
+  }
+
+  async function subir(id, blob) {
+    if (!validId(id)) throw new Error('Identificador de foto no válido');
+    if (!blob || !blob.size) throw new Error('La foto está vacía');
+    if (blob.size > MAX_BYTES) throw new Error('La foto supera el tamaño permitido');
+    var res;
+    try {
+      res = await fetch(BASE + id, {
+        method: 'PUT',
+        headers: headers(blob.type || 'image/jpeg'),
+        body: blob
+      });
+    } catch(e) {
+      throw new Error('Sin conexión: no se pudo subir la foto');
+    }
+    if (!res || !res.ok) {
+      var st = res ? res.status : 0;
+      if (st === 401) throw new Error('Sesión no válida');
+      if (st === 413) throw new Error('La foto supera el tamaño permitido');
+      throw new Error('No se pudo subir la foto');
+    }
+    olvidar(id);
+    return { id: id, size: blob.size };
+  }
+
+  async function cargar(id) {
+    if (!validId(id)) throw new Error('Identificador de foto no válido');
+    if (cache.has(id)) return cache.get(id);
+    var res;
+    try {
+      res = await fetch(BASE + id, { headers: headers(null) });
+    } catch(e) {
+      throw new Error('Sin conexión: no se pudo cargar la foto');
+    }
+    if (!res || !res.ok) {
+      var st = res ? res.status : 0;
+      if (st === 401) throw new Error('Sesión no válida');
+      if (st === 404) throw new Error('La foto ya no está disponible');
+      throw new Error('No se pudo cargar la foto');
+    }
+    var blob = await res.blob();
+    var url = URL.createObjectURL(blob);
+    cache.set(id, url);
+    return url;
+  }
+
+  // Best-effort: nunca lanza. true si el servidor confirmó el borrado.
+  async function borrar(id) {
+    if (!validId(id)) return false;
+    olvidar(id);
+    try {
+      var res = await fetch(BASE + id, { method: 'DELETE', headers: headers(null) });
+      return !!(res && res.ok);
+    } catch(e) { return false; }
+  }
+
+  return {
+    nuevoId: nuevoId, validId: validId, comprimir: comprimir,
+    subir: subir, cargar: cargar, borrar: borrar, olvidar: olvidar,
+    MAX_BYTES: MAX_BYTES
+  };
+})();
+
+/* ============================================================
    STATE & GLOBALS
    ============================================================ */
 var saveTimer = null;
@@ -1463,17 +1703,19 @@ var S = {
   propiedades: [],
   snaps: [],
   liquido: [],
-  config: { baseIRPF: 0 },
+  config: { baseIRPF: 0, cfInmoModo: 'anio' },
   objetivo: { partidas: [] },
   _savedAt: 0
 };
 
 /* ============================================================
-   FISCAL — escala IRPF España 2024
+   FISCAL — escala agregada de referencia (estatal + autonómica
+   de referencia), ejercicio 2026
+   Umbrales: 12.450 / 20.200 / 35.200 / 60.000 / 300.000
    ============================================================ */
 function irpf(base) {
   if (base <= 0) return 0;
-  var tramos = [[12450,19],[7600,24],[15150,30],[24800,37],[1e9,45]];
+  var tramos = [[12450,19],[7750,24],[15000,30],[24800,37],[240000,45],[1e9,47]];
   var t = 0, rem = base;
   for (var i = 0; i < tramos.length; i++) {
     var chunk = Math.min(rem, tramos[i][0]);
@@ -1486,7 +1728,7 @@ function irpf(base) {
 
 function irpfAhorro(base) {
   if (base <= 0) return 0;
-  var tramos = [[6000,19],[44000,21],[150000,23],[100000,27],[1e9,28]];
+  var tramos = [[6000,19],[44000,21],[150000,23],[100000,27],[1e9,30]];
   var t = 0, rem = base;
   for (var i = 0; i < tramos.length; i++) {
     var chunk = Math.min(rem, tramos[i][0]);
@@ -1531,16 +1773,74 @@ function calcAmortiFrances(capital, tinAnual, plazoAnios, cuotaNum) {
   return { cuota:cuota, interesMes:interesMes, amortiMes:amortiMes, saldoRestante:saldoRest };
 }
 
-function calcProp(p) {
-  var BASE = (S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0;
-  var alqAnual = nv(p.alquiler) * 12;
-  var gastosDed = (p.ibi !== undefined)
-    ? nv(p.ibi) + nv(p.seguro) + nv(p.comunidad) + nv(p.otrosGastos)
-    : nv(p.gastosDed);
-  var cuotaMensual, interesesMensual, amortiMensual, saldoPendiente = 0;
-  var cuotaActualInfo = null; // {n, total} si usa tabla
-  var tieneTabla = p.amortiTable && p.amortiTable.length && p.fechaPrimeraCuota;
+/* ============================================================
+   FISCAL INMUEBLES — categorías de factura
+   deducible : resta del rendimiento íntegro del ejercicio
+   tope      : sujeta al límite conjunto del art. 23.1.a).1º LIRPF
+               (intereses + reparación y conservación <= rendimientos íntegros)
+   prorrateo : se reparte por días arrendados (false = 100 %)
+   amortiza  : null | 'muebles' (10 % anual, 10 años) | 'inmueble' (3 %)
+   ============================================================ */
+var FACT_CATS = [
+  { key:'reparacion',   label:'Reparación y conservación',                          deducible:true,  tope:true,  prorrateo:true,  amortiza:null },
+  { key:'derrama',      label:'Derrama de comunidad (conservación)',                deducible:true,  tope:true,  prorrateo:true,  amortiza:null },
+  { key:'financiacion', label:'Comisiones y gastos de financiación',                deducible:true,  tope:true,  prorrateo:true,  amortiza:null },
+  { key:'suministros',  label:'Suministros pagados por el propietario',             deducible:true,  tope:false, prorrateo:true,  amortiza:null },
+  { key:'tributos',     label:'Tasas y tributos (basuras, vado…)',                  deducible:true,  tope:false, prorrateo:true,  amortiza:null },
+  { key:'servicios',    label:'Administración, limpieza, gestión',                  deducible:true,  tope:false, prorrateo:true,  amortiza:null },
+  { key:'contrato',     label:'Agencia, formalización, jurídico, seguro de impago', deducible:true,  tope:false, prorrateo:false, amortiza:null },
+  { key:'mobiliario',   label:'Mobiliario y electrodomésticos',                     deducible:false, tope:false, prorrateo:true,  amortiza:'muebles' },
+  { key:'mejora',       label:'Mejora o ampliación',                                deducible:false, tope:false, prorrateo:true,  amortiza:'inmueble' },
+  { key:'nodeducible',  label:'No deducible',                                       deducible:false, tope:false, prorrateo:false, amortiza:null }
+];
 
+var DIAS_ANIO_FISCAL = 365;          // simplificación: se ignoran los bisiestos
+var ARRASTRE_ANIOS = 4;              // el exceso del tope se arrastra 4 ejercicios
+var AMORT_INMUEBLE_PCT = 3;
+var AMORT_MUEBLES_PCT = 10;
+var AMORT_MUEBLES_ANIOS = 10;
+var REDUCCION_FECHA_CORTE = '2023-05-26';  // entrada en vigor de la Ley 12/2023
+
+function isFechaISO(s) {
+  var t = String(s == null ? '' : s);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false;
+  var y = parseInt(t.slice(0,4), 10), m = parseInt(t.slice(5,7), 10), d = parseInt(t.slice(8,10), 10);
+  if (m < 1 || m > 12 || d < 1) return false;
+  return d <= new Date(y, m, 0).getDate();
+}
+function anioISO(s) { return isFechaISO(s) ? parseInt(String(s).slice(0,4), 10) : null; }
+function fechaDesdeISO(s) {
+  if (!isFechaISO(s)) return null;
+  var d = new Date(String(s) + 'T00:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+// Devuelve null cuando el valor no está informado; si no, un número acotado.
+function numOrNull(v, min, max) {
+  if (v === null || v === undefined || v === '') return null;
+  var n = parseFloat(v);
+  if (!isFinite(n)) return null;
+  if (min !== null && min !== undefined && n < min) n = min;
+  if (max !== null && max !== undefined && n > max) n = max;
+  return n;
+}
+
+function partidaCat(cat) {
+  for (var i = 0; i < FACT_CATS.length; i++) { if (FACT_CATS[i].key === cat) return FACT_CATS[i]; }
+  return null;
+}
+function partidaCatSegura(cat) { return partidaCat(cat) || partidaCat('nodeducible'); }
+
+function facturasDeAnio(p, year) {
+  var y = parseInt(year, 10);
+  var arr = (p && Array.isArray(p.facturas)) ? p.facturas : [];
+  return arr.filter(function(f) { return f && anioISO(f.fecha) === y; });
+}
+
+// Hipoteca: cuota, intereses y amortización del MES ACTUAL (vista estructural).
+function calcHipotecaMensual(p) {
+  var cuotaMensual, interesesMensual, amortiMensual, saldoPendiente = 0;
+  var cuotaActualInfo = null;
+  var tieneTabla = p.amortiTable && p.amortiTable.length && p.fechaPrimeraCuota;
   if (tieneTabla) {
     var nLocal = cuotaActualDesdeFecha(p.fechaPrimeraCuota, p.amortiTable.length);
     var row = p.amortiTable[nLocal - 1];
@@ -1551,11 +1851,7 @@ function calcProp(p) {
     // Si el banco proporciona "base de cálculo" (saldo antes de pagar esta cuota), lo usamos
     // como saldo pendiente actual; si no, usamos el saldo posterior estándar.
     saldoPendiente = row.base !== undefined ? nv(row.base) : nv(row.saldo);
-    cuotaActualInfo = {
-      n: pagadas + nLocal,
-      total: pagadas + p.amortiTable.length,
-      fecha: row.fecha || ''
-    };
+    cuotaActualInfo = { n: pagadas + nLocal, total: pagadas + p.amortiTable.length, fecha: row.fecha || '' };
   } else if (nv(p.tin) && nv(p.plazoAnios)) {
     var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
     var rf = calcAmortiFrances(capitalFin, nv(p.tin), nv(p.plazoAnios), nv(p.cuotaNum)||1);
@@ -1567,21 +1863,397 @@ function calcProp(p) {
     interesesMensual = cuotaMensual * pctInt;
     amortiMensual = nv(p.amorti) ? nv(p.amorti)/12 : (cuotaMensual - interesesMensual);
   }
-  var cuotaAnual = cuotaMensual * 12;
-  var interesesAnual = interesesMensual * 12;
-  var amortiAnual = amortiMensual * 12;
-  var rendBruto = alqAnual - gastosDed - interesesAnual;
-  var reduccion = rendBruto > 0 ? rendBruto * 0.6 : 0;
-  var rendNeto = rendBruto - reduccion;
-  var impuesto = irpf(BASE + Math.max(0, rendNeto)) - irpf(BASE);
-  var cfNetoAnual = alqAnual - gastosDed - cuotaAnual - impuesto;
-  var capPropio = nv(p.entrada) + nv(p.gastos) + nv(p.reforma);
-  var roce = capPropio > 0 ? (cfNetoAnual + amortiAnual) / capPropio : 0;
-  var yieldCF = capPropio > 0 ? cfNetoAnual / capPropio : 0;
-  var yieldBruto = nv(p.valor) > 0 ? alqAnual / nv(p.valor) : 0;
-  var yieldNeto = nv(p.valor) > 0 ? (alqAnual - gastosDed - impuesto) / nv(p.valor) : 0;
-  var equityProp = nv(p.valor) - saldoPendiente;
-  return { cfNetoMensual: cfNetoAnual/12, cfNetoAnual: cfNetoAnual, amortiAnual: amortiAnual, amortiMensual: amortiMensual, interesesMensual: interesesMensual, cuotaMensual: cuotaMensual, roce: roce, yieldCF: yieldCF, yieldBruto: yieldBruto, yieldNeto: yieldNeto, impuesto: impuesto, capPropio: capPropio, saldoPendiente: saldoPendiente, equityProp: equityProp, cuotaActualInfo: cuotaActualInfo };
+  return {
+    cuotaMensual: cuotaMensual, interesesMensual: interesesMensual, amortiMensual: amortiMensual,
+    saldoPendiente: saldoPendiente, cuotaActualInfo: cuotaActualInfo
+  };
+}
+
+// Intereses y cuotas realmente devengados en un ejercicio.
+// aprox=true cuando no hay ancla temporal y se estima con el mes actual x 12.
+function interesesYCuotaAnio(p, year) {
+  var y = parseInt(year, 10);
+  var tabla = (p && p.amortiTable && p.amortiTable.length) ? p.amortiTable : null;
+  var intereses = 0, cuotas = 0, n = 0, i;
+  // Si la hipoteca arranca dentro del ejercicio (después de enero) el año solo tiene cuotas parciales,
+  // pero el alquiler se anualiza a 12 meses: se usa la cuota estructural x12 para no distorsionar el cashflow.
+  var iniHip = fechaDesdeISO(p && p.fechaPrimeraCuota);
+  if (iniHip && iniHip.getFullYear() === y && iniHip.getMonth() > 0) {
+    var hm0 = calcHipotecaMensual(p);
+    return { intereses: hm0.interesesMensual * 12, cuotas: hm0.cuotaMensual * 12, cuotasAnio: 12, aprox: true, fuente: 'inicio-anio' };
+  }
+
+  if (tabla) {
+    var conFechas = false;
+    for (i = 0; i < tabla.length; i++) { if (tabla[i] && tabla[i].fecha) { conFechas = true; break; } }
+    if (conFechas) {
+      for (i = 0; i < tabla.length; i++) {
+        var d = (tabla[i] && tabla[i].fecha) ? parseFechaES(tabla[i].fecha) : null;
+        if (d && d.getFullYear() === y) { intereses += nv(tabla[i].interes); cuotas += nv(tabla[i].cuota); n++; }
+      }
+      return { intereses: intereses, cuotas: cuotas, cuotasAnio: n, aprox: false, fuente: 'tabla' };
+    }
+    var ini = fechaDesdeISO(p.fechaPrimeraCuota);
+    if (ini) {
+      for (i = 0; i < tabla.length; i++) {
+        var anioFila = ini.getFullYear() + Math.floor((ini.getMonth() + i) / 12);
+        if (anioFila === y) { intereses += nv(tabla[i].interes); cuotas += nv(tabla[i].cuota); n++; }
+      }
+      return { intereses: intereses, cuotas: cuotas, cuotasAnio: n, aprox: false, fuente: 'tabla-sin-fechas' };
+    }
+  } else if (nv(p.tin) && nv(p.plazoAnios)) {
+    var ini2 = fechaDesdeISO(p.fechaPrimeraCuota);
+    if (ini2) {
+      var capitalFin = nv(p.precioCompra) * (1 - nv(p.pctEntrada)/100);
+      var pagadas = Math.max(0, Math.floor(nv(p.cuotasPagadas)));
+      var nTot = Math.round(nv(p.plazoAnios) * 12);
+      for (var m = 0; m < 12; m++) {
+        var meses = (y - ini2.getFullYear()) * 12 + (m - ini2.getMonth());
+        if (meses < 0) continue;
+        var num = meses + 1 + pagadas;
+        if (nTot && num > nTot) continue;
+        var rf2 = calcAmortiFrances(capitalFin, nv(p.tin), nv(p.plazoAnios), num);
+        if (!rf2) continue;
+        intereses += rf2.interesMes; cuotas += rf2.cuota; n++;
+      }
+      return { intereses: intereses, cuotas: cuotas, cuotasAnio: n, aprox: false, fuente: 'frances' };
+    }
+  }
+
+  var hm = calcHipotecaMensual(p);
+  return { intereses: hm.interesesMensual * 12, cuotas: hm.cuotaMensual * 12, cuotasAnio: 12, aprox: true, fuente: 'estimado' };
+}
+
+// Liquidación de UN ejercicio a partir de los excesos pendientes de años previos.
+// pendientes: [{ anio, importe }]. Devuelve el detalle + pendientesSalida.
+// opts.estructural: año completo, sin facturas del año y sin vacío.
+function _fiscalEjercicio(p, year, pendientes, opts) {
+  opts = opts || {};
+  var estructural = !!opts.estructural;
+  var BASE = (S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0;
+  var D = DIAS_ANIO_FISCAL;
+  var avisos = [];
+  var i;
+
+  /* --- 1. Rendimiento íntegro y días arrendados --- */
+  var alquilerMensual = nv(p.alquiler);
+  var vacRaw = (!estructural && p.vacio && typeof p.vacio === 'object') ? parseFloat(p.vacio[String(year)]) : 0;
+  var mesesVacio = (isFinite(vacRaw) && vacRaw > 0) ? Math.min(12, vacRaw) : 0;
+  var RI = alquilerMensual * (12 - mesesVacio);
+  if (RI < 0) RI = 0;
+  // Sin renta y sin vacío declarado: el inmueble no ha generado rendimiento,
+  // así que no se deducen gastos (criterio conservador).
+  var sinActividad = (RI <= 0 && mesesVacio <= 0);
+  if (sinActividad) { mesesVacio = 12; RI = 0; }
+  var dAlq = mesesVacio >= 12 ? 0 : Math.round(D - mesesVacio * 30);
+  var dVacio = D - dAlq;
+  var factor = dAlq / D;
+
+  /* --- 2. Hipoteca del ejercicio --- */
+  var interesesAnio, cuotasAnio, interesesAprox = false, fuenteIntereses;
+  if (estructural) {
+    var hm = calcHipotecaMensual(p);
+    interesesAnio = hm.interesesMensual * 12;
+    cuotasAnio = hm.cuotaMensual * 12;
+    fuenteIntereses = 'estructural';
+  } else {
+    var hip = interesesYCuotaAnio(p, year);
+    interesesAnio = hip.intereses;
+    cuotasAnio = hip.cuotas;
+    interesesAprox = hip.aprox;
+    fuenteIntereses = hip.fuente;
+  }
+  var interesesProrrateados = interesesAnio * factor;
+
+  /* --- 3. Facturas del ejercicio --- */
+  var facturas = estructural ? [] : facturasDeAnio(p, year);
+  var facturasCash = 0, facturasTope = 0, facturasOtros = 0;
+  var porCat = {};
+  facturas.forEach(function(f) {
+    var imp = nv(f.importe);
+    var cat = partidaCatSegura(f.cat);
+    facturasCash += imp;
+    porCat[cat.key] = (porCat[cat.key] || 0) + imp;
+    if (!cat.deducible || sinActividad) return;
+    var val = cat.prorrateo ? imp * factor : imp;
+    if (cat.tope) facturasTope += val; else facturasOtros += val;
+  });
+
+  /* --- 4. Amortizaciones (se calculan sobre TODAS las facturas, no solo las del año) --- */
+  var todas = (p && Array.isArray(p.facturas)) ? p.facturas : [];
+  var mejorasAcum = 0, amortMuebles = 0;
+  todas.forEach(function(f) {
+    var af = anioISO(f.fecha);
+    if (af === null || af > year) return;
+    var cat = partidaCatSegura(f.cat);
+    if (cat.amortiza === 'inmueble') mejorasAcum += nv(f.importe);
+    else if (cat.amortiza === 'muebles' && (year - af) < AMORT_MUEBLES_ANIOS) {
+      amortMuebles += nv(f.importe) * AMORT_MUEBLES_PCT / 100 * factor;
+    }
+  });
+  var pctSuelo = numOrNull(p.pctSuelo, 0, 100);
+  var amortDisponible = (pctSuelo !== null);
+  var pctConstruccion = amortDisponible ? (1 - pctSuelo / 100) : 0;
+  var valorCatastral = numOrNull(p.valorCatastral, 0, null);
+  var baseCoste = (nv(p.precioCompra) + nv(p.gastos) + nv(p.reforma) + mejorasAcum) * pctConstruccion;
+  var baseCatastral = nv(valorCatastral) * pctConstruccion;
+  var baseAmort = Math.max(baseCoste, baseCatastral);
+  var amortInmueble = amortDisponible ? (AMORT_INMUEBLE_PCT / 100) * baseAmort * factor : 0;
+
+  /* --- 5. Gastos recurrentes (importes anuales y prorrateados) --- */
+  var legacy = (p.ibi === undefined);
+  var ibiA = legacy ? 0 : nv(p.ibi);
+  var seguroA = legacy ? 0 : nv(p.seguro);
+  var comunidadA = legacy ? 0 : nv(p.comunidad);
+  var otrosA = legacy ? nv(p.gastosDed) : nv(p.otrosGastos);
+  var gastosRecurrentes = ibiA + seguroA + comunidadA + otrosA;
+  var ibi = ibiA * factor, seguro = seguroA * factor, comunidad = comunidadA * factor, otrosGastos = otrosA * factor;
+
+  /* --- 6. Tope conjunto intereses + reparación (art. 23.1.a).1º LIRPF) --- */
+  var gastosTopeAnio = interesesProrrateados + facturasTope;
+  var vigentes = [];
+  if (!estructural && pendientes) {
+    for (i = 0; i < pendientes.length; i++) {
+      var q = pendientes[i];
+      if (!q || nv(q.importe) <= 0) continue;
+      if (year - nv(q.anio) > ARRASTRE_ANIOS) continue;   // caducado
+      vigentes.push({ anio: nv(q.anio), importe: nv(q.importe) });
+    }
+    vigentes.sort(function(a, b) { return a.anio - b.anio; });
+  }
+  var pendientesDisponibles = 0;
+  vigentes.forEach(function(q) { pendientesDisponibles += q.importe; });
+
+  var gTopeBruto = gastosTopeAnio + pendientesDisponibles;
+  var gTopeDeduc = Math.min(gTopeBruto, RI);
+  var exceso = gTopeBruto - gTopeDeduc;
+
+  // Orden de imputación: primero el ejercicio corriente, después los pendientes
+  // de más antiguo a más reciente (criterio habitual, no explícito en la norma).
+  var aplicadoAnio = Math.min(gastosTopeAnio, RI);
+  var margen = RI - aplicadoAnio;
+  var pendientesAplicados = 0;
+  var pendientesSalida = [];
+  vigentes.forEach(function(q) {
+    var usa = Math.min(q.importe, margen);
+    margen -= usa;
+    pendientesAplicados += usa;
+    var resto = q.importe - usa;
+    if (resto > 1e-9 && (year + 1) - q.anio <= ARRASTRE_ANIOS) pendientesSalida.push({ anio: q.anio, importe: resto });
+  });
+  var excesoAnio = gastosTopeAnio - aplicadoAnio;
+  if (excesoAnio > 1e-9) pendientesSalida.push({ anio: year, importe: excesoAnio });
+
+  /* --- 7. Rendimiento neto, reducción e imputación --- */
+  var gOtros = ibi + seguro + comunidad + otrosGastos + facturasOtros + amortInmueble + amortMuebles;
+  var RN = RI - gTopeDeduc - gOtros;
+
+  var esVivienda = (p.tipoAlquiler !== 'otro');
+  var reduccionPct;
+  if (!esVivienda) reduccionPct = 0;
+  else {
+    var manual = numOrNull(p.reduccionPct, 0, 100);
+    if (manual !== null) reduccionPct = manual;
+    else reduccionPct = (!isFechaISO(p.fechaContrato) || String(p.fechaContrato) < REDUCCION_FECHA_CORTE) ? 60 : 50;
+  }
+  var reduccion = (RN > 0 && esVivienda) ? RN * reduccionPct / 100 : 0;
+  var RNR = RN - reduccion;
+
+  var pctImputacion = (nv(p.pctImputacion) === 1.1) ? 1.1 : 2;
+  var imputacion = (valorCatastral !== null && valorCatastral > 0 && dVacio > 0)
+    ? (pctImputacion / 100) * valorCatastral * dVacio / D
+    : 0;
+
+  var aportacion = RNR + imputacion;
+  var impuestoMarginal = irpf(BASE + aportacion) - irpf(BASE);
+
+  /* --- 8. Avisos --- */
+  if (interesesAprox) avisos.push('Intereses estimados: no hay tabla de amortización ni fecha de primera cuota para situar el ejercicio.');
+  if (!amortDisponible) avisos.push('Sin amortización del inmueble: falta el porcentaje de suelo del recibo del IBI.');
+  if (exceso > 0.005) avisos.push('Tope aplicado: ' + eur2(exceso) + ' de intereses y reparaciones no deducidos; se arrastran ' + ARRASTRE_ANIOS + ' ejercicios.');
+  if (pendientesAplicados > 0.005) avisos.push('Se han aplicado ' + eur2(pendientesAplicados) + ' de excesos de ejercicios anteriores.');
+  if (dVacio > 0 && (valorCatastral === null || valorCatastral <= 0)) avisos.push('Sin imputación de renta por los días sin alquilar: falta el valor catastral.');
+
+  return {
+    year: year, estructural: estructural, sinActividad: sinActividad,
+    dias: D, mesesVacio: mesesVacio, dAlq: dAlq, dVacio: dVacio, factor: factor,
+    alquilerMensual: alquilerMensual, RI: RI,
+    interesesAnio: interesesAnio, cuotasAnio: cuotasAnio, interesesAprox: interesesAprox,
+    fuenteIntereses: fuenteIntereses, interesesProrrateados: interesesProrrateados,
+    facturasTope: facturasTope, facturasOtros: facturasOtros, facturasCash: facturasCash,
+    facturasCount: facturas.length, facturasPorCat: porCat,
+    gastosTopeAnio: gastosTopeAnio, pendientesDisponibles: pendientesDisponibles,
+    pendientesAplicados: pendientesAplicados, gTopeBruto: gTopeBruto, gTopeDeduc: gTopeDeduc,
+    exceso: exceso, pendientesSalida: pendientesSalida,
+    gastosRecurrentes: gastosRecurrentes,
+    ibi: ibi, seguro: seguro, comunidad: comunidad, otrosGastos: otrosGastos,
+    amortDisponible: amortDisponible, pctSuelo: pctSuelo, pctConstruccion: pctConstruccion,
+    mejorasAcum: mejorasAcum, baseCoste: baseCoste, baseCatastral: baseCatastral, baseAmort: baseAmort,
+    amortInmueble: amortInmueble, amortMuebles: amortMuebles,
+    gOtros: gOtros, RN: RN,
+    esVivienda: esVivienda, reduccionPct: reduccionPct, reduccion: reduccion, RNR: RNR,
+    valorCatastral: valorCatastral, pctImputacion: pctImputacion, imputacion: imputacion,
+    base: BASE, aportacion: aportacion, impuestoMarginal: impuestoMarginal,
+    avisos: avisos
+  };
+}
+
+// Liquidación fiscal de un inmueble en un ejercicio, con el arrastre de excesos
+// de los 4 ejercicios anteriores calculado en secuencia (sin recursión).
+function calcFiscalProp(p, year, opts) {
+  opts = opts || {};
+  var y = parseInt(year, 10);
+  if (!isFinite(y)) y = new Date().getFullYear();
+  if (opts.estructural) return _fiscalEjercicio(p, y, [], opts);
+  var pend = [];
+  for (var a = y - ARRASTRE_ANIOS; a < y; a++) {
+    pend = _fiscalEjercicio(p, a, pend, {}).pendientesSalida;
+  }
+  return _fiscalEjercicio(p, y, pend, opts);
+}
+
+// Declaración conjunta del ejercicio: la cuota se calcula sobre la suma de
+// aportaciones, de modo que captura los saltos de tramo entre inmuebles.
+function calcRenta(year) {
+  var y = parseInt(year, 10);
+  if (!isFinite(y)) y = new Date().getFullYear();
+  var BASE = (S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0;
+  var inmuebles = [], avisos = [];
+  var sumRI = 0, sumRNR = 0, sumImputacion = 0;
+  S.propiedades.forEach(function(p) {
+    if (p.uso === 'habitual') return;
+    var f = calcFiscalProp(p, y);
+    inmuebles.push({ id: p.id, nombre: p.nombre, fiscal: f });
+    sumRI += f.RI;
+    sumRNR += f.RNR;
+    sumImputacion += f.imputacion;
+    f.avisos.forEach(function(a) {
+      var txt = String(p.nombre || '') + ': ' + a;
+      if (avisos.indexOf(txt) < 0) avisos.push(txt);
+    });
+  });
+  var aportacion = sumRNR + sumImputacion;
+  var cuota = irpf(BASE + aportacion) - irpf(BASE);
+  return {
+    year: y, base: BASE, inmuebles: inmuebles,
+    sumRI: sumRI, sumRNR: sumRNR, sumImputacion: sumImputacion,
+    aportacion: aportacion, cuota: cuota,
+    tipoEfectivo: sumRI > 0 ? cuota / sumRI : null,
+    tramoBase: tramoMarginal(BASE), tramoFinal: tramoMarginal(BASE + aportacion),
+    avisos: avisos
+  };
+}
+
+// Caché de calcProp: se consulta por identidad del inmueble y se invalida en
+// renderAll() y trySave(). La clave añade el modo y la base de IRPF porque
+// ambos cambian el resultado sin tocar el objeto del inmueble.
+var _calcPropCache = new WeakMap();
+function invalidateCalcProp() { _calcPropCache = new WeakMap(); }
+function calcProp(p) {
+  if (!p || typeof p !== 'object') return _calcPropCalc(p);
+  var modo = (S.config && S.config.cfInmoModo === 'estructural') ? 'estructural' : 'anio';
+  var clave = modo + '|' + ((S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0);
+  var slot = _calcPropCache.get(p);
+  if (slot && slot.k === clave) return slot.v;
+  var val = _calcPropCalc(p);
+  _calcPropCache.set(p, { k: clave, v: val });
+  return val;
+}
+
+function _calcPropCalc(p) {
+  var BASE = (S.config && S.config.baseIRPF) ? nv(S.config.baseIRPF) : 0;
+  var hm = calcHipotecaMensual(p);
+  var cuotaMensual = hm.cuotaMensual, interesesMensual = hm.interesesMensual, amortiMensual = hm.amortiMensual;
+  var saldoPendiente = hm.saldoPendiente, cuotaActualInfo = hm.cuotaActualInfo;
+  var cuotaAnual = cuotaMensual * 12, interesesAnual = interesesMensual * 12, amortiAnual = amortiMensual * 12;
+
+  var alqAnual = nv(p.alquiler) * 12;
+  var gastosDed = (p.ibi !== undefined)
+    ? nv(p.ibi) + nv(p.seguro) + nv(p.comunidad) + nv(p.otrosGastos)
+    : nv(p.gastosDed);
+  var valor = nv(p.valor);
+  var equityProp = valor - saldoPendiente;
+  var yieldBruto = valor > 0 ? alqAnual / valor : 0;
+
+  // Las mejoras capitalizadas son capital propio aportado al inmueble.
+  var mejorasCap = 0;
+  ((p && Array.isArray(p.facturas)) ? p.facturas : []).forEach(function(f) {
+    var afc = anioISO(f.fecha);
+    if (afc === null || afc > anioHoy()) return;
+    if (partidaCatSegura(f.cat).amortiza === 'inmueble') mejorasCap += nv(f.importe);
+  });
+  var capPropio = nv(p.entrada) + nv(p.gastos) + nv(p.reforma) + mejorasCap;
+
+  // Vivienda habitual: no genera rendimiento del capital inmobiliario.
+  if (p.uso === 'habitual') {
+    var rendBrutoH = alqAnual - gastosDed - interesesAnual;
+    var reduccionH = rendBrutoH > 0 ? rendBrutoH * 0.6 : 0;
+    var rendNetoH = rendBrutoH - reduccionH;
+    var impuestoH = irpf(BASE + Math.max(0, rendNetoH)) - irpf(BASE);
+    var cfH = alqAnual - gastosDed - cuotaAnual - impuestoH;
+    var vistaH = {
+      cfNetoAnual: cfH, cfNetoMensual: cfH / 12, impuesto: impuestoH,
+      roce: capPropio > 0 ? (cfH + amortiAnual) / capPropio : 0,
+      yieldCF: capPropio > 0 ? cfH / capPropio : 0,
+      yieldNeto: valor > 0 ? (alqAnual - gastosDed - impuestoH) / valor : 0,
+      fiscal: null
+    };
+    return {
+      cfNetoMensual: vistaH.cfNetoMensual, cfNetoAnual: vistaH.cfNetoAnual,
+      amortiAnual: amortiAnual, amortiMensual: amortiMensual,
+      interesesMensual: interesesMensual, cuotaMensual: cuotaMensual,
+      roce: vistaH.roce, yieldCF: vistaH.yieldCF, yieldBruto: yieldBruto, yieldNeto: vistaH.yieldNeto,
+      impuesto: impuestoH, capPropio: capPropio, saldoPendiente: saldoPendiente,
+      equityProp: equityProp, cuotaActualInfo: cuotaActualInfo,
+      alqAnual: alqAnual, gastosDed: gastosDed, interesesAnual: interesesAnual,
+      rendBruto: rendBrutoH, reduccion: reduccionH, rendNeto: rendNetoH,
+      fiscalAnio: null, est: vistaH, anio: vistaH, modo: 'habitual'
+    };
+  }
+
+  var anioActual = new Date().getFullYear();
+  var fEst = calcFiscalProp(p, anioActual, { estructural: true });
+  var fAnio = calcFiscalProp(p, anioActual);
+
+  // Vista estructural: año completo, gastos recurrentes, sin facturas puntuales.
+  var impEst = fEst.impuestoMarginal;
+  var cfEst = alqAnual - gastosDed - cuotaAnual - impEst;
+  var vistaEst = {
+    cfNetoAnual: cfEst, cfNetoMensual: cfEst / 12, impuesto: impEst,
+    roce: capPropio > 0 ? (cfEst + amortiAnual) / capPropio : 0,
+    yieldCF: capPropio > 0 ? cfEst / capPropio : 0,
+    yieldNeto: valor > 0 ? (alqAnual - gastosDed - impEst) / valor : 0,
+    fiscal: fEst
+  };
+
+  // Vista del año en curso: ingresos, facturas y cuotas reales del ejercicio.
+  var impAnio = fAnio.impuestoMarginal;
+  var netoAnioSinHipoteca = fAnio.RI - fAnio.gastosRecurrentes - fAnio.facturasCash - impAnio;
+  var cfAnio = netoAnioSinHipoteca - fAnio.cuotasAnio;
+  var amortiAnioReal = fAnio.cuotasAnio - fAnio.interesesAnio;
+  var vistaAnio = {
+    cfNetoAnual: cfAnio, cfNetoMensual: cfAnio / 12, impuesto: impAnio,
+    roce: capPropio > 0 ? (cfAnio + amortiAnioReal) / capPropio : 0,
+    yieldCF: capPropio > 0 ? cfAnio / capPropio : 0,
+    yieldNeto: valor > 0 ? netoAnioSinHipoteca / valor : 0,
+    fiscal: fAnio
+  };
+
+  var modo = (S.config && S.config.cfInmoModo === 'estructural') ? 'estructural' : 'anio';
+  var act = modo === 'estructural' ? vistaEst : vistaAnio;
+  var fAct = act.fiscal;
+
+  return {
+    cfNetoMensual: act.cfNetoMensual, cfNetoAnual: act.cfNetoAnual,
+    amortiAnual: amortiAnual, amortiMensual: amortiMensual,
+    interesesMensual: interesesMensual, cuotaMensual: cuotaMensual,
+    roce: act.roce, yieldCF: act.yieldCF, yieldBruto: yieldBruto, yieldNeto: act.yieldNeto,
+    impuesto: act.impuesto, capPropio: capPropio, saldoPendiente: saldoPendiente,
+    equityProp: equityProp, cuotaActualInfo: cuotaActualInfo,
+    alqAnual: alqAnual, gastosDed: gastosDed, interesesAnual: interesesAnual,
+    rendBruto: fAct.RN, reduccion: fAct.reduccion, rendNeto: fAct.RNR,
+    fiscalAnio: fAnio, est: vistaEst, anio: vistaAnio, modo: modo
+  };
 }
 
 function getCFInv(inv) {
@@ -1800,6 +2472,7 @@ function closeSidebar() {
    PERSISTENCE
    ============================================================ */
 function trySave() {
+  invalidateCalcProp();
   S._savedAt = Date.now();
   Store.saveLocal(S);
   setSyncStatus('busy');
@@ -1836,12 +2509,92 @@ async function tryLoad() {
 function mergeState(data) {
   if (!data) return;
   S.inversiones = data.inversiones || [];
-  S.propiedades = data.propiedades || [];
+  S.propiedades = sanitizePropiedades(data.propiedades);
   S.snaps = data.snaps || [];
   S.liquido = data.liquido || [];
-  S.config = data.config || { baseIRPF: 0 };
+  S.config = sanitizeConfig(data.config);
   S.objetivo = sanitizeObjetivo(data.objetivo);
   S._savedAt = data._savedAt || 0;
+}
+
+// Sanea la configuración (local, cloud o import JSON).
+function sanitizeConfig(c) {
+  var out = { baseIRPF: 0, cfInmoModo: 'anio' };
+  if (!c || typeof c !== 'object') return out;
+  for (var k in c) {
+    if (Object.prototype.hasOwnProperty.call(c, k) && out[k] === undefined) out[k] = c[k];
+  }
+  out.baseIRPF = nv(c.baseIRPF);
+  out.cfInmoModo = (c.cfInmoModo === 'estructural') ? 'estructural' : 'anio';
+  return out;
+}
+
+// Sanea las facturas de un inmueble: tipos y defaults, sin perder datos válidos.
+function sanitizeFacturas(arr) {
+  var out = [];
+  if (!Array.isArray(arr)) return out;
+  arr.forEach(function(f, i) {
+    if (!f || typeof f !== 'object') return;
+    var imp = nv(f.importe);
+    var bytes = nv(f.fotoBytes);
+    out.push({
+      id: nv(f.id) || (Date.now() + i),
+      fecha: isFechaISO(f.fecha) ? String(f.fecha) : '',
+      concepto: String(f.concepto == null ? '' : f.concepto),
+      importe: imp > 0 ? imp : 0,
+      cat: partidaCat(f.cat) ? String(f.cat) : 'nodeducible',
+      notas: String(f.notas == null ? '' : f.notas),
+      fotoId: (typeof f.fotoId === 'string' && f.fotoId) ? f.fotoId : null,
+      fotoBytes: bytes > 0 ? bytes : 0
+    });
+  });
+  return out;
+}
+
+// Sanea el mapa de meses sin alquilar: { 'yyyy': meses }.
+function sanitizeVacio(v) {
+  var out = {};
+  if (!v || typeof v !== 'object') return out;
+  Object.keys(v).forEach(function(k) {
+    if (!/^\d{4}$/.test(String(k))) return;
+    var m = parseFloat(v[k]);
+    if (!isFinite(m) || m <= 0) return;
+    out[String(k)] = Math.min(12, m);
+  });
+  return out;
+}
+
+// Sanea el array de inmuebles: conserva las claves existentes y garantiza
+// los campos fiscales nuevos con defaults que no alteran los cálculos previos.
+function sanitizePropiedades(arr) {
+  var out = [];
+  if (!Array.isArray(arr)) return out;
+  arr.forEach(function(p) {
+    if (!p || typeof p !== 'object') return;
+    var q = {};
+    for (var k in p) { if (Object.prototype.hasOwnProperty.call(p, k)) q[k] = p[k]; }
+    q.facturas = sanitizeFacturas(p.facturas);
+    q.tipoAlquiler = (p.tipoAlquiler === 'otro') ? 'otro' : 'vivienda';
+    q.fechaContrato = isFechaISO(p.fechaContrato) ? String(p.fechaContrato) : '';
+    q.reduccionPct = numOrNull(p.reduccionPct, 0, 100);
+    q.valorCatastral = numOrNull(p.valorCatastral, 0, null);
+    q.pctSuelo = numOrNull(p.pctSuelo, 0, 100);
+    q.pctImputacion = (nv(p.pctImputacion) === 1.1) ? 1.1 : 2;
+    q.vacio = sanitizeVacio(p.vacio);
+    out.push(q);
+  });
+  return out;
+}
+
+// Fusión al editar un inmueble: el formulario solo gestiona una parte de las
+// claves, así que las demás (facturas, campos fiscales) se conservan.
+function mergePropEdit(prev, prop) {
+  if (!prev || typeof prev !== 'object') return prop;
+  var out = {};
+  var k;
+  for (k in prev) { if (Object.prototype.hasOwnProperty.call(prev, k)) out[k] = prev[k]; }
+  for (k in prop) { if (Object.prototype.hasOwnProperty.call(prop, k)) out[k] = prop[k]; }
+  return out;
 }
 
 // Sanea la rama `objetivo` venga de donde venga (local, cloud o import JSON).
@@ -1867,6 +2620,7 @@ function sanitizeObjetivo(o) {
    RENDER ALL
    ============================================================ */
 function renderAll() {
+  invalidateCalcProp();
   renderResumen();
   renderInvList();
   renderPropList();
@@ -1950,10 +2704,20 @@ function renderResumenKPIs() {
   html += '</div>';
 
   // CF Real — c-3
+  var factAnio = 0;
+  if (!S.config || S.config.cfInmoModo !== 'estructural') {
+    S.propiedades.forEach(function(p) {
+      if (p.uso === 'habitual') return;
+      var cp = calcProp(p);
+      if (cp.fiscalAnio) factAnio += nv(cp.fiscalAnio.facturasCash);
+    });
+  }
   html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">CF real / mes</span></div>';
   html += '<div class="tile-v g num">' + eur(t.cfReal) + '</div>';
-  html += '<div class="tile-foot"><span class="chip g">' + pct1(yieldReal) + ' anual</span><span>' + eur(t.cfReal * 12) + '/año</span></div>';
+  html += '<div class="tile-foot"><span class="chip g">' + pct1(yieldReal) + ' anual</span><span>' + eur(t.cfReal * 12) + '/año</span>';
+  if (factAnio > 0) html += '<span class="chip mu">incluye facturas ' + anioHoy() + ': ' + eur(factAnio) + '</span>';
+  html += '</div>';
   html += '</div>';
 
   // CF Pot — c-3
@@ -2173,7 +2937,9 @@ function quickEditLiqSaldo(id) {
 
 function filterInv(tipo, el) {
   invFilter = tipo;
-  document.querySelectorAll('.ftab').forEach(function(t){ t.classList.remove('active'); });
+  // Acotado al panel de inversiones: Inmobiliario tiene sus propias .ftab.
+  var cont = (el && el.closest) ? el.closest('.ftabs') : document.querySelector('#tab-inversiones .ftabs');
+  if (cont) cont.querySelectorAll('.ftab').forEach(function(t){ t.classList.remove('active'); });
   if (el) el.classList.add('active');
   renderInvList();
 }
@@ -2325,11 +3091,6 @@ function onPropHipotecaToggle() {
     document.getElementById('prop-hip-result').style.display = 'none';
   }
 }
-function toggleProp(id) {
-  var el = document.querySelector('.prop-row[data-id="' + id + '"]');
-  if (el) el.classList.toggle('expanded');
-}
-
 /* ----- Tabla de amortización ----- */
 var _tempAmortiTable = null;
 
@@ -2503,13 +3264,13 @@ function saveProp() {
     plazoAnios: tieneHip ? gv('prop-plazoAnios') : 0,
     cuotaNum: tieneHip && !usaTabla ? (gv('prop-cuotaNum') || 1) : 1,
     modoHipoteca: modoHip,
-    fechaPrimeraCuota: usaTabla ? document.getElementById('prop-fechaPrimeraCuota').value : '',
+    fechaPrimeraCuota: tieneHip ? (document.getElementById('prop-fechaPrimeraCuota').value || '') : '',
     cuotasPagadas: usaTabla ? (gv('prop-cuotasPagadas') || 0) : 0,
     amortiTable: usaTabla ? _tempAmortiTable : null
   };
   if (editPropId) {
     var idx = S.propiedades.findIndex(function(x){ return x.id === editPropId; });
-    if (idx >= 0) S.propiedades[idx] = prop;
+    if (idx >= 0) S.propiedades[idx] = mergePropEdit(S.propiedades[idx], prop);
   } else {
     S.propiedades.push(prop);
   }
@@ -2553,9 +3314,9 @@ function editProp(id) {
     var modo = tieneTabla ? 'tabla' : (p.modoHipoteca || 'auto');
     document.getElementById('prop-hip-modo').value = modo;
     onPropHipModoChange();
+    document.getElementById('prop-fechaPrimeraCuota').value = p.fechaPrimeraCuota || '';
     if (tieneTabla) {
       _tempAmortiTable = p.amortiTable;
-      document.getElementById('prop-fechaPrimeraCuota').value = p.fechaPrimeraCuota || '';
       document.getElementById('prop-cuotasPagadas').value = p.cuotasPagadas || '';
       document.getElementById('prop-tabla-count').value = p.amortiTable.length + ' cuotas';
       document.getElementById('prop-tabla-status').textContent = 'Tabla cargada · ' + p.amortiTable.length + ' cuotas';
@@ -2570,10 +3331,16 @@ function editProp(id) {
   showTab('inmo');
   setTimeout(function(){ document.getElementById('add-prop-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
 }
+// Borra en el servidor (best-effort) las fotos de todas las facturas de un inmueble.
+function borrarFotosDe(prop) {
+  if (!prop || !Array.isArray(prop.facturas) || typeof Foto === 'undefined') return;
+  prop.facturas.forEach(function(f) { if (f && f.fotoId) { try { Foto.borrar(f.fotoId); } catch (e) {} } });
+}
 function delProp(id) {
   var prop = S.propiedades.find(function(x){ return x.id === id; });
   var nombre = prop ? prop.nombre : 'esta propiedad';
   confirmAction('¿Eliminar propiedad?', nombre + ' se eliminará de forma permanente.', function() {
+    borrarFotosDe(prop);
     S.propiedades = S.propiedades.filter(function(x){ return x.id !== id; });
     trySave(); renderAll(); toast('Propiedad eliminada');
   });
@@ -2600,106 +3367,1013 @@ function cancelEditProp() {
   document.getElementById('add-prop-panel').style.display = 'none';
 }
 
+/* ============================================================
+   INMOBILIARIO — estado de la vista
+   renderPropList() reescribe todo el innerHTML, así que la tarjeta
+   abierta, la subpestaña y el ejercicio viven en estas variables.
+   ============================================================ */
+var _propExpanded = {};   // { id: true }
+var _propSubtab = {};     // { id: 'resumen'|'hipoteca'|'facturas'|'fiscal' }
+var _propYear = {};       // { id: yyyy }
+var _rentaYear = null;    // ejercicio del bloque de la renta
+var _factEdit = null;     // { pid, fid } de la factura en edición en línea
+
+function anioHoy() { return new Date().getFullYear(); }
+function hoyISO() { return fechaISO(new Date()); }
+// 'yyyy-mm-dd' -> 'dd/mm/yyyy'
+function fechaES(iso) {
+  if (!isFechaISO(iso)) return '';
+  var s = String(iso);
+  return s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4);
+}
+function findPropById(id) {
+  var pid = nv(id);
+  for (var i = 0; i < S.propiedades.length; i++) { if (S.propiedades[i].id === pid) return S.propiedades[i]; }
+  return null;
+}
+function findFactura(p, fid) {
+  var arr = (p && Array.isArray(p.facturas)) ? p.facturas : [];
+  for (var i = 0; i < arr.length; i++) { if (arr[i].id === nv(fid)) return arr[i]; }
+  return null;
+}
+
+function propYear(pid) {
+  var y = parseInt(_propYear[nv(pid)], 10);
+  return isFinite(y) ? y : anioHoy();
+}
+function rentaYear() {
+  var y = parseInt(_rentaYear, 10);
+  return isFinite(y) ? y : anioHoy();
+}
+// Años con facturas ∪ año actual ∪ año anterior ∪ el seleccionado, descendente.
+function aniosProp(p) {
+  var cur = anioHoy(), set = {};
+  set[cur] = true; set[cur - 1] = true; set[propYear(p.id)] = true;
+  ((p && Array.isArray(p.facturas)) ? p.facturas : []).forEach(function(f) {
+    var a = anioISO(f.fecha);
+    if (a !== null) set[a] = true;
+  });
+  var out = Object.keys(set).map(function(k){ return parseInt(k, 10); });
+  out.sort(function(a, b){ return b - a; });
+  return out;
+}
+function propSubtab(p) {
+  var validas = (p.uso === 'habitual') ? ['resumen','hipoteca'] : ['resumen','hipoteca','facturas','fiscal'];
+  var t = _propSubtab[p.id];
+  return validas.indexOf(t) >= 0 ? t : 'resumen';
+}
+
+function setPropSubtab(pid, tab) {
+  pid = nv(pid);
+  _propSubtab[pid] = tab;
+  _factEdit = null;
+  rerenderProp(pid);
+}
+function setPropYear(pid, year) {
+  pid = nv(pid);
+  _propYear[pid] = parseInt(year, 10) || anioHoy();
+  _factEdit = null;
+  rerenderProp(pid);
+}
+function setRentaYear(year) {
+  _rentaYear = parseInt(year, 10) || anioHoy();
+  renderRenta();
+}
+
+function toggleProp(id) {
+  var pid = nv(id);
+  var el = document.querySelector('.prop-row[data-id="' + pid + '"]');
+  _propExpanded[pid] = el ? !el.classList.contains('expanded') : !_propExpanded[pid];
+  if (el) el.classList.toggle('expanded');
+}
+
+// Re-render de UNA tarjeta conservando expansión, subpestaña y ejercicio.
+// Si el DOM no está disponible (o la tarjeta no existe) repinta la lista entera.
+function rerenderProp(pid) {
+  pid = nv(pid);
+  invalidateCalcProp();
+  var p = findPropById(pid);
+  var el = document.querySelector ? document.querySelector('.prop-row[data-id="' + pid + '"]') : null;
+  if (!p || !el) { renderPropList(); return; }
+  el.outerHTML = propCardHTML(p);
+  renderRenta();
+  _focoFactura();
+}
+function _focoFactura() {
+  if (!_factEdit) return;
+  var el = document.getElementById('fe' + _factEdit.fid + '-concepto');
+  if (el && el.focus) { el.focus(); if (el.select) el.select(); }
+}
+
+/* ---------- helpers de presentación ---------- */
+function inmoRow(label, valor, cls, sub) {
+  return '<div class="frow"><span class="fl' + (sub ? ' mu' : '') + '"' + (sub ? ' style="padding-left:14px;"' : '') + '>' +
+    label + '</span><span class="fv' + (cls ? ' ' + cls : '') + '">' + valor + '</span></div>';
+}
+function inmoSec(titulo) {
+  return '<div class="row-body-hd"><span class="subbox-l">' + titulo + '</span></div>';
+}
+// Condensa un aviso del motor fiscal en una ficha corta (texto completo en title).
+function avisoChipHTML(txt) {
+  var t = String(txt || ''), cls = 'am', lbl = t;
+  if (t.indexOf('Intereses estimados') === 0) { cls = 'mu'; lbl = 'Intereses aproximados'; }
+  else if (t.indexOf('Sin amortización') === 0) { lbl = 'Amortización no disponible'; }
+  else if (t.indexOf('Tope aplicado') === 0) { lbl = 'Tope aplicado · ' + t.replace(/^Tope aplicado: /, '').replace(/ de intereses[\s\S]*$/, '') + ' no deducidos'; }
+  else if (t.indexOf('Se han aplicado') === 0) { cls = 'g'; lbl = 'Pendientes aplicados · ' + t.replace(/^Se han aplicado /, '').replace(/ de excesos[\s\S]*$/, ''); }
+  else if (t.indexOf('Sin imputación') === 0) { lbl = 'Falta el valor catastral'; }
+  return '<span class="chip ' + cls + '" title="' + esc(t) + '">' + esc(lbl) + '</span>';
+}
+
+/* ============================================================
+   DECLARACIÓN DE LA RENTA — estimación del ejercicio
+   ============================================================ */
+function renderRenta() {
+  var box = document.getElementById('renta-block');
+  if (!box) return;
+  var cur = anioHoy();
+  var y = rentaYear();
+  if (y !== cur && y !== cur - 1) { y = cur; _rentaYear = cur; }
+
+  var h = '<div class="tile">';
+  h += '<div class="tile-hd"><span class="tile-l">Declaración de la renta · estimación</span>';
+  h += '<div class="ftabs yr-tabs">';
+  h += '<button class="ftab' + (y === cur - 1 ? ' active' : '') + '" onclick="setRentaYear(' + (cur - 1) + ')">' + (cur - 1) + '</button>';
+  h += '<button class="ftab' + (y === cur ? ' active' : '') + '" onclick="setRentaYear(' + cur + ')">' + cur + '</button>';
+  h += '</div></div>';
+
+  var hayAlquiler = false;
+  S.propiedades.forEach(function(p){ if (p.uso !== 'habitual') hayAlquiler = true; });
+  if (!hayAlquiler) {
+    h += '<div class="empty">Todavía no hay inmuebles en alquiler. Añade uno para estimar su efecto en la declaración.</div></div>';
+    box.innerHTML = h;
+    return;
+  }
+
+  var r = calcRenta(y);
+  var cuotaNeg = r.cuota < -0.005;
+
+  h += '<div class="kpis-grid k6">';
+  h += '<div class="minikpi"><div class="mini-l">Ingresos íntegros</div><div class="mini-v">' + eur(r.sumRI) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Rend. neto reducido' + (r.sumImputacion > 0.005 ? ' · + imputación ' + eur(r.sumImputacion) : '') + '</div><div class="mini-v">' + eur(r.sumRNR) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Cuota estimada' + (cuotaNeg ? ' · ahorro' : '') + '</div><div class="mini-v ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '">' + eur(Math.abs(r.cuota)) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Tipo efectivo</div><div class="mini-v">' + (r.tipoEfectivo === null ? '—' : pct2(r.tipoEfectivo * 100)) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Tramo marginal final</div><div class="mini-v am">' + r.tramoFinal.pct + '%</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Base previa</div><div class="mini-v ' + (r.base > 0 ? '' : 'mu') + '">' + (r.base > 0 ? eur(r.base) : '—') + '</div></div>';
+  h += '</div>';
+
+  if (!(r.base > 0)) {
+    h += '<div class="renta-avisos" style="margin-top:12px;"><span class="chip am">Configura tu base en Configuración</span></div>';
+  }
+
+  h += '<div style="margin-top:16px;">';
+  h += '<div class="renta-row hd"><span class="renta-n">Inmueble</span>' +
+       '<span class="renta-c">Íntegros</span><span class="renta-c">Gastos ded.</span><span class="renta-c">Rend. neto</span>' +
+       '<span class="renta-c">Reducción</span><span class="renta-c">RN reducido</span><span class="renta-c">Cuota</span></div>';
+  r.inmuebles.forEach(function(x) {
+    var f = x.fiscal;
+    var gastos = f.gTopeDeduc + f.gOtros;
+    h += '<div class="renta-row">';
+    h += '<span class="renta-n" title="' + esc(x.nombre) + '">' + esc(x.nombre) + '</span>';
+    h += '<span class="renta-c" data-l="Íntegros">' + eur(f.RI) + '</span>';
+    h += '<span class="renta-c" data-l="Gastos ded.">' + eur(gastos) + '</span>';
+    h += '<span class="renta-c" data-l="Rend. neto" style="color:' + colorVal(f.RN) + '">' + eur(f.RN) + '</span>';
+    h += '<span class="renta-c" data-l="Reducción" title="' + esc(eur2(f.reduccion)) + '">' + pct1(f.reduccionPct) + '</span>';
+    h += '<span class="renta-c" data-l="RN reducido">' + eur(f.RNR + f.imputacion) + '</span>';
+    h += '<span class="renta-c" data-l="Cuota" style="color:' + colorVal(-f.impuestoMarginal) + '">' + eur(f.impuestoMarginal) + '</span>';
+    h += '</div>';
+    if (f.avisos.length) {
+      h += '<div class="renta-avisos">';
+      f.avisos.forEach(function(a){ h += avisoChipHTML(a); });
+      h += '</div>';
+    }
+  });
+  h += '</div>';
+
+  h += '<p class="hint" style="margin-top:14px;">Cálculo estimativo: no sustituye a la declaración. Usa la escala estatal más una autonómica de referencia, sin mínimo personal ni deducciones autonómicas, y no descuenta retenciones ni pagos a cuenta. La reducción del rendimiento depende de requisitos que debes confirmar. De la hipoteca solo se deducen los intereses, nunca la cuota. La cuota de cada inmueble es la marginal aislada; la cuota estimada total es el cálculo conjunto.</p>';
+  h += '</div>';
+  box.innerHTML = h;
+}
+
+/* ============================================================
+   LISTA DE INMUEBLES
+   ============================================================ */
 function renderPropList() {
   var list = document.getElementById('prop-list');
-  if (S.propiedades.length === 0) { list.innerHTML = '<div class="empty">No hay propiedades. Añade la primera arriba.</div>'; return; }
+  if (!list) return;
+  if (S.propiedades.length === 0) {
+    list.innerHTML = '<div class="empty">No hay propiedades. Añade la primera arriba.</div>';
+    renderRenta();
+    return;
+  }
   var html = '';
-  S.propiedades.forEach(function(p) {
-    var c = calcProp(p);
-    var gastosTotal = (p.ibi !== undefined) ? nv(p.ibi)+nv(p.seguro)+nv(p.comunidad)+nv(p.otrosGastos) : nv(p.gastosDed);
-    var esHabitual = p.uso === 'habitual';
-
-    html += '<div class="prop-row" data-id="' + p.id + '">';
-    html += '<div class="prop-sum" onclick="toggleProp(' + p.id + ')">';
-    html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + '</div>';
-    html += '<div class="prop-kpis">';
-    if (esHabitual) {
-      html += '<div class="prop-kpi"><div class="prop-kpi-l">Equity</div><div class="prop-kpi-v ac">' + eur(c.equityProp) + '</div></div>';
-    } else {
-      html += '<div class="prop-kpi"><div class="prop-kpi-l">ROCE</div><div class="prop-kpi-v am">' + pct1(c.roce*100) + '</div></div>';
-      html += '<div class="prop-kpi"><div class="prop-kpi-l">Rent. capital</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoAnual) + '">' + pct1(c.yieldCF*100) + '</div></div>';
-      html += '<div class="prop-kpi"><div class="prop-kpi-l">CF / mes</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoMensual) + '">' + eur(c.cfNetoMensual) + '</div></div>';
-    }
-    html += '</div>';
-    html += '<div class="prop-acts">';
-    html += '<button class="btn ghost sm" onclick="event.stopPropagation();editProp(' + p.id + ')">Editar</button>';
-    html += '<button class="btn br2 sm icon" onclick="event.stopPropagation();delProp(' + p.id + ')" title="Eliminar">×</button>';
-    html += '<span class="chev">&#9660;</span>';
-    html += '</div>';
-    html += '</div>';
-
-    html += '<div class="prop-det">';
-    if (esHabitual) {
-      html += '<div class="kpis-grid">';
-      html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
-      if (c.saldoPendiente > 0) {
-        html += '<div class="minikpi"><div class="mini-l">Saldo hipoteca</div><div class="mini-v r">' + eur(c.saldoPendiente) + '</div></div>';
-        html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
-      }
-      html += '</div>';
-      html += '<div style="margin-top:14px;">';
-      html += '<div class="frow"><span class="fl">Capital propio (entrada+gastos)</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
-      if (c.cuotaMensual > 0) {
-        html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
-        if (c.cuotaActualInfo) {
-          var fechaTxtH = c.cuotaActualInfo.fecha ? ' · ' + esc(c.cuotaActualInfo.fecha) : '';
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + fechaTxtH + '</span></div>';
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
-        } else if (nv(p.tin) && nv(p.plazoAnios)) {
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
-          html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
-        }
-      }
-      html += '</div>';
-      html += '<p class="hint" style="margin-top:14px;">Vivienda habitual — computa en patrimonio total pero no genera cashflow de inversión.</p>';
-    } else {
-      html += '<div class="kpis-grid k6">';
-      html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Yield bruto</div><div class="mini-v mu">' + pct1(c.yieldBruto*100) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Yield neto</div><div class="mini-v g">' + pct1(c.yieldNeto*100) + '</div></div>';
-      html += '<div class="minikpi"><div class="mini-l">Yield CF</div><div class="mini-v mu">' + pct1(c.yieldCF*100) + '</div></div>';
-      html += '</div>';
-      html += '<div class="fgrid" style="margin-top:14px;">';
-      html += '<div class="span6">';
-      html += '<div class="frow"><span class="fl">Alquiler bruto/mes</span><span class="fv">' + eur(p.alquiler) + '</span></div>';
-      var capLabel = nv(p.reforma) > 0 ? 'Capital propio (entrada+gastos+reforma)' : 'Capital propio (entrada+gastos)';
-      html += '<div class="frow"><span class="fl">' + capLabel + '</span><span class="fv">' + eur(c.capPropio) + '</span></div>';
-      if (nv(p.reforma) > 0) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Coste reforma</span><span class="fv mu">' + eur(p.reforma) + '</span></div>';
-      html += '<div class="frow"><span class="fl">Cuota hipoteca/mes</span><span class="fv">' + eur(c.cuotaMensual) + '</span></div>';
-      if (c.cuotaActualInfo) {
-        var fechaTxt = c.cuotaActualInfo.fecha ? ' · ' + esc(c.cuotaActualInfo.fecha) : '';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Cuota actual (tabla)</span><span class="fv ac">' + c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + fechaTxt + '</span></div>';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
-      } else if (nv(p.tin) && nv(p.plazoAnios)) {
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Intereses/mes</span><span class="fv r">' + eur(c.interesesMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Amortización/mes</span><span class="fv ac">' + eur(c.amortiMensual) + '</span></div>';
-        html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Saldo pendiente</span><span class="fv r">' + eur(c.saldoPendiente) + '</span></div>';
-      }
-      html += '</div>';
-      html += '<div class="span6">';
-      html += '<div class="frow"><span class="fl">Gastos ded. anuales</span><span class="fv">' + eur(gastosTotal) + '</span></div>';
-      if (p.ibi !== undefined) {
-        if (nv(p.ibi)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">IBI</span><span class="fv mu">' + eur(p.ibi) + '</span></div>';
-        if (nv(p.seguro)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Seguro</span><span class="fv mu">' + eur(p.seguro) + '</span></div>';
-        if (nv(p.comunidad)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Comunidad</span><span class="fv mu">' + eur(p.comunidad) + '</span></div>';
-        if (nv(p.otrosGastos)) html += '<div class="frow"><span class="fl mu" style="padding-left:14px;">Otros</span><span class="fv mu">' + eur(p.otrosGastos) + '</span></div>';
-      }
-      html += '<div class="frow"><span class="fl">IRPF estimado</span><span class="fv r">' + eur(c.impuesto) + '</span></div>';
-      html += '<div class="frow"><span class="fl">CF neto anual</span><span class="fv" style="color:' + colorVal(c.cfNetoAnual) + '">' + eur(c.cfNetoAnual) + '</span></div>';
-      html += '</div>';
-      html += '</div>';
-      html += '<p class="hint" style="margin-top:14px;">IRPF calculado con escala general. Reducción 60% art.23.2 LIRPF aplicada si rendimiento neto positivo. BASE_IRPF configurada en ajustes.</p>';
-    }
-    html += '</div>';
-    html += '</div>';
-  });
+  S.propiedades.forEach(function(p) { html += propCardHTML(p); });
   list.innerHTML = html;
+  renderRenta();
+  _focoFactura();
+}
+
+function propCardHTML(p) {
+  var c = calcProp(p);
+  var esHabitual = p.uso === 'habitual';
+  var abierto = !!_propExpanded[p.id];
+  var tab = propSubtab(p);
+
+  var html = '<div class="prop-row' + (abierto ? ' expanded' : '') + '" data-id="' + p.id + '">';
+  html += '<div class="prop-sum" onclick="toggleProp(' + p.id + ')">';
+  html += '<div><div class="prop-name">' + esc(p.nombre) + '</div>' + pillHTML(esHabitual ? 'habitual' : 'inmo') + '</div>';
+  html += '<div class="prop-kpis">';
+  if (esHabitual) {
+    html += '<div class="prop-kpi"><div class="prop-kpi-l">Equity</div><div class="prop-kpi-v ac">' + eur(c.equityProp) + '</div></div>';
+  } else {
+    html += '<div class="prop-kpi"><div class="prop-kpi-l">ROCE</div><div class="prop-kpi-v am">' + pct1(c.roce*100) + '</div></div>';
+    html += '<div class="prop-kpi"><div class="prop-kpi-l">Rent. capital</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoAnual) + '">' + pct1(c.yieldCF*100) + '</div></div>';
+    html += '<div class="prop-kpi"><div class="prop-kpi-l">CF / mes</div><div class="prop-kpi-v" style="color:' + colorVal(c.cfNetoMensual) + '">' + eur(c.cfNetoMensual) + '</div></div>';
+  }
+  html += '</div>';
+  html += '<div class="prop-acts">';
+  html += '<button class="btn ghost sm" onclick="event.stopPropagation();editProp(' + p.id + ')">Editar</button>';
+  html += '<button class="btn br2 sm icon" onclick="event.stopPropagation();delProp(' + p.id + ')" title="Eliminar inmueble" aria-label="Eliminar inmueble">×</button>';
+  html += '<span class="chev">&#9660;</span>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="prop-det">';
+  html += propTabsHTML(p, tab);
+  if (tab === 'hipoteca') html += propHipotecaHTML(p, c);
+  else if (tab === 'facturas' && !esHabitual) html += propFacturasHTML(p);
+  else if (tab === 'fiscal' && !esHabitual) html += propFiscalHTML(p, c);
+  else html += propResumenHTML(p, c);
+  html += '</div>';
+  html += '</div>';
+  return html;
+}
+
+function propTabsHTML(p, tab) {
+  var esHabitual = p.uso === 'habitual';
+  var tabs = esHabitual
+    ? [['resumen','Resumen'], ['hipoteca','Hipoteca']]
+    : [['resumen','Resumen'], ['hipoteca','Hipoteca'], ['facturas','Facturas'], ['fiscal','Fiscal']];
+  var h = '<div class="inmo-tabs"><div class="ftabs">';
+  tabs.forEach(function(t) {
+    h += '<button class="ftab' + (tab === t[0] ? ' active' : '') + '" onclick="setPropSubtab(' + p.id + ',\'' + t[0] + '\')">' + t[1] + '</button>';
+  });
+  h += '</div>';
+  if (tab !== 'resumen') {
+    var sel = propYear(p.id);
+    h += '<div class="ftabs yr-tabs">';
+    aniosProp(p).forEach(function(y) {
+      h += '<button class="ftab' + (y === sel ? ' active' : '') + '" onclick="setPropYear(' + p.id + ',' + y + ')">' + y + '</button>';
+    });
+    h += '</div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+/* ---------- Subpestaña: Resumen ---------- */
+function propResumenHTML(p, c) {
+  var esHabitual = p.uso === 'habitual';
+  var html = '';
+  if (esHabitual) {
+    html += '<div class="kpis-grid">';
+    html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
+    html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
+    if (c.saldoPendiente > 0) {
+      html += '<div class="minikpi"><div class="mini-l">Saldo hipoteca</div><div class="mini-v r">' + eur(c.saldoPendiente) + '</div></div>';
+      html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
+    }
+    html += '</div>';
+    html += '<div style="margin-top:14px;">';
+    html += inmoRow('Capital propio (entrada+gastos)', eur(c.capPropio));
+    if (c.cuotaMensual > 0) html += inmoRow('Cuota hipoteca/mes', eur(c.cuotaMensual));
+    html += '</div>';
+    html += '<p class="hint" style="margin-top:14px;">Vivienda habitual — computa en patrimonio total pero no genera cashflow de inversión.</p>';
+    return html;
+  }
+
+  var gastosTotal = (p.ibi !== undefined) ? nv(p.ibi)+nv(p.seguro)+nv(p.comunidad)+nv(p.otrosGastos) : nv(p.gastosDed);
+  var fAct = (c.modo === 'estructural') ? c.est.fiscal : c.anio.fiscal;
+  var otro = (c.modo === 'estructural') ? c.anio : c.est;
+  var otroL = (c.modo === 'estructural') ? 'año en curso' : 'estructural';
+  var modoL = (c.modo === 'estructural') ? 'estructural' : 'año en curso';
+  var mejoras = c.capPropio - nv(p.entrada) - nv(p.gastos) - nv(p.reforma);
+
+  html += '<div class="kpis-grid k6">';
+  html += '<div class="minikpi"><div class="mini-l">Valor mercado</div><div class="mini-v">' + eur(p.valor) + '</div></div>';
+  html += '<div class="minikpi"><div class="mini-l">Equity real</div><div class="mini-v ac">' + eur(c.equityProp) + '</div></div>';
+  html += '<div class="minikpi"><div class="mini-l">Amort./mes</div><div class="mini-v ac">' + eur2(c.amortiMensual) + '</div></div>';
+  html += '<div class="minikpi"><div class="mini-l">Yield bruto</div><div class="mini-v mu">' + pct1(c.yieldBruto*100) + '</div></div>';
+  html += '<div class="minikpi"><div class="mini-l">Yield neto</div><div class="mini-v g">' + pct1(c.yieldNeto*100) + '</div></div>';
+  html += '<div class="minikpi"><div class="mini-l">Yield CF</div><div class="mini-v mu">' + pct1(c.yieldCF*100) + '</div></div>';
+  html += '</div>';
+
+  html += '<div class="fgrid" style="margin-top:14px;">';
+  html += '<div class="span6">';
+  html += inmoRow('Alquiler bruto/mes', eur(p.alquiler));
+  var capLabel = nv(p.reforma) > 0 ? 'Capital propio (entrada+gastos+reforma)' : 'Capital propio (entrada+gastos)';
+  html += inmoRow(capLabel, eur(c.capPropio));
+  if (nv(p.reforma) > 0) html += inmoRow('Coste reforma', eur(p.reforma), 'mu', true);
+  if (mejoras > 0.5) html += inmoRow('Mejoras capitalizadas', eur(mejoras), 'mu', true);
+  html += inmoRow('Cuota hipoteca/mes', eur(c.cuotaMensual));
+  html += '</div>';
+  html += '<div class="span6">';
+  html += inmoRow('Gastos ded. anuales', eur(gastosTotal));
+  if (p.ibi !== undefined) {
+    if (nv(p.ibi)) html += inmoRow('IBI', eur(p.ibi), 'mu', true);
+    if (nv(p.seguro)) html += inmoRow('Seguro', eur(p.seguro), 'mu', true);
+    if (nv(p.comunidad)) html += inmoRow('Comunidad', eur(p.comunidad), 'mu', true);
+    if (nv(p.otrosGastos)) html += inmoRow('Otros', eur(p.otrosGastos), 'mu', true);
+  }
+  html += inmoRow('IRPF estimado', eur(c.impuesto), 'r');
+  html += inmoRow('CF neto anual', '<span style="color:' + colorVal(c.cfNetoAnual) + '">' + eur(c.cfNetoAnual) + '</span>');
+  html += '</div>';
+  html += '</div>';
+
+  var notaRed = (fAct.reduccion > 0)
+    ? 'Reducción del ' + pct1(fAct.reduccionPct) + ' aplicada.'
+    : 'Sin reducción (rendimiento negativo o alquiler no de vivienda).';
+  html += '<p class="hint" style="margin-top:14px;">' + notaRed +
+    ' Cashflow en modo ' + modoL + ' · ' + eur2(otro.cfNetoMensual) + '/mes en modo ' + otroL + '.</p>';
+  return html;
+}
+
+/* ---------- Subpestaña: Hipoteca ---------- */
+// Cuotas de la tabla de amortización que caen en un ejercicio.
+function filasAmortiAnio(p, year) {
+  var tabla = (p && p.amortiTable && p.amortiTable.length) ? p.amortiTable : null;
+  if (!tabla) return [];
+  var out = [], i, conFechas = false;
+  for (i = 0; i < tabla.length; i++) { if (tabla[i] && tabla[i].fecha) { conFechas = true; break; } }
+  if (conFechas) {
+    for (i = 0; i < tabla.length; i++) {
+      var d = (tabla[i] && tabla[i].fecha) ? parseFechaES(tabla[i].fecha) : null;
+      if (d && d.getFullYear() === year) out.push({ idx: i, row: tabla[i], fecha: tabla[i].fecha });
+    }
+    return out;
+  }
+  var ini = fechaDesdeISO(p.fechaPrimeraCuota);
+  if (!ini) return [];
+  for (i = 0; i < tabla.length; i++) {
+    var a = ini.getFullYear() + Math.floor((ini.getMonth() + i) / 12);
+    if (a !== year) continue;
+    var mes = (ini.getMonth() + i) % 12;
+    out.push({ idx: i, row: tabla[i], fecha: '01/' + String(mes + 1).padStart(2, '0') + '/' + a });
+  }
+  return out;
+}
+
+function propHipotecaHTML(p, c) {
+  var y = propYear(p.id);
+  if (!(c.cuotaMensual > 0)) {
+    return '<div class="empty">Sin hipoteca registrada. Añádela desde el botón Editar de este inmueble.</div>';
+  }
+  var h = '';
+  h += inmoRow('Cuota hipoteca/mes', eur2(c.cuotaMensual));
+  if (c.cuotaActualInfo) {
+    var fechaTxt = c.cuotaActualInfo.fecha ? ' · ' + esc(c.cuotaActualInfo.fecha) : '';
+    h += inmoRow('Cuota actual (tabla)', c.cuotaActualInfo.n + ' de ' + c.cuotaActualInfo.total + fechaTxt, 'ac', true);
+  }
+  h += inmoRow('Intereses/mes', eur2(c.interesesMensual), 'r', true);
+  h += inmoRow('Amortización/mes', eur2(c.amortiMensual), 'ac', true);
+  h += inmoRow('Saldo pendiente', eur(c.saldoPendiente), 'r', true);
+
+  var hip = interesesYCuotaAnio(p, y);
+  var chipAprox = hip.aprox ? ' <span class="chip mu">aprox.</span>' : '';
+  h += inmoSec('Ejercicio ' + y);
+  h += inmoRow('Intereses ' + y, eur2(hip.intereses) + chipAprox, 'r');
+  h += inmoRow('Cuotas pagadas ' + y, hip.cuotasAnio + (hip.cuotasAnio === 1 ? ' cuota' : ' cuotas') + ' · ' + eur2(hip.cuotas));
+  if (hip.fuente === 'estimado') {
+    h += '<p class="hint" style="margin-top:10px;">Añade la fecha de la primera cuota al editar el inmueble para calcular los intereses reales del año.</p>';
+  }
+
+  var filas = filasAmortiAnio(p, y);
+  if (filas.length) {
+    var nLocal = p.fechaPrimeraCuota ? cuotaActualDesdeFecha(p.fechaPrimeraCuota, p.amortiTable.length) : 0;
+    h += '<div class="amort-list">';
+    h += '<div class="amort-row hd"><span class="amort-c l">Fecha</span><span class="amort-c">Cuota</span><span class="amort-c">Intereses</span><span class="amort-c">Amortización</span><span class="amort-c">Saldo</span></div>';
+    filas.forEach(function(f) {
+      var esActual = (nLocal > 0 && f.idx === nLocal - 1);
+      h += '<div class="amort-row' + (esActual ? ' now' : '') + '">';
+      h += '<span class="amort-c l">' + esc(f.fecha) + (esActual ? ' · actual' : '') + '</span>';
+      h += '<span class="amort-c" data-l="Cuota">' + eur2(f.row.cuota) + '</span>';
+      h += '<span class="amort-c" data-l="Intereses">' + eur2(f.row.interes) + '</span>';
+      h += '<span class="amort-c" data-l="Amortización">' + eur2(f.row.amorti) + '</span>';
+      h += '<span class="amort-c" data-l="Saldo">' + eur(f.row.saldo) + '</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+  return h;
+}
+
+/* ---------- Fotos de factura: control, estado y visor ---------- */
+// Foto elegida y aún no subida. Clave: 'a<pid>' en el alta, 'e<fid>' en la edición.
+var _fotoPendiente = {};   // clave -> { blob, nombre, url }
+var _fotoQuitar = {};      // { fid: true } foto marcada para quitar al guardar
+var _fotoCtl = {};         // clave -> { pid, fid } para repintar el control solo
+
+function fotoKey(pid, fid) { return fid ? ('e' + nv(fid)) : ('a' + nv(pid)); }
+function fotoKB(bytes) { return Math.max(1, Math.round(nv(bytes) / 1024)) + ' KB'; }
+function olvidaPendiente(key) {
+  var p = _fotoPendiente[key];
+  if (p && p.url) { try { URL.revokeObjectURL(p.url); } catch(e) {} }
+  delete _fotoPendiente[key];
+}
+
+// Control de foto reutilizado por el alta (fid null) y por la edición en línea.
+function fotoCtlHTML(pid, fid) {
+  pid = nv(pid); fid = fid ? nv(fid) : null;
+  var key = fotoKey(pid, fid);
+  _fotoCtl[key] = { pid: pid, fid: fid };
+  var pend = _fotoPendiente[key];
+  var f = fid ? findFactura(findPropById(pid), fid) : null;
+  var tiene = !!(f && Foto.validId(f.fotoId));
+  var quitada = !!(fid && _fotoQuitar[fid]);
+
+  var h = '<div class="foto-ctl" id="foto-ctl-' + key + '">';
+  h += '<input type="file" accept="image/*" capture="environment" id="foto-in-' + key +
+       '" hidden onchange="onFotoElegida(\'' + key + '\')">';
+
+  if (pend) {
+    h += '<img class="foto-thumb" src="' + esc(pend.url) + '" alt="Vista previa de la foto">';
+    h += '<span class="foto-info"><span class="foto-nm">' + esc(pend.nombre) + '</span>' +
+         '<span>Se subirá como ' + esc(fotoTipoLabel(pend.blob)) + ' · ' + fotoKB(pend.blob.size) + '</span></span>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Cambiar</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="quitarFotoPendiente(\'' + key + '\')">Quitar</button>';
+  } else if (tiene && !quitada) {
+    h += '<span class="foto-info"><span class="foto-nm">Foto adjunta</span><span>' + fotoKB(f.fotoBytes) + '</span></span>';
+    h += '<button type="button" class="btn ghost sm" onclick="verFoto(\'' + esc(f.fotoId) + '\')">Ver foto</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Sustituir</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="marcarQuitarFoto(' + fid + ')">Quitar foto</button>';
+  } else if (tiene && quitada) {
+    h += '<span class="foto-info"><span class="foto-nm">La foto se quitará al guardar</span></span>';
+    h += '<button type="button" class="btn ghost sm" onclick="deshacerQuitarFoto(' + fid + ')">Deshacer</button>';
+  } else {
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">' +
+         (fid ? 'Añadir foto' : 'Hacer foto o adjuntar') + '</button>';
+  }
+  h += '<span class="foto-est" id="foto-est-' + key + '"></span>';
+  h += '</div>';
+  return h;
+}
+function fotoTipoLabel(blob) {
+  var t = String((blob && blob.type) || '').toLowerCase();
+  if (t.indexOf('png') >= 0) return 'PNG';
+  if (t.indexOf('webp') >= 0) return 'WEBP';
+  return 'JPEG';
+}
+function repintaFotoCtl(key) {
+  var ref = _fotoCtl[key];
+  var el = document.getElementById('foto-ctl-' + key);
+  if (!ref || !el) return;
+  el.outerHTML = fotoCtlHTML(ref.pid, ref.fid);
+}
+function fotoEstado(key, txt, level) {
+  var el = document.getElementById('foto-est-' + key);
+  if (!el) return;
+  el.className = 'foto-est' + (level ? ' ' + level : '');
+  el.textContent = txt || '';
+}
+function pedirFoto(key) {
+  var inp = document.getElementById('foto-in-' + key);
+  if (inp && inp.click) inp.click();
+}
+function quitarFotoPendiente(key) {
+  olvidaPendiente(key);
+  repintaFotoCtl(key);
+}
+function marcarQuitarFoto(fid) {
+  fid = nv(fid);
+  _fotoQuitar[fid] = true;
+  olvidaPendiente('e' + fid);
+  repintaFotoCtl('e' + fid);
+}
+function deshacerQuitarFoto(fid) {
+  fid = nv(fid);
+  delete _fotoQuitar[fid];
+  repintaFotoCtl('e' + fid);
+}
+
+// Comprime en el momento y guarda el Blob a la espera de subirlo al guardar.
+async function onFotoElegida(key) {
+  var inp = document.getElementById('foto-in-' + key);
+  var file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
+  if (inp) { try { inp.value = ''; } catch(e) {} }
+  if (!file) return;
+  fotoEstado(key, 'Procesando la foto…');
+  var blob;
+  try {
+    blob = await Foto.comprimir(file);
+  } catch(e) {
+    fotoEstado(key, (e && e.message) ? e.message : 'No se pudo procesar la foto', 'r');
+    return;
+  }
+  olvidaPendiente(key);
+  var ref = _fotoCtl[key];
+  if (ref && ref.fid) delete _fotoQuitar[ref.fid];
+  var url = '';
+  try { url = URL.createObjectURL(blob); } catch(e) {}
+  _fotoPendiente[key] = { blob: blob, nombre: String(file.name || 'foto.jpg'), url: url };
+  repintaFotoCtl(key);
+}
+
+/* ---------- Visor de foto a pantalla completa ---------- */
+var _fotoVisor = { id: null, zoom: false, esc: null };
+
+function fotoVisorEl() {
+  var ov = document.getElementById('foto-viewer');
+  if (ov) return ov;
+  if (!document.body || !document.body.appendChild) return null;
+  ov = document.createElement('div');
+  ov.id = 'foto-viewer';
+  ov.className = 'foto-ov';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-modal', 'true');
+  ov.setAttribute('aria-label', 'Foto de la factura');
+  ov.hidden = true;
+  ov.innerHTML =
+    '<div class="foto-ov-bar">' +
+      '<button type="button" class="btn ghost sm" id="foto-ov-zoom" onclick="toggleFotoZoom()">Ampliar</button>' +
+      '<button type="button" class="btn ghost sm" onclick="cerrarFoto()">Cerrar</button>' +
+    '</div>' +
+    '<div class="foto-ov-body" id="foto-ov-body" onclick="fotoFondoClick(event)">' +
+      '<div class="foto-ov-msg" id="foto-ov-msg">Cargando…</div>' +
+      '<img class="foto-ov-img" id="foto-ov-img" alt="Foto de la factura" hidden>' +
+    '</div>';
+  document.body.appendChild(ov);
+  return ov;
+}
+function fotoZoomLabel() {
+  var b = document.getElementById('foto-ov-zoom');
+  if (b) b.textContent = _fotoVisor.zoom ? 'Ajustar' : 'Ampliar';
+}
+async function verFoto(id) {
+  var ov = fotoVisorEl();
+  if (!ov) return;
+  var img = document.getElementById('foto-ov-img');
+  var msg = document.getElementById('foto-ov-msg');
+  _fotoVisor.id = id;
+  _fotoVisor.zoom = false;
+  ov.className = 'foto-ov';
+  ov.hidden = false;
+  if (img) { img.hidden = true; if (img.removeAttribute) img.removeAttribute('src'); }
+  if (msg) { msg.hidden = false; msg.className = 'foto-ov-msg'; msg.textContent = 'Cargando…'; }
+  fotoZoomLabel();
+  if (!_fotoVisor.esc) {
+    _fotoVisor.esc = function(e) { if (e.key === 'Escape') cerrarFoto(); };
+    document.addEventListener('keydown', _fotoVisor.esc);
+  }
+  try {
+    var url = await Foto.cargar(id);
+    if (_fotoVisor.id !== id) return;        // se cerró o se abrió otra mientras tanto
+    if (img) { img.src = url; img.hidden = false; }
+    if (msg) { msg.hidden = true; msg.textContent = ''; }
+  } catch(e) {
+    if (_fotoVisor.id !== id) return;
+    if (msg) { msg.className = 'foto-ov-msg r'; msg.textContent = (e && e.message) ? e.message : 'No se pudo cargar la foto'; }
+  }
+}
+function cerrarFoto() {
+  var ov = document.getElementById('foto-viewer');
+  _fotoVisor.id = null;
+  _fotoVisor.zoom = false;
+  if (ov) { ov.hidden = true; ov.className = 'foto-ov'; }
+  if (_fotoVisor.esc) { document.removeEventListener('keydown', _fotoVisor.esc); _fotoVisor.esc = null; }
+}
+function toggleFotoZoom() {
+  var ov = document.getElementById('foto-viewer');
+  if (!ov) return;
+  _fotoVisor.zoom = !_fotoVisor.zoom;
+  ov.className = 'foto-ov' + (_fotoVisor.zoom ? ' zoom' : '');
+  fotoZoomLabel();
+}
+function fotoFondoClick(e) {
+  var body = document.getElementById('foto-ov-body');
+  if (e && e.target === body) cerrarFoto();
+}
+
+/* ---------- Subpestaña: Facturas ---------- */
+// Acceso a la foto desde la fila de la factura.
+function factFotoHTML(f) {
+  if (!f || !Foto.validId(f.fotoId)) return '';
+  var h = '<button type="button" class="btn ghost sm" onclick="verFoto(\'' + esc(f.fotoId) + '\')">Ver foto</button>';
+  if (nv(f.fotoBytes) > 0) h += '<span class="fact-foto-kb">' + fotoKB(f.fotoBytes) + '</span>';
+  return h;
+}
+
+function factCatSelect(id, selected, onchange) {
+  var h = '<select id="' + id + '"' + (onchange ? ' onchange="' + onchange + '"' : '') + '>';
+  FACT_CATS.forEach(function(c) {
+    h += '<option value="' + c.key + '"' + (selected === c.key ? ' selected' : '') + '>' + esc(c.label) + '</option>';
+  });
+  return h + '</select>';
+}
+function factCatHint(key) {
+  var c = partidaCatSegura(key);
+  if (c.amortiza === 'muebles') return 'Se amortiza al ' + AMORT_MUEBLES_PCT + ' % anual durante ' + AMORT_MUEBLES_ANIOS + ' años; no deduce de golpe.';
+  if (c.amortiza === 'inmueble') return 'Se capitaliza: eleva la base de amortización del inmueble, que deduce al ' + AMORT_INMUEBLE_PCT + ' % anual.';
+  if (!c.deducible) return 'No deducible: solo afecta al cashflow.';
+  if (c.tope) return 'Deducible, con tope conjunto junto a los intereses' + (c.prorrateo ? ' y prorrateo por días alquilados.' : '.');
+  return 'Deducible sin tope' + (c.prorrateo ? ', prorrateado por días alquilados.' : ', al 100 %.');
+}
+
+function renderFacturaRow(p, f) {
+  var cat = partidaCatSegura(f.cat);
+  var editando = !!(_factEdit && _factEdit.pid === p.id && _factEdit.fid === f.id);
+  var pf = 'fe' + f.id + '-';
+  var h = '<div class="fact-row' + (editando ? ' editing' : '') + '">';
+  h += '<div class="fact-top"><div class="fact-info">';
+  h += '<div class="fact-cn">' + esc(f.concepto || 'Sin concepto') + '</div>';
+  h += '<div class="fact-meta"><span class="num">' + esc(fechaES(f.fecha)) + '</span><span class="chip mu">' + esc(cat.label) + '</span></div>';
+  if (f.notas) h += '<div class="fact-notas">' + esc(f.notas) + '</div>';
+  h += '</div>';
+  h += '<div class="fact-side">';
+  h += '<span class="fact-imp">' + eur2(f.importe) + '</span>';
+  h += '<span class="fact-foto" data-fid="' + f.id + '">' + factFotoHTML(f) + '</span>';
+  h += '<button class="btn ghost sm" onclick="editFactura(' + p.id + ',' + f.id + ')">' + (editando ? 'Cerrar' : 'Editar') + '</button>';
+  h += '<button class="btn br2 sm icon" onclick="delFactura(' + p.id + ',' + f.id + ')" title="Eliminar" aria-label="Eliminar">×</button>';
+  h += '</div></div>';
+
+  if (editando) {
+    var k = ' onkeydown="factEditKey(event,' + p.id + ',' + f.id + ')"';
+    h += '<div class="fact-edit"><div class="fgrid">';
+    h += '<div class="ef span3"><label>Fecha</label><input type="date" id="' + pf + 'fecha" value="' + esc(f.fecha) + '"' + k + '></div>';
+    h += '<div class="ef span6"><label>Concepto</label><input id="' + pf + 'concepto" value="' + esc(f.concepto) + '" maxlength="80"' + k + '></div>';
+    h += '<div class="ef span3"><label>Importe (€)</label><input type="number" id="' + pf + 'importe" value="' + nv(f.importe) + '" min="0" step="0.01"' + k + '></div>';
+    h += '<div class="ef span6"><label>Categoría</label>' + factCatSelect(pf + 'cat', cat.key, null) + '</div>';
+    h += '<div class="ef span6"><label>Notas</label><input id="' + pf + 'notas" value="' + esc(f.notas) + '" maxlength="140"' + k + '></div>';
+    h += '<div class="ef span12"><label>Foto</label>' + fotoCtlHTML(p.id, f.id) + '</div>';
+    h += '</div><div class="btn-row" style="margin-top:12px;">';
+    h += '<button class="btn bp sm" id="' + pf + 'btn" onclick="saveEditFactura(' + p.id + ',' + f.id + ')">Guardar</button>';
+    h += '<button class="btn ghost sm" onclick="cancelEditFactura()">Cancelar</button>';
+    h += '<span class="flash" id="' + pf + 'flash"></span></div></div>';
+  }
+  h += '</div>';
+  return h;
+}
+
+function renderFacturaForm(p) {
+  var pf = 'fa' + p.id + '-';
+  var h = '<div class="fact-form">';
+  h += '<div class="subbox-l" style="margin-bottom:10px;">Nueva factura</div>';
+  h += '<div class="fgrid">';
+  h += '<div class="ef span3"><label>Fecha</label><input type="date" id="' + pf + 'fecha" value="' + hoyISO() + '"></div>';
+  h += '<div class="ef span6"><label>Concepto</label><input id="' + pf + 'concepto" placeholder="Ej: Fontanero, cambio de grifo" maxlength="80" onkeydown="factAddKey(event,' + p.id + ')"></div>';
+  h += '<div class="ef span3"><label>Importe (€)</label><input type="number" id="' + pf + 'importe" placeholder="0" min="0" step="0.01" onkeydown="factAddKey(event,' + p.id + ')"></div>';
+  h += '<div class="ef span6"><label>Categoría</label>' + factCatSelect(pf + 'cat', 'reparacion', 'onFactCatChange(' + p.id + ')') +
+       '<p class="hint" id="' + pf + 'hint">' + esc(factCatHint('reparacion')) + '</p></div>';
+  h += '<div class="ef span6"><label>Notas (opcional)</label><input id="' + pf + 'notas" placeholder="Proveedor, garantía, detalle" maxlength="140" onkeydown="factAddKey(event,' + p.id + ')"></div>';
+  h += '<div class="fact-foto-slot ef span12" id="fact-foto-slot-' + p.id + '"><label>Foto (opcional)</label>' +
+       fotoCtlHTML(p.id, null) + '</div>';
+  h += '</div>';
+  h += '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" id="' + pf + 'btn" onclick="addFactura(' + p.id + ')">Añadir factura</button>';
+  h += '<span class="flash" id="' + pf + 'flash"></span></div>';
+  h += '</div>';
+  return h;
+}
+
+function propFacturasHTML(p) {
+  var y = propYear(p.id);
+  var f = calcFiscalProp(p, y);
+  var facts = facturasDeAnio(p, y).slice().sort(function(a, b) { return String(b.fecha).localeCompare(String(a.fecha)); });
+  var amortizable = 0;
+  facts.forEach(function(x) { if (partidaCatSegura(x.cat).amortiza) amortizable += nv(x.importe); });
+
+  var h = '';
+  h += '<div class="fact-hd"><span class="subbox-l">Facturas ' + y + '</span>';
+  h += '<span class="chip mu">' + facts.length + (facts.length === 1 ? ' factura' : ' facturas') + '</span></div>';
+  h += '<div class="kpis-grid k3">';
+  h += '<div class="minikpi"><div class="mini-l">Total ' + y + '</div><div class="mini-v">' + eur2(f.facturasCash) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Deducible este ejercicio</div><div class="mini-v g">' + eur2(f.facturasTope + f.facturasOtros) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Se amortiza</div><div class="mini-v am">' + eur2(amortizable) + '</div></div>';
+  h += '</div>';
+  h += '<p class="hint" style="margin-top:10px;">IBI, seguro y comunidad ya están en la ficha del inmueble; registra aquí solo gastos puntuales.</p>';
+
+  if (facts.length === 0) {
+    h += '<div class="empty" style="margin-top:12px;">Sin facturas registradas en ' + y + '.</div>';
+  } else {
+    h += '<div class="fact-list">';
+    facts.forEach(function(x) { h += renderFacturaRow(p, x); });
+    h += '</div>';
+  }
+  h += renderFacturaForm(p);
+  return h;
+}
+
+/* ---------- Mutaciones de facturas ---------- */
+async function addFactura(pid) {
+  pid = nv(pid);
+  var p = findPropById(pid);
+  if (!p) return;
+  var pf = 'fa' + pid + '-', fl = pf + 'flash';
+  var elC = document.getElementById(pf + 'concepto');
+  var concepto = elC ? String(elC.value == null ? '' : elC.value).trim() : '';
+  if (!concepto) { flash(fl, 'El concepto es obligatorio', 'r'); if (elC && elC.focus) elC.focus(); return; }
+  var importe = gv(pf + 'importe');
+  if (!(importe > 0)) { flash(fl, 'Introduce un importe mayor que 0', 'r'); return; }
+  var elF = document.getElementById(pf + 'fecha');
+  var fecha = elF ? String(elF.value == null ? '' : elF.value) : '';
+  if (!isFechaISO(fecha)) { flash(fl, 'Introduce una fecha válida', 'r'); return; }
+  var elCat = document.getElementById(pf + 'cat');
+  var cat = (elCat && partidaCat(elCat.value)) ? String(elCat.value) : 'nodeducible';
+  var elN = document.getElementById(pf + 'notas');
+
+  if (!Array.isArray(p.facturas)) p.facturas = [];
+  var nueva = {
+    id: Date.now(), fecha: fecha, concepto: concepto, importe: importe,
+    cat: cat, notas: elN ? String(elN.value == null ? '' : elN.value).trim() : '',
+    fotoId: null, fotoBytes: 0
+  };
+  p.facturas.push(nueva);
+  _propYear[pid] = anioISO(fecha);   // salta al ejercicio de la factura recién creada
+  _factEdit = null;
+  trySave();
+
+  var key = fotoKey(pid, null);
+  var pend = _fotoPendiente[key];
+  if (!pend) { rerenderProp(pid); toast('Factura añadida'); return; }
+
+  // Subida de la foto: la factura ya está guardada, así que un fallo aquí
+  // solo deja la factura sin foto (la pendiente queda para reintentar).
+  var btn = document.getElementById(pf + 'btn');
+  if (btn) btn.disabled = true;
+  fotoEstado(key, 'Subiendo foto…');
+  var err = null;
+  try {
+    var nid = Foto.nuevoId();
+    await Foto.subir(nid, pend.blob);
+    nueva.fotoId = nid;
+    nueva.fotoBytes = nv(pend.blob.size);
+    trySave();
+  } catch(e) { err = e; }
+  if (btn) btn.disabled = false;
+
+  if (err) {
+    _fotoPendiente['e' + nueva.id] = pend;   // se reintenta desde la edición
+    delete _fotoPendiente[key];
+    rerenderProp(pid);
+    flash(fl, (err && err.message) ? err.message : 'No se pudo subir la foto', 'r');
+    return;
+  }
+  olvidaPendiente(key);
+  rerenderProp(pid);
+  toast('Foto guardada');
+}
+
+// Cerrar o cancelar la edición descarta también los cambios de foto pendientes.
+function descartaFotoEdicion(fid) {
+  fid = nv(fid);
+  olvidaPendiente('e' + fid);
+  delete _fotoQuitar[fid];
+}
+
+function editFactura(pid, fid) {
+  pid = nv(pid); fid = nv(fid);
+  if (_factEdit && _factEdit.pid === pid && _factEdit.fid === fid) { descartaFotoEdicion(fid); _factEdit = null; }
+  else _factEdit = { pid: pid, fid: fid };
+  rerenderProp(pid);
+}
+
+function cancelEditFactura() {
+  if (!_factEdit) return;
+  var pid = _factEdit.pid;
+  descartaFotoEdicion(_factEdit.fid);
+  _factEdit = null;
+  rerenderProp(pid);
+}
+
+async function saveEditFactura(pid, fid) {
+  pid = nv(pid); fid = nv(fid);
+  var p = findPropById(pid);
+  if (!p) return;
+  var f = findFactura(p, fid);
+  if (!f) return;
+  var pf = 'fe' + fid + '-', fl = pf + 'flash';
+  var elC = document.getElementById(pf + 'concepto');
+  var concepto = elC ? String(elC.value == null ? '' : elC.value).trim() : '';
+  if (!concepto) { flash(fl, 'El concepto es obligatorio', 'r'); return; }
+  var importe = gv(pf + 'importe');
+  if (!(importe > 0)) { flash(fl, 'Introduce un importe mayor que 0', 'r'); return; }
+  var elF = document.getElementById(pf + 'fecha');
+  var fecha = elF ? String(elF.value == null ? '' : elF.value) : '';
+  if (!isFechaISO(fecha)) { flash(fl, 'Introduce una fecha válida', 'r'); return; }
+  var elCat = document.getElementById(pf + 'cat');
+  var elN = document.getElementById(pf + 'notas');
+
+  f.fecha = fecha;
+  f.concepto = concepto;
+  f.importe = importe;
+  if (elCat && partidaCat(elCat.value)) f.cat = String(elCat.value);
+  if (elN) f.notas = String(elN.value == null ? '' : elN.value).trim();
+  _propYear[pid] = anioISO(fecha);
+
+  var key = fotoKey(pid, fid);
+  var pend = _fotoPendiente[key];
+  var quitar = !!_fotoQuitar[fid];
+  var anterior = Foto.validId(f.fotoId) ? f.fotoId : null;
+
+  if (!pend && !quitar) {
+    _factEdit = null;
+    trySave();
+    rerenderProp(pid);
+    toast('Factura actualizada');
+    return;
+  }
+
+  var btn = document.getElementById(pf + 'btn');
+  if (btn) btn.disabled = true;
+  var err = null;
+  if (pend) {
+    fotoEstado(key, 'Subiendo foto…');
+    try {
+      var nid = Foto.nuevoId();
+      await Foto.subir(nid, pend.blob);
+      f.fotoId = nid;
+      f.fotoBytes = nv(pend.blob.size);
+      if (anterior) Foto.borrar(anterior);   // best-effort, no bloquea
+    } catch(e) { err = e; }
+  } else {
+    f.fotoId = null;
+    f.fotoBytes = 0;
+    if (anterior) Foto.borrar(anterior);
+  }
+  if (btn) btn.disabled = false;
+  trySave();
+
+  if (err) {
+    // El resto de cambios queda guardado; la edición sigue abierta para reintentar.
+    rerenderProp(pid);
+    flash(fl, (err && err.message) ? err.message : 'No se pudo subir la foto', 'r');
+    return;
+  }
+  olvidaPendiente(key);
+  delete _fotoQuitar[fid];
+  _factEdit = null;
+  rerenderProp(pid);
+  toast('Factura actualizada');
+}
+
+function delFactura(pid, fid) {
+  pid = nv(pid); fid = nv(fid);
+  var p = findPropById(pid);
+  if (!p) return;
+  var f = findFactura(p, fid);
+  var nombre = (f && f.concepto) ? f.concepto : 'La factura';
+  var fotoId = (f && Foto.validId(f.fotoId)) ? f.fotoId : null;
+  confirmAction('¿Eliminar factura?', nombre + ' se eliminará de forma permanente.', function() {
+    p.facturas = ((p && Array.isArray(p.facturas)) ? p.facturas : []).filter(function(x){ return x.id !== fid; });
+    if (_factEdit && _factEdit.fid === fid) _factEdit = null;
+    olvidaPendiente('e' + fid);
+    delete _fotoQuitar[fid];
+    if (fotoId) Foto.borrar(fotoId);   // best-effort: nunca lanza
+    trySave();
+    rerenderProp(pid);
+    toast('Factura eliminada');
+  });
+}
+
+function factEditKey(e, pid, fid) {
+  if (e.key === 'Enter') { e.preventDefault(); saveEditFactura(pid, fid); }
+  else if (e.key === 'Escape') { e.preventDefault(); cancelEditFactura(); }
+}
+function factAddKey(e, pid) {
+  if (e.key === 'Enter') { e.preventDefault(); addFactura(pid); }
+}
+function onFactCatChange(pid) {
+  var pf = 'fa' + nv(pid) + '-';
+  var sel = document.getElementById(pf + 'cat');
+  var hint = document.getElementById(pf + 'hint');
+  if (sel && hint) hint.textContent = factCatHint(sel.value);
+}
+
+/* ---------- Subpestaña: Fiscal ---------- */
+function propFiscalHTML(p, c) {
+  var y = propYear(p.id);
+  var f = calcFiscalProp(p, y);
+  var pf = 'fi' + p.id + '-';
+  var vacio = (p.vacio && typeof p.vacio === 'object' && p.vacio[String(y)] !== undefined) ? p.vacio[String(y)] : '';
+  var red = (p.reduccionPct === null || p.reduccionPct === undefined) ? '' : String(nv(p.reduccionPct));
+  var h = '';
+
+  /* --- formulario de datos fiscales --- */
+  h += '<div class="subbox"><div class="subbox-hd"><span class="subbox-l">Datos fiscales del inmueble</span></div>';
+  h += '<div class="fgrid">';
+  h += '<div class="ef span4"><label>Tipo de alquiler</label><select id="' + pf + 'tipo">';
+  h += '<option value="vivienda"' + (p.tipoAlquiler === 'otro' ? '' : ' selected') + '>Vivienda del inquilino</option>';
+  h += '<option value="otro"' + (p.tipoAlquiler === 'otro' ? ' selected' : '') + '>Otro (temporada, local, turístico)</option>';
+  h += '</select></div>';
+  h += '<div class="ef span4"><label>Fecha del contrato</label><input type="date" id="' + pf + 'contrato" value="' + esc(p.fechaContrato || '') + '"></div>';
+  h += '<div class="ef span4"><label>Reducción</label><select id="' + pf + 'red">';
+  [['','Automática'],['50','50 %'],['60','60 %'],['70','70 %'],['90','90 %']].forEach(function(o) {
+    h += '<option value="' + o[0] + '"' + (red === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+  });
+  h += '</select><p class="hint">Automática: 60 % si el contrato es anterior al 26/05/2023 o no hay fecha, 50 % si es posterior. Los tipos del 70 % y 90 % exigen requisitos que debes confirmar.</p></div>';
+  h += '<div class="ef span4"><label>Valor catastral total (€)</label><input type="number" id="' + pf + 'catastral" value="' + (p.valorCatastral === null || p.valorCatastral === undefined ? '' : nv(p.valorCatastral)) + '" min="0" step="1" placeholder="0"></div>';
+  h += '<div class="ef span4"><label>% de suelo</label><input type="number" id="' + pf + 'suelo" value="' + (p.pctSuelo === null || p.pctSuelo === undefined ? '' : nv(p.pctSuelo)) + '" min="0" max="100" step="0.01" placeholder="0"><p class="hint">Según el recibo del IBI.</p></div>';
+  h += '<div class="ef span4"><label>% de imputación</label><select id="' + pf + 'imput">';
+  h += '<option value="2"' + (nv(p.pctImputacion) === 1.1 ? '' : ' selected') + '>2 %</option>';
+  h += '<option value="1.1"' + (nv(p.pctImputacion) === 1.1 ? ' selected' : '') + '>1,1 %</option>';
+  h += '</select><p class="hint">1,1 % si el valor catastral se revisó en los últimos 10 años.</p></div>';
+  h += '<div class="ef span4"><label>Meses sin alquilar en ' + y + '</label><input type="number" id="' + pf + 'vacio" value="' + esc(String(vacio)) + '" min="0" max="12" step="0.5" placeholder="0"></div>';
+  h += '</div>';
+  h += '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" onclick="saveFiscalProp(' + p.id + ')">Guardar datos fiscales</button>';
+  h += '<span class="flash" id="' + pf + 'flash"></span></div></div>';
+
+  /* --- liquidación del ejercicio --- */
+  var repar = ((f.facturasPorCat.reparacion || 0) + (f.facturasPorCat.derrama || 0)) * f.factor;
+  var finan = (f.facturasPorCat.financiacion || 0) * f.factor;
+
+  h += inmoSec('Liquidación estimada ' + y);
+  h += inmoRow('Ingresos íntegros' + (f.dAlq < f.dias ? ' · ' + f.dAlq + ' días alquilados' : ''), eur2(f.RI));
+
+  h += inmoSec('Gastos con tope (intereses y conservación)');
+  h += inmoRow('Intereses de la hipoteca', eur2(f.interesesProrrateados) + (f.interesesAprox ? ' <span class="chip mu">aprox.</span>' : ''), 'mu', true);
+  h += inmoRow('Comisiones y gastos de financiación', eur2(finan), 'mu', true);
+  h += inmoRow('Reparación y conservación', eur2(repar), 'mu', true);
+  h += inmoRow('Pendiente de ejercicios anteriores', eur2(f.pendientesDisponibles), 'mu', true);
+  h += inmoRow('Tope: rendimientos íntegros', eur2(f.RI));
+  h += inmoRow('Deducido este ejercicio', eur2(f.gTopeDeduc), 'g');
+  h += inmoRow('Exceso que se arrastra (' + ARRASTRE_ANIOS + ' ejercicios)', eur2(f.exceso), f.exceso > 0.005 ? 'am' : 'mu');
+
+  h += inmoSec('Otros gastos deducibles');
+  h += inmoRow('IBI', eur2(f.ibi), 'mu', true);
+  h += inmoRow('Seguro', eur2(f.seguro), 'mu', true);
+  h += inmoRow('Comunidad', eur2(f.comunidad), 'mu', true);
+  h += inmoRow('Otros gastos', eur2(f.otrosGastos), 'mu', true);
+  h += inmoRow('Facturas sin tope', eur2(f.facturasOtros), 'mu', true);
+  if (f.amortDisponible) {
+    h += inmoRow('Amortización del inmueble (' + AMORT_INMUEBLE_PCT + ' %)', eur2(f.amortInmueble), 'mu', true);
+    h += inmoRow('Base de amortización', eur(f.baseAmort), 'mu', true);
+  } else {
+    h += inmoRow('Amortización del inmueble', 'No disponible: indica el % de suelo', 'am', true);
+  }
+  h += inmoRow('Amortización de mobiliario', eur2(f.amortMuebles), 'mu', true);
+  h += inmoRow('Total otros gastos', eur2(f.gOtros));
+
+  h += inmoSec('Resultado');
+  h += inmoRow('Rendimiento neto', '<span style="color:' + colorVal(f.RN) + '">' + eur2(f.RN) + '</span>');
+  h += inmoRow('Reducción ' + pct1(f.reduccionPct), '−' + eur2(f.reduccion), 'g');
+  h += inmoRow('Rendimiento neto reducido', eur2(f.RNR));
+  if (f.imputacion > 0.005) h += inmoRow('Imputación de renta (' + f.pctImputacion + ' % · ' + f.dVacio + ' días)', eur2(f.imputacion), 'am');
+  h += inmoRow('Aportación a la base imponible', eur2(f.aportacion));
+  h += inmoRow('Impuesto estimado', '<span style="color:' + colorVal(-f.impuestoMarginal) + '">' + eur2(f.impuestoMarginal) + '</span>');
+
+  if (f.avisos.length) {
+    h += '<div class="renta-avisos" style="margin-top:10px;">';
+    f.avisos.forEach(function(a){ h += avisoChipHTML(a); });
+    h += '</div>';
+  }
+
+  /* --- cashflow del ejercicio --- */
+  var cfAnual = f.RI - f.gastosRecurrentes - f.facturasCash - f.cuotasAnio - f.impuestoMarginal;
+  var cfMes = cfAnual / 12;
+  var dif = cfMes - c.est.cfNetoMensual;
+  h += inmoSec('Cashflow ' + y);
+  h += inmoRow('Ingresos por alquiler', eur2(f.RI));
+  h += inmoRow('Gastos recurrentes', '−' + eur2(f.gastosRecurrentes), 'mu', true);
+  h += inmoRow('Facturas del ejercicio', '−' + eur2(f.facturasCash), 'mu', true);
+  h += inmoRow('Cuotas de hipoteca', '−' + eur2(f.cuotasAnio), 'mu', true);
+  h += inmoRow('Impuesto estimado', '−' + eur2(f.impuestoMarginal), 'mu', true);
+  h += inmoRow('CF neto ' + y, '<span style="color:' + colorVal(cfAnual) + '">' + eur2(cfAnual) + '</span>');
+  h += inmoRow('CF neto mensual', '<span style="color:' + colorVal(cfMes) + '">' + eur2(cfMes) + '</span> <span class="chip ' + (dif >= 0 ? 'g' : 'am') + '">' + (dif >= 0 ? '+' : '−') + eur2(Math.abs(dif)) + ' vs estructural</span>');
+  return h;
+}
+
+function saveFiscalProp(pid) {
+  pid = nv(pid);
+  var p = findPropById(pid);
+  if (!p) return;
+  var pf = 'fi' + pid + '-', fl = pf + 'flash';
+  var y = propYear(pid);
+  var val = function(id) { var el = document.getElementById(pf + id); return el ? String(el.value == null ? '' : el.value).trim() : ''; };
+
+  var contrato = val('contrato');
+  if (contrato && !isFechaISO(contrato)) { flash(fl, 'La fecha del contrato no es válida', 'r'); return; }
+  var catastral = val('catastral');
+  if (catastral !== '' && !(parseFloat(catastral) >= 0)) { flash(fl, 'El valor catastral no es válido', 'r'); return; }
+  var suelo = val('suelo');
+  if (suelo !== '') {
+    var sN = parseFloat(suelo);
+    if (!isFinite(sN) || sN < 0 || sN > 100) { flash(fl, 'El % de suelo debe estar entre 0 y 100', 'r'); return; }
+  }
+  var vac = val('vacio');
+  var vacN = vac === '' ? 0 : parseFloat(vac);
+  if (!isFinite(vacN) || vacN < 0 || vacN > 12) { flash(fl, 'Los meses sin alquilar deben ir de 0 a 12', 'r'); return; }
+
+  p.tipoAlquiler = (val('tipo') === 'otro') ? 'otro' : 'vivienda';
+  p.fechaContrato = contrato;
+  var red = val('red');
+  p.reduccionPct = (red === '') ? null : numOrNull(red, 0, 100);
+  p.valorCatastral = numOrNull(catastral === '' ? null : catastral, 0, null);
+  p.pctSuelo = numOrNull(suelo === '' ? null : suelo, 0, 100);
+  p.pctImputacion = (parseFloat(val('imput')) === 1.1) ? 1.1 : 2;
+  if (!p.vacio || typeof p.vacio !== 'object') p.vacio = {};
+  if (vacN > 0) p.vacio[String(y)] = Math.min(12, vacN);
+  else delete p.vacio[String(y)];
+
+  trySave();
+  rerenderProp(pid);
+  flash(fl, 'Datos fiscales guardados');
 }
 
 /* ============================================================
@@ -3345,14 +5019,15 @@ function renderActivoChart() {
    ============================================================ */
 function tramoMarginal(base) {
   var tramos = [
-    { hasta: 12450,  pct: 19, label: 'hasta 12.450 €' },
-    { hasta: 20050,  pct: 24, label: '12.450 – 20.050 €' },
-    { hasta: 35200,  pct: 30, label: '20.050 – 35.200 €' },
-    { hasta: 60000,  pct: 37, label: '35.200 – 60.000 €' },
-    { hasta: Infinity, pct: 45, label: 'más de 60.000 €' }
+    { hasta: 12450,    pct: 19, label: 'hasta 12.450 €' },
+    { hasta: 20200,    pct: 24, label: '12.450 – 20.200 €' },
+    { hasta: 35200,    pct: 30, label: '20.200 – 35.200 €' },
+    { hasta: 60000,    pct: 37, label: '35.200 – 60.000 €' },
+    { hasta: 300000,   pct: 45, label: '60.000 – 300.000 €' },
+    { hasta: Infinity, pct: 47, label: 'más de 300.000 €' }
   ];
   for (var i = 0; i < tramos.length; i++) {
-    if (base < (i === 0 ? 12450 : [12450,20050,35200,60000,Infinity][i])) return tramos[i];
+    if (base < tramos[i].hasta) return tramos[i];
   }
   return tramos[tramos.length - 1];
 }
@@ -3361,16 +5036,20 @@ function previewIRPF() {
   var tramo = tramoMarginal(base);
   document.getElementById('cfg-irpf-tramo').textContent = tramo.pct + '%';
   document.getElementById('cfg-irpf-desc').textContent = 'Tramo: ' + tramo.label;
-  var colors = { 19:'var(--g)', 24:'var(--g)', 30:'var(--am)', 37:'var(--am)', 45:'var(--r)' };
+  var colors = { 19:'var(--g)', 24:'var(--g)', 30:'var(--am)', 37:'var(--am)', 45:'var(--r)', 47:'var(--r)' };
   document.getElementById('cfg-irpf-tramo').style.color = colors[tramo.pct] || 'var(--am)';
 }
 function loadConfigForm() {
   document.getElementById('cfg-baseIRPF').value = (S.config && S.config.baseIRPF) ? S.config.baseIRPF : '';
+  var sel = document.getElementById('cfg-cfInmoModo');
+  if (sel) sel.value = (S.config && S.config.cfInmoModo === 'estructural') ? 'estructural' : 'anio';
   previewIRPF();
 }
 function saveConfig() {
-  if (!S.config) S.config = {};
+  if (!S.config) S.config = { baseIRPF: 0, cfInmoModo: 'anio' };
   S.config.baseIRPF = gv('cfg-baseIRPF');
+  var sel = document.getElementById('cfg-cfInmoModo');
+  S.config.cfInmoModo = (sel && sel.value === 'estructural') ? 'estructural' : 'anio';
   trySave(); renderAll();
   flash('cfg-flash', 'Actualizado');
 }
@@ -3404,7 +5083,8 @@ function importData(event) {
 function borrarTodo() {
   confirmAction('¿Borrar TODOS los datos?', 'Se eliminarán inversiones, propiedades, snapshots y la copia local. Los datos del servidor se borrarán en el próximo guardado. Esta acción no se puede deshacer.', function() {
     confirmAction('Confirmación final', 'Pulsa borrar para confirmar definitivamente.', function() {
-      S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0 }, objetivo:{ partidas:[] }, _savedAt: Date.now() };
+      S.propiedades.forEach(borrarFotosDe);
+      S = { inversiones:[], propiedades:[], snaps:[], liquido:[], config:{ baseIRPF:0, cfInmoModo:'anio' }, objetivo:{ partidas:[] }, _savedAt: Date.now() };
       Store.clearLocal();
       trySave();
       Auth.logout();
