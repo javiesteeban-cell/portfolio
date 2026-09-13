@@ -594,6 +594,11 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 .prop-acts{display:flex;align-items:center;gap:6px;}
 .chev{color:var(--mu);font-size:.62rem;transition:transform var(--tb);}
 .prop-row.expanded .chev{transform:rotate(180deg);}
+.renta-hd{cursor:pointer;user-select:none;}
+.renta-hd-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+.renta-tile .renta-body{display:none;}
+.renta-tile.open .renta-body{display:block;animation:slide .25s;}
+.renta-tile.open .chev{transform:rotate(180deg);}
 .prop-det{display:none;padding-top:16px;margin-top:16px;border-top:1px solid var(--bd);}
 .prop-row.expanded .prop-det{display:block;animation:slide .25s ease-out;}
 
@@ -3376,6 +3381,7 @@ var _propExpanded = {};   // { id: true }
 var _propSubtab = {};     // { id: 'resumen'|'hipoteca'|'facturas'|'fiscal' }
 var _propYear = {};       // { id: yyyy }
 var _rentaYear = null;    // ejercicio del bloque de la renta
+var _rentaOpen = false;   // bloque de la renta desplegado (cerrado por defecto)
 var _factEdit = null;     // { pid, fid } de la factura en edición en línea
 
 function anioHoy() { return new Date().getFullYear(); }
@@ -3487,6 +3493,8 @@ function avisoChipHTML(txt) {
 /* ============================================================
    DECLARACIÓN DE LA RENTA — estimación del ejercicio
    ============================================================ */
+function toggleRenta() { _rentaOpen = !_rentaOpen; renderRenta(); }
+function toggleRentaKey(ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggleRenta(); } }
 function renderRenta() {
   var box = document.getElementById('renta-block');
   if (!box) return;
@@ -3494,23 +3502,30 @@ function renderRenta() {
   var y = rentaYear();
   if (y !== cur && y !== cur - 1) { y = cur; _rentaYear = cur; }
 
-  var h = '<div class="tile">';
-  h += '<div class="tile-hd"><span class="tile-l">Declaración de la renta · estimación</span>';
-  h += '<div class="ftabs yr-tabs">';
-  h += '<button class="ftab' + (y === cur - 1 ? ' active' : '') + '" onclick="setRentaYear(' + (cur - 1) + ')">' + (cur - 1) + '</button>';
-  h += '<button class="ftab' + (y === cur ? ' active' : '') + '" onclick="setRentaYear(' + cur + ')">' + cur + '</button>';
-  h += '</div></div>';
-
   var hayAlquiler = false;
   S.propiedades.forEach(function(p){ if (p.uso !== 'habitual') hayAlquiler = true; });
+  var r = hayAlquiler ? calcRenta(y) : null;
+  var cuotaNeg = r ? r.cuota < -0.005 : false;
+
+  // Cabecera siempre visible (clicable para desplegar); resumen de la cuota cuando está plegado.
+  var h = '<div class="tile renta-tile' + (_rentaOpen ? ' open' : '') + '">';
+  h += '<div class="tile-hd renta-hd" onclick="toggleRenta()" onkeydown="toggleRentaKey(event)" role="button" tabindex="0" aria-expanded="' + (_rentaOpen ? 'true' : 'false') + '">';
+  h += '<span class="tile-l">Declaración de la renta · estimación</span>';
+  h += '<div class="renta-hd-r">';
+  if (r) h += '<span class="chip ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '" title="Cuota estimada atribuible a los alquileres en ' + y + '">' + (cuotaNeg ? 'Ahorro ' : 'Cuota ') + eur(Math.abs(r.cuota)) + '</span>';
+  h += '<div class="ftabs yr-tabs" onclick="event.stopPropagation()">';
+  h += '<button class="ftab' + (y === cur - 1 ? ' active' : '') + '" onclick="setRentaYear(' + (cur - 1) + ')">' + (cur - 1) + '</button>';
+  h += '<button class="ftab' + (y === cur ? ' active' : '') + '" onclick="setRentaYear(' + cur + ')">' + cur + '</button>';
+  h += '</div>';
+  h += '<span class="chev">&#9660;</span>';
+  h += '</div></div>';
+
   if (!hayAlquiler) {
-    h += '<div class="empty">Todavía no hay inmuebles en alquiler. Añade uno para estimar su efecto en la declaración.</div></div>';
+    h += '<div class="renta-body"><div class="empty">Todavía no hay inmuebles en alquiler. Añade uno para estimar su efecto en la declaración.</div></div></div>';
     box.innerHTML = h;
     return;
   }
-
-  var r = calcRenta(y);
-  var cuotaNeg = r.cuota < -0.005;
+  h += '<div class="renta-body">';
 
   h += '<div class="kpis-grid k6">';
   h += '<div class="minikpi"><div class="mini-l">Ingresos íntegros</div><div class="mini-v">' + eur(r.sumRI) + '</div></div>';
@@ -3550,7 +3565,7 @@ function renderRenta() {
   h += '</div>';
 
   h += '<p class="hint" style="margin-top:14px;">Cálculo estimativo: no sustituye a la declaración. Usa la escala estatal más una autonómica de referencia, sin mínimo personal ni deducciones autonómicas, y no descuenta retenciones ni pagos a cuenta. La reducción del rendimiento depende de requisitos que debes confirmar. De la hipoteca solo se deducen los intereses, nunca la cuota. La cuota de cada inmueble es la marginal aislada; la cuota estimada total es el cálculo conjunto.</p>';
-  h += '</div>';
+  h += '</div></div>';
   box.innerHTML = h;
 }
 
