@@ -3515,7 +3515,7 @@ function renderRenta() {
   h += '<div class="tile-hd renta-hd" onclick="toggleRenta()" onkeydown="toggleRentaKey(event)" role="button" tabindex="0" aria-expanded="' + (_rentaOpen ? 'true' : 'false') + '">';
   h += '<span class="tile-l">Declaración de la renta · estimación</span>';
   h += '<div class="renta-hd-r">';
-  if (r) h += '<span class="chip ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '" title="Cuota estimada atribuible a los alquileres en ' + y + '">' + (cuotaNeg ? 'Ahorro ' : 'Cuota ') + eur(Math.abs(r.cuota)) + '</span>';
+  if (r) h += '<span class="chip ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '" title="Cuota estimada de la Renta ' + y + ', que se presenta y paga entre abril y junio de ' + (y + 1) + '">' + (cuotaNeg ? 'Ahorro ' : 'Cuota ') + eur(Math.abs(r.cuota)) + ' · ' + (y < cur ? 'pagada en ' : 'se paga en ') + (y + 1) + '</span>';
   h += '<div class="ftabs yr-tabs" onclick="event.stopPropagation()">';
   h += '<button class="ftab' + (y === cur - 1 ? ' active' : '') + '" onclick="setRentaYear(' + (cur - 1) + ')">' + (cur - 1) + '</button>';
   h += '<button class="ftab' + (y === cur ? ' active' : '') + '" onclick="setRentaYear(' + cur + ')">' + cur + '</button>';
@@ -3529,11 +3529,12 @@ function renderRenta() {
     return;
   }
   h += '<div class="renta-body">';
+  h += '<p class="hint" style="margin:0 0 12px;">Renta ' + y + ': liquida lo generado en ' + y + ' y se presenta y paga entre abril y junio de ' + (y + 1) + (y < cur ? ' (ya presentada)' : '') + '. El cashflow del año atribuye el impuesto al ejercicio que lo genera, no al año en que se paga.</p>';
 
   h += '<div class="kpis-grid k6">';
   h += '<div class="minikpi"><div class="mini-l">Ingresos íntegros</div><div class="mini-v">' + eur(r.sumRI) + '</div></div>';
   h += '<div class="minikpi"><div class="mini-l">Rend. neto reducido' + (r.sumImputacion > 0.005 ? ' · + imputación ' + eur(r.sumImputacion) : '') + '</div><div class="mini-v">' + eur(r.sumRNR) + '</div></div>';
-  h += '<div class="minikpi"><div class="mini-l">Cuota estimada' + (cuotaNeg ? ' · ahorro' : '') + '</div><div class="mini-v ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '">' + eur(Math.abs(r.cuota)) + '</div></div>';
+  h += '<div class="minikpi"><div class="mini-l">Cuota estimada · ' + (y < cur ? 'pagada en ' : 'pago en ') + (y + 1) + (cuotaNeg ? ' · ahorro' : '') + '</div><div class="mini-v ' + (cuotaNeg ? 'g' : (r.cuota > 0.005 ? 'r' : 'mu')) + '">' + eur(Math.abs(r.cuota)) + '</div></div>';
   h += '<div class="minikpi"><div class="mini-l">Tipo efectivo</div><div class="mini-v">' + (r.tipoEfectivo === null ? '—' : pct2(r.tipoEfectivo * 100)) + '</div></div>';
   h += '<div class="minikpi"><div class="mini-l">Tramo marginal final</div><div class="mini-v am">' + r.tramoFinal.pct + '%</div></div>';
   h += '<div class="minikpi"><div class="mini-l">Base previa</div><div class="mini-v ' + (r.base > 0 ? '' : 'mu') + '">' + (r.base > 0 ? eur(r.base) : '—') + '</div></div>';
@@ -4334,7 +4335,7 @@ function propFiscalHTML(p, c) {
   h += inmoRow('Rendimiento neto reducido', eur2(f.RNR));
   if (f.imputacion > 0.005) h += inmoRow('Imputación de renta (' + f.pctImputacion + ' % · ' + f.dVacio + ' días)', eur2(f.imputacion), 'am');
   h += inmoRow('Aportación a la base imponible', eur2(f.aportacion));
-  h += inmoRow('Impuesto estimado', '<span style="color:' + colorVal(-f.impuestoMarginal) + '">' + eur2(f.impuestoMarginal) + '</span>');
+  h += inmoRow('Impuesto estimado · se paga en ' + (y + 1), '<span style="color:' + colorVal(-f.impuestoMarginal) + '">' + eur2(f.impuestoMarginal) + '</span>');
 
   if (f.avisos.length) {
     h += '<div class="renta-avisos" style="margin-top:10px;">';
@@ -4351,7 +4352,7 @@ function propFiscalHTML(p, c) {
   h += inmoRow('Gastos recurrentes', '−' + eur2(f.gastosRecurrentes), 'mu', true);
   h += inmoRow('Facturas del ejercicio', '−' + eur2(f.facturasCash), 'mu', true);
   h += inmoRow('Cuotas de hipoteca', '−' + eur2(f.cuotasAnio), 'mu', true);
-  h += inmoRow('Impuesto estimado', '−' + eur2(f.impuestoMarginal), 'mu', true);
+  h += inmoRow('Impuesto estimado (Renta ' + y + ', pago en ' + (y + 1) + ')', '−' + eur2(f.impuestoMarginal), 'mu', true);
   h += inmoRow('CF neto ' + y, '<span style="color:' + colorVal(cfAnual) + '">' + eur2(cfAnual) + '</span>');
   h += inmoRow('CF neto mensual', '<span style="color:' + colorVal(cfMes) + '">' + eur2(cfMes) + '</span> <span class="chip ' + (dif >= 0 ? 'g' : 'am') + '">' + (dif >= 0 ? '+' : '−') + eur2(Math.abs(dif)) + ' vs estructural</span>');
   return h;
