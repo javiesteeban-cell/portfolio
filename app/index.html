@@ -729,6 +729,11 @@ input[type=range].crypto::-moz-range-thumb{
 .ring-v{font-size:1.4rem;font-weight:800;letter-spacing:-.6px;}
 .ring-l{font-size:.56rem;color:var(--mu);font-weight:700;letter-spacing:.9px;text-transform:uppercase;margin-top:4px;}
 .ring-obj.ring{--ring-size:72px;}
+.ob-sum{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+.ob-sum .ob-hero{flex:0 1 320px;min-width:240px;}
+.ob-sum-bar{flex:1 1 260px;min-width:0;}
+.ob-sum-bar .bar-trk{height:8px;}
+.ob-sum-leg{display:flex;justify-content:space-between;gap:12px;font-size:.78rem;color:var(--mu);margin-top:8px;}
 
 .ob-hero{display:flex;align-items:center;gap:22px;flex-wrap:wrap;position:relative;z-index:1;}
 .ob-hero-txt{flex:1;min-width:180px;}
@@ -819,6 +824,8 @@ input[type=range].crypto::-moz-range-thumb{
   .tile-hero .tile-v{font-size:1.8rem;}
   .tile-hero .tile-aside{display:none;}
   .ring-obj.ring{--ring-size:64px;}
+  .ob-sum{gap:16px;}
+  .ob-sum .ob-hero{flex-basis:100%;min-width:0;}
   .row,.prop-row,.snap{padding:14px;}
   .fgrid > .ef,.fgrid > .span3,.fgrid > .span4,.fgrid > .span6{grid-column:span 12;}
   .kpis-grid,.kpis-grid.k6,.hip-grid{grid-template-columns:1fr 1fr;}
@@ -1773,6 +1780,7 @@ function showTab(name) {
     document.getElementById('tb-title').textContent = meta.title;
     document.getElementById('tb-eyebrow').textContent = meta.eyebrow;
   }
+  if (name === 'resumen') renderResumen();
   if (name === 'objetivo') renderObjetivo();
   if (name === 'graficas') setTimeout(renderGraficas, 50);
   if (name === 'config') loadConfigForm();
@@ -1941,55 +1949,60 @@ function renderResumenKPIs() {
   if (patExtra) html += '<div class="tile-foot">' + patExtra + '</div>';
   html += '</div>';
 
-  // Objetivo: cobertura de gastos — c-6, clicable a la pestaña Objetivo
-  html += '<div class="tile tile-obj c-6" onclick="showTab(\'objetivo\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showTab(\'objetivo\');}" role="button" tabindex="0">';
-  html += '<div class="tile-hd"><span class="tile-l">Objetivo · cobertura de gastos</span></div>';
-  html += '<div class="ob-hero">';
-  html += '<div class="ring ring-obj" style="--p:' + oRingPct.toFixed(1) + ';--ring-col:' + oCol + ';"><div class="ring-in"></div></div>';
-  html += '<div class="ob-hero-txt"><div class="tile-v ' + oCls + ' num">' + (oCob === null ? '—' : pct1(Math.max(0, oCob))) + '</div><div class="tile-s">' + oSupport + '</div></div>';
-  html += '</div></div>';
-
-  // CF Real — c-4
-  html += '<div class="tile c-4">';
+  // CF Real — c-3
+  html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">CF real / mes</span></div>';
   html += '<div class="tile-v g num">' + eur(t.cfReal) + '</div>';
   html += '<div class="tile-foot"><span class="chip g">' + pct1(yieldReal) + ' anual</span><span>' + eur(t.cfReal * 12) + '/año</span></div>';
   html += '</div>';
 
-  // CF Pot — c-4
-  html += '<div class="tile c-4">';
+  // CF Pot — c-3
+  html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">CF potencial / mes</span>' + (simActiva ? '<span class="chip am">sim</span>' : '') + '</div>';
   html += '<div class="tile-v am num">' + eur(t.cfPot) + '</div>';
   html += '<div class="tile-foot"><span class="chip am">' + pct1(yieldPot) + ' anual</span><span>' + eur(t.cfPot * 12) + '/año</span></div>';
   html += '</div>';
 
-  // CF + amort — c-4
-  html += '<div class="tile c-4">';
-  html += '<div class="tile-hd"><span class="tile-l">CF pot. + amortización</span></div>';
-  html += '<div class="tile-v ac num">' + eur(t.cfPot + amortiMensual) + '</div>';
-  html += '<div class="tile-foot"><span class="chip ac">Equity-building</span><span>' + eur((t.cfPot + amortiMensual) * 12) + '/año</span></div>';
-  html += '</div>';
-
-  // Inversiones — c-4
-  html += '<div class="tile c-4">';
+  // Inversiones — c-3
+  html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">Inversiones</span></div>';
   html += '<div class="tile-v num">' + eur(t.totalInv) + '</div>';
   html += '<div class="tile-foot"><span class="chip ac">ETF · Crypto · P2P</span><span>' + S.inversiones.length + ' activos</span></div>';
   html += '</div>';
 
-  // Inmobiliario — c-4
-  html += '<div class="tile c-4">';
+  // Inmobiliario — c-3
+  html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">Inmobiliario · equity</span></div>';
   html += '<div class="tile-v num">' + eur(t.totalProp + t.totalPropHab) + '</div>';
   html += '<div class="tile-foot"><span class="chip ac">' + eur(amortiMensual) + '/mes amortización</span><span>' + S.propiedades.length + ' inmuebles</span></div>';
   html += '</div>';
 
-  // Liquidez — c-4
-  html += '<div class="tile c-4">';
+  // Liquidez — c-3
+  html += '<div class="tile c-3">';
   html += '<div class="tile-hd"><span class="tile-l">Liquidez</span></div>';
   html += '<div class="tile-v g num">' + eur(t.totalLiq) + '</div>';
   html += '<div class="tile-foot"><span class="chip mu">' + S.liquido.length + ' cuentas</span></div>';
   html += '</div>';
+  // CF + amort — c-3
+  html += '<div class="tile c-3">';
+  html += '<div class="tile-hd"><span class="tile-l">CF pot. + amortización</span></div>';
+  html += '<div class="tile-v ac num">' + eur(t.cfPot + amortiMensual) + '</div>';
+  html += '<div class="tile-foot"><span class="chip ac">Equity-building</span><span>' + eur((t.cfPot + amortiMensual) * 12) + '/año</span></div>';
+  html += '</div>';
+
+
+  // Objetivo: cobertura de gastos — c-12 al final, clicable a la pestaña Objetivo
+  var oLeg = o.gastosMes > 0
+    ? '<span>' + eur(Math.max(0, o.cfReal)) + ' cubiertos</span><span>de ' + eur(o.gastosMes) + ' al mes</span>'
+    : '<span>Sin partidas con importe</span><span></span>';
+  html += '<div class="tile tile-obj c-12" onclick="showTab(\'objetivo\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();showTab(\'objetivo\');}" role="button" tabindex="0">';
+  html += '<div class="tile-hd"><span class="tile-l">Objetivo · cobertura de gastos</span><span class="tile-aside">Ver detalle en Objetivo</span></div>';
+  html += '<div class="ob-sum">';
+  html += '<div class="ob-hero"><div class="ring ring-obj" style="--p:' + oRingPct.toFixed(1) + ';--ring-col:' + oCol + ';"><div class="ring-in"></div></div>';
+  html += '<div class="ob-hero-txt"><div class="tile-v ' + oCls + ' num">' + (oCob === null ? '—' : pct1(Math.max(0, oCob))) + '</div><div class="tile-s">' + oSupport + '</div></div></div>';
+  html += '<div class="ob-sum-bar"><div class="bar-trk"><div class="bar-fll" style="width:' + oRingPct.toFixed(1) + '%;background:' + oCol + ';box-shadow:0 0 8px ' + oCol + ';"></div></div>';
+  html += '<div class="ob-sum-leg">' + oLeg + '</div></div>';
+  html += '</div></div>';
 
   document.getElementById('resumen-bento').innerHTML = html;
 
