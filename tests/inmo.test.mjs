@@ -422,13 +422,70 @@ test('factCatHint describe el tratamiento de cada categoría', () => {
 /* ============================================================
    4. DATOS FISCALES
    ============================================================ */
+test('La subpestaña Fiscal muestra un resumen plegado y el formulario solo al abrirlo', () => {
+  stubEfectos();
+  resetEstado([propAlquiler()]);
+  ctx._propExpanded[PID] = true;
+  ctx._propSubtab[PID] = 'fiscal';
+  ctx._propYear[PID] = ANIO;
+  ctx._fiscalFormOpen = {};
+  ctx.renderPropList();
+
+  // Plegado por defecto: resumen de valores guardados, sin campos de entrada.
+  const plegado = htmlLista();
+  ok(!ctx._fiscalFormOpen[PID], 'el formulario fiscal nace plegado');
+  incluye(plegado, 'Editar datos fiscales', 'botón para abrir el formulario');
+  incluye(plegado, 'Vivienda del inquilino', 'tipo de alquiler en el resumen');
+  incluye(plegado, ctx.fechaES('2022-03-01'), 'fecha de contrato en formato español');
+  incluye(plegado, 'Automática · ' + ctx.pct1(60), 'reducción automática resuelta');
+  incluye(plegado, ctx.eur(90000), 'valor catastral en el resumen');
+  ok(plegado.indexOf('id="fi' + PID + '-catastral"') < 0, 'sin input de valor catastral mientras está plegado');
+  ok(plegado.indexOf('Guardar datos fiscales') < 0, 'sin botón de guardado mientras está plegado');
+
+  // Abierto: formulario completo con Guardar y Cancelar.
+  ctx.abrirFiscalForm(PID);
+  const abierto = htmlLista();
+  eq(ctx._fiscalFormOpen[PID], true, 'abrirFiscalForm marca el formulario como abierto');
+  incluye(abierto, 'id="fi' + PID + '-catastral"', 'input de valor catastral');
+  incluye(abierto, 'id="fi' + PID + '-vacio"', 'input de meses sin alquilar');
+  incluye(abierto, 'Guardar datos fiscales', 'botón de guardado');
+  incluye(abierto, 'cerrarFiscalForm(' + PID + ')', 'botón de cancelar');
+  ok(abierto.indexOf('Editar datos fiscales') < 0, 'el botón de edición desaparece al abrir');
+
+  // Cancelar vuelve al resumen sin tocar el estado.
+  ctx.cerrarFiscalForm(PID);
+  eq(ctx._fiscalFormOpen[PID], false, 'cerrarFiscalForm pliega el formulario');
+  incluye(htmlLista(), 'Editar datos fiscales', 'vuelve el resumen plegado');
+  eq(saves, 0, 'cancelar no guarda nada');
+});
+
+test('El resumen fiscal avisa de los datos que faltan', () => {
+  stubEfectos();
+  const p = propAlquiler();
+  p.valorCatastral = null;
+  p.pctSuelo = null;
+  resetEstado([p]);
+  ctx._propExpanded[PID] = true;
+  ctx._propSubtab[PID] = 'fiscal';
+  ctx._propYear[PID] = ANIO;
+  ctx._fiscalFormOpen = {};
+  ctx.renderPropList();
+  const h = htmlLista();
+  incluye(h, 'Sin % de suelo', 'ficha ámbar por el porcentaje de suelo');
+  incluye(h, 'Sin valor catastral', 'ficha ámbar por el valor catastral');
+  incluye(h, 'Sin indicar', 'los valores ausentes se marcan en el resumen');
+});
+
 test('saveFiscalProp muta el inmueble y conserva el estado de la tarjeta', () => {
   stubEfectos();
   resetEstado([propAlquiler()]);
   ctx._propExpanded[PID] = true;
   ctx._propSubtab[PID] = 'fiscal';
   ctx._propYear[PID] = ANIO;
+  ctx._fiscalFormOpen = {};
   ctx.renderPropList();
+  ok(!ctx._fiscalFormOpen[PID], 'el formulario fiscal está plegado por defecto');
+  ctx.abrirFiscalForm(PID);   // el formulario solo existe si el usuario lo abre
 
   const pf = 'fi' + PID + '-';
   set(pf + 'tipo', 'otro');
@@ -452,8 +509,10 @@ test('saveFiscalProp muta el inmueble y conserva el estado de la tarjeta', () =>
   eq(ctx._propExpanded[PID], true, 'expansión conservada');
   eq(ctx._propSubtab[PID], 'fiscal', 'subpestaña conservada');
   eq(ctx._propYear[PID], ANIO, 'ejercicio conservado');
+  eq(ctx._fiscalFormOpen[PID], false, 'el formulario se pliega tras guardar');
 
   // Reducción automática y borrado del vacío.
+  ctx.abrirFiscalForm(PID);
   set(pf + 'red', '');
   set(pf + 'vacio', '0');
   ctx.saveFiscalProp(PID);
@@ -466,7 +525,10 @@ test('saveFiscalProp rechaza valores fuera de rango', () => {
   resetEstado([propAlquiler()]);
   ctx._propExpanded[PID] = true;
   ctx._propSubtab[PID] = 'fiscal';
+  ctx._fiscalFormOpen = {};
   ctx.renderPropList();
+  ok(!ctx._fiscalFormOpen[PID], 'el formulario fiscal está plegado por defecto');
+  ctx.abrirFiscalForm(PID);
   const pf = 'fi' + PID + '-';
   set(pf + 'tipo', 'vivienda');
   set(pf + 'contrato', '');
@@ -479,6 +541,7 @@ test('saveFiscalProp rechaza valores fuera de rango', () => {
   ctx.saveFiscalProp(PID);
   eq(saves, 0, 'no guarda con un % de suelo inválido');
   eq(flashes[flashes.length - 1].level, 'r', 'avisa en rojo');
+  eq(ctx._fiscalFormOpen[PID], true, 'el formulario sigue abierto si el guardado falla');
 
   set(pf + 'suelo', '40');
   set(pf + 'vacio', '15');

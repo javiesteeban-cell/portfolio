@@ -739,6 +739,52 @@ test('Humo: renderAll, saveSnap y calcObjetivo con una cartera mixta', () => {
 });
 
 /* ============================================================
+   9c. OBJETIVO: el formulario de alta nace plegado
+   ============================================================ */
+test('El formulario de nueva partida del Objetivo está plegado por defecto', () => {
+  resetState(20000, 'anio');
+  ctx.S.objetivo = { partidas: [{ id: 401, nombre: 'Vivienda', importe: 900, periodicidad: 'mensual', orden: 0 }] };
+  const orig = ctx.trySave;
+  const origToast = ctx.toast;
+  ctx.trySave = function () {};
+  ctx.toast = function () {};
+
+  const form = ctx.document.getElementById('obj-form');
+  const btns = ctx.document.getElementById('obj-form-btns');
+  ctx.renderObjetivo();
+  eq(ctx._objFormOpen, false, 'estado plegado por defecto');
+  eq(form.style.display, 'none', 'el formulario no se ve tras el render');
+  eq(btns.style.display, '', 'el botón de alta sí se ve');
+
+  ctx.abrirObjForm();
+  eq(ctx._objFormOpen, true, 'abrirObjForm lo despliega');
+  eq(form.style.display, 'block', 'el formulario se muestra');
+  eq(btns.style.display, 'none', 'el botón de alta se oculta mientras está abierto');
+
+  // Cancelar pliega y limpia los campos.
+  ctx.document.getElementById('obj-nombre').value = 'Transporte';
+  ctx.document.getElementById('obj-importe').value = '120';
+  ctx.cerrarObjForm();
+  eq(ctx._objFormOpen, false, 'cerrarObjForm pliega');
+  eq(form.style.display, 'none', 'el formulario vuelve a ocultarse');
+  eq(ctx.document.getElementById('obj-nombre').value, '', 'el concepto se limpia al cancelar');
+  eq(ctx.S.objetivo.partidas.length, 1, 'cancelar no añade nada');
+
+  // Añadir una partida pliega el formulario de nuevo.
+  ctx.abrirObjForm();
+  ctx.document.getElementById('obj-nombre').value = 'Suministros';
+  ctx.document.getElementById('obj-importe').value = '95';
+  ctx.document.getElementById('obj-periodicidad').value = 'mensual';
+  ctx.addPartida();
+  eq(ctx.S.objetivo.partidas.length, 2, 'la partida se ha añadido');
+  eq(ctx._objFormOpen, false, 'el formulario se pliega tras añadir');
+  eq(form.style.display, 'none', 'y deja de verse');
+
+  ctx.trySave = orig;
+  ctx.toast = origToast;
+});
+
+/* ============================================================
    10. PERSISTENCIA Y SANEADO
    ============================================================ */
 test('mergeState: aplica defaults a inmuebles sin campos nuevos', () => {

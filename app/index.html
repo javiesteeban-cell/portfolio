@@ -1315,7 +1315,11 @@ input[type=range].crypto::-moz-range-thumb{
               <span class="tile-aside" id="obj-part-aside"></span>
             </div>
             <div class="ob-list" id="obj-partidas"></div>
-            <div class="ob-form">
+            <div class="btn-row" id="obj-form-btns" style="margin-top:16px;">
+              <button class="btn bp sm" onclick="abrirObjForm()">+ Nueva partida</button>
+            </div>
+            <div class="ob-form" id="obj-form" style="display:none;">
+              <div class="subbox-l" style="margin-bottom:10px;">Nueva partida</div>
               <div class="fgrid">
                 <div class="ef span6"><label>Concepto</label><input id="obj-nombre" placeholder="Ej: Vivienda, Alimentación" maxlength="60" onkeydown="objFormKey(event)"></div>
                 <div class="ef span3"><label>Importe (€)</label><input type="number" id="obj-importe" placeholder="0" min="0" step="0.01" onkeydown="objFormKey(event)"></div>
@@ -1328,6 +1332,7 @@ input[type=range].crypto::-moz-range-thumb{
               </div>
               <div class="btn-row" style="margin-top:12px;">
                 <button class="btn bp sm" onclick="addPartida()">Añadir partida</button>
+                <button class="btn ghost sm" onclick="cerrarObjForm()">Cancelar</button>
                 <span class="flash" id="obj-flash"></span>
               </div>
             </div>
@@ -3400,6 +3405,7 @@ var _rentaYear = null;    // ejercicio del bloque de la renta
 var _rentaOpen = false;   // bloque de la renta desplegado (cerrado por defecto)
 var _factEdit = null;     // { pid, fid } de la factura en edición en línea
 var _factFormOpen = {};   // pid -> true si el formulario de nueva factura está abierto
+var _fiscalFormOpen = {}; // pid -> true si el formulario de datos fiscales está abierto
 
 function anioHoy() { return new Date().getFullYear(); }
 function hoyISO() { return fechaISO(new Date()); }
@@ -4337,37 +4343,91 @@ function onFactCatChange(pid) {
 }
 
 /* ---------- Subpestaña: Fiscal ---------- */
-function propFiscalHTML(p, c) {
-  var y = propYear(p.id);
-  var f = calcFiscalProp(p, y);
+// Meses sin alquilar declarados en un ejercicio (0 si no hay dato).
+function mesesVacioAnio(p, year) {
+  var raw = (p && p.vacio && typeof p.vacio === 'object') ? parseFloat(p.vacio[String(year)]) : NaN;
+  return (isFinite(raw) && raw > 0) ? Math.min(12, raw) : 0;
+}
+function abrirFiscalForm(pid) {
+  _fiscalFormOpen[pid] = true;
+  rerenderProp(pid);
+  var el = document.getElementById('fi' + pid + '-tipo');
+  if (el && el.focus) { try { el.focus(); } catch (e) {} }
+}
+function cerrarFiscalForm(pid) {
+  _fiscalFormOpen[pid] = false;
+  rerenderProp(pid);
+}
+function fiscalFormKey(e, pid) {
+  if (e.key === 'Escape') { e.preventDefault(); cerrarFiscalForm(pid); }
+}
+
+// Estado plegado: resumen de lo guardado + botón de edición.
+function fiscalResumenHTML(p, y, f) {
+  var cat = numOrNull(p.valorCatastral, 0, null);
+  var suelo = numOrNull(p.pctSuelo, 0, 100);
+  var manual = numOrNull(p.reduccionPct, 0, 100);
+  var sinDato = '<span class="mu">Sin indicar</span>';
+  var h = '';
+  h += inmoRow('Tipo de alquiler', f.esVivienda ? 'Vivienda del inquilino' : 'Otro (temporada, local, turístico)');
+  h += inmoRow('Fecha del contrato', isFechaISO(p.fechaContrato) ? fechaES(p.fechaContrato) : '<span class="mu">Sin fecha</span>');
+  h += inmoRow('Reducción', f.esVivienda
+    ? (manual === null ? 'Automática · ' : 'Manual · ') + pct1(f.reduccionPct)
+    : '<span class="mu">No se aplica fuera del alquiler de vivienda</span>');
+  h += inmoRow('Valor catastral total', cat === null ? sinDato : eur(cat));
+  h += inmoRow('% de suelo', suelo === null ? sinDato : pct1(suelo));
+  h += inmoRow('% de imputación', pct1(f.pctImputacion));
+  h += inmoRow('Sin alquilar en ' + y, objMeses(mesesVacioAnio(p, y)));
+
+  var chips = '';
+  if (suelo === null) chips += '<span class="chip am">Sin % de suelo: no se aplica la amortización</span>';
+  if (cat === null || cat <= 0) chips += '<span class="chip am">Sin valor catastral: no se imputa renta por los días vacíos</span>';
+  if (chips) h += '<div class="renta-avisos" style="margin-top:10px;">' + chips + '</div>';
+
+  h += '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" onclick="abrirFiscalForm(' + p.id + ')">Editar datos fiscales</button></div>';
+  return h;
+}
+
+// Estado abierto: formulario de edición con Guardar y Cancelar.
+function fiscalFormHTML(p, y) {
   var pf = 'fi' + p.id + '-';
+  var kd = ' onkeydown="fiscalFormKey(event,' + p.id + ')"';
   var vacio = (p.vacio && typeof p.vacio === 'object' && p.vacio[String(y)] !== undefined) ? p.vacio[String(y)] : '';
   var red = (p.reduccionPct === null || p.reduccionPct === undefined) ? '' : String(nv(p.reduccionPct));
-  var h = '';
-
-  /* --- formulario de datos fiscales --- */
-  h += '<div class="subbox"><div class="subbox-hd"><span class="subbox-l">Datos fiscales del inmueble</span></div>';
-  h += '<div class="fgrid">';
-  h += '<div class="ef span4"><label>Tipo de alquiler</label><select id="' + pf + 'tipo">';
+  var h = '<div class="fgrid">';
+  h += '<div class="ef span4"><label>Tipo de alquiler</label><select id="' + pf + 'tipo"' + kd + '>';
   h += '<option value="vivienda"' + (p.tipoAlquiler === 'otro' ? '' : ' selected') + '>Vivienda del inquilino</option>';
   h += '<option value="otro"' + (p.tipoAlquiler === 'otro' ? ' selected' : '') + '>Otro (temporada, local, turístico)</option>';
   h += '</select></div>';
-  h += '<div class="ef span4"><label>Fecha del contrato</label><input type="date" id="' + pf + 'contrato" value="' + esc(p.fechaContrato || '') + '"></div>';
-  h += '<div class="ef span4"><label>Reducción</label><select id="' + pf + 'red">';
+  h += '<div class="ef span4"><label>Fecha del contrato</label><input type="date" id="' + pf + 'contrato" value="' + esc(p.fechaContrato || '') + '"' + kd + '></div>';
+  h += '<div class="ef span4"><label>Reducción</label><select id="' + pf + 'red"' + kd + '>';
   [['','Automática'],['50','50 %'],['60','60 %'],['70','70 %'],['90','90 %']].forEach(function(o) {
     h += '<option value="' + o[0] + '"' + (red === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
   });
   h += '</select><p class="hint">Automática: 60 % si el contrato es anterior al 26/05/2023 o no hay fecha, 50 % si es posterior. Los tipos del 70 % y 90 % exigen requisitos que debes confirmar.</p></div>';
-  h += '<div class="ef span4"><label>Valor catastral total (€)</label><input type="number" id="' + pf + 'catastral" value="' + (p.valorCatastral === null || p.valorCatastral === undefined ? '' : nv(p.valorCatastral)) + '" min="0" step="1" placeholder="0"></div>';
-  h += '<div class="ef span4"><label>% de suelo</label><input type="number" id="' + pf + 'suelo" value="' + (p.pctSuelo === null || p.pctSuelo === undefined ? '' : nv(p.pctSuelo)) + '" min="0" max="100" step="0.01" placeholder="0"><p class="hint">Según el recibo del IBI.</p></div>';
-  h += '<div class="ef span4"><label>% de imputación</label><select id="' + pf + 'imput">';
+  h += '<div class="ef span4"><label>Valor catastral total (€)</label><input type="number" id="' + pf + 'catastral" value="' + (p.valorCatastral === null || p.valorCatastral === undefined ? '' : nv(p.valorCatastral)) + '" min="0" step="1" placeholder="0"' + kd + '></div>';
+  h += '<div class="ef span4"><label>% de suelo</label><input type="number" id="' + pf + 'suelo" value="' + (p.pctSuelo === null || p.pctSuelo === undefined ? '' : nv(p.pctSuelo)) + '" min="0" max="100" step="0.01" placeholder="0"' + kd + '><p class="hint">Según el recibo del IBI.</p></div>';
+  h += '<div class="ef span4"><label>% de imputación</label><select id="' + pf + 'imput"' + kd + '>';
   h += '<option value="2"' + (nv(p.pctImputacion) === 1.1 ? '' : ' selected') + '>2 %</option>';
   h += '<option value="1.1"' + (nv(p.pctImputacion) === 1.1 ? ' selected' : '') + '>1,1 %</option>';
   h += '</select><p class="hint">1,1 % si el valor catastral se revisó en los últimos 10 años.</p></div>';
-  h += '<div class="ef span4"><label>Meses sin alquilar en ' + y + '</label><input type="number" id="' + pf + 'vacio" value="' + esc(String(vacio)) + '" min="0" max="12" step="0.5" placeholder="0"></div>';
+  h += '<div class="ef span4"><label>Meses sin alquilar en ' + y + '</label><input type="number" id="' + pf + 'vacio" value="' + esc(String(vacio)) + '" min="0" max="12" step="0.5" placeholder="0"' + kd + '></div>';
   h += '</div>';
   h += '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" onclick="saveFiscalProp(' + p.id + ')">Guardar datos fiscales</button>';
-  h += '<span class="flash" id="' + pf + 'flash"></span></div></div>';
+  h += '<button class="btn ghost sm" onclick="cerrarFiscalForm(' + p.id + ')">Cancelar</button>';
+  h += '<span class="flash" id="' + pf + 'flash"></span></div>';
+  return h;
+}
+
+function propFiscalHTML(p, c) {
+  var y = propYear(p.id);
+  var f = calcFiscalProp(p, y);
+  var h = '';
+
+  /* --- datos fiscales: resumen plegado, formulario solo si el usuario lo abre --- */
+  h += '<div class="subbox"><div class="subbox-hd"><span class="subbox-l">Datos fiscales del inmueble</span></div>';
+  h += _fiscalFormOpen[p.id] ? fiscalFormHTML(p, y) : fiscalResumenHTML(p, y, f);
+  h += '</div>';
 
   /* --- liquidación del ejercicio --- */
   var repar = ((f.facturasPorCat.reparacion || 0) + (f.facturasPorCat.derrama || 0)) * f.factor;
@@ -4461,9 +4521,10 @@ function saveFiscalProp(pid) {
   if (vacN > 0) p.vacio[String(y)] = Math.min(12, vacN);
   else delete p.vacio[String(y)];
 
+  _fiscalFormOpen[pid] = false;   // el formulario se pliega tras guardar
   trySave();
   rerenderProp(pid);
-  flash(fl, 'Datos fiscales guardados');
+  toast('Datos fiscales guardados');
 }
 
 /* ============================================================
@@ -4573,6 +4634,7 @@ function renderLiqList() {
    OBJETIVO — cobertura de gastos con cashflow
    ============================================================ */
 var editPartidaId = null;
+var _objFormOpen = false;   // formulario de nueva partida: plegado por defecto
 var PARTIDAS_PLANTILLA = ['Vivienda', 'Alimentación', 'Suministros', 'Transporte', 'Seguros', 'Ocio y otros'];
 var OBJ_TIPO_COLOR = {
   'fondo':'var(--c-fondo)', 'fondo-dist':'var(--c-fondo-dist)', 'etf':'var(--c-fondo-dist)',
@@ -4791,7 +4853,7 @@ function renderObjetivo() {
   o.escalera.forEach(function(e){ mapEsc[e.id] = e; });
   var lista = document.getElementById('obj-partidas');
   if (o.partidas.length === 0) {
-    lista.innerHTML = '<div class="empty">Aún no hay partidas de gasto. Añade las tuyas abajo o empieza con una plantilla.' +
+    lista.innerHTML = '<div class="empty">Aún no hay partidas de gasto. Añade la primera con «+ Nueva partida» o empieza con una plantilla.' +
       '<div class="btn-row" style="justify-content:center;margin-top:14px;"><button class="btn bp sm" onclick="cargarPlantillaPartidas()">Cargar plantilla</button></div></div>';
   } else {
     var ph = '';
@@ -4858,6 +4920,32 @@ function renderObjetivo() {
         sub + '</div></div>';
     }).join('');
   }
+
+  syncObjForm();
+}
+
+/* ---- Formulario de alta: plegado salvo que el usuario lo abra ---- */
+function syncObjForm() {
+  var form = document.getElementById('obj-form');
+  var btns = document.getElementById('obj-form-btns');
+  if (form) form.style.display = _objFormOpen ? 'block' : 'none';
+  if (btns) btns.style.display = _objFormOpen ? 'none' : '';
+}
+function limpiaObjForm() {
+  var n = document.getElementById('obj-nombre'); if (n) n.value = '';
+  var i = document.getElementById('obj-importe'); if (i) i.value = '';
+  var per = document.getElementById('obj-periodicidad'); if (per) per.value = 'mensual';
+}
+function abrirObjForm() {
+  _objFormOpen = true;
+  syncObjForm();
+  var el = document.getElementById('obj-nombre');
+  if (el && el.focus) { try { el.focus(); } catch (e) {} }
+}
+function cerrarObjForm() {
+  _objFormOpen = false;
+  limpiaObjForm();
+  syncObjForm();
 }
 
 /* ---- Mutaciones ---- */
@@ -4872,11 +4960,9 @@ function addPartida() {
   arr.push({ id: Date.now(), nombre: nombre, importe: importe, periodicidad: per, orden: arr.length });
   reordenarPartidas(arr);
   trySave();
-  elN.value = '';
-  document.getElementById('obj-importe').value = '';
-  document.getElementById('obj-periodicidad').value = 'mensual';
+  limpiaObjForm();
+  _objFormOpen = false;        // el formulario se pliega tras añadir
   renderObjetivo();
-  elN.focus();
   toast('Partida añadida');
 }
 
@@ -4941,6 +5027,7 @@ function movePartida(id, dir) {
 
 function objFormKey(e) {
   if (e.key === 'Enter') { e.preventDefault(); addPartida(); }
+  else if (e.key === 'Escape') { e.preventDefault(); cerrarObjForm(); }
 }
 function objEditKey(e, id) {
   if (e.key === 'Enter') { e.preventDefault(); saveEditPartida(id); }
