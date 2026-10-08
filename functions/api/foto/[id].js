@@ -1,6 +1,6 @@
 // Cloudflare Pages Function — almacenamiento de fotos de facturas.
 // GET    /api/foto/:id  → devuelve el binario de la foto guardada (404 si no existe).
-// PUT    /api/foto/:id  → guarda el body binario (JPEG/PNG/WEBP) como nueva foto.
+// PUT    /api/foto/:id  → guarda el body binario (JPEG/PNG/WEBP/PDF) como nuevo adjunto.
 // DELETE /api/foto/:id  → elimina la foto (idempotente).
 // Auth: header  Authorization: Bearer <sha256(PIN)>
 // Server compara con env.AUTH_PIN_HASH (hex SHA-256 del PIN, configurado en Cloudflare).
@@ -8,7 +8,7 @@
 
 const ID_RE = /^[A-Za-z0-9_-]{6,64}$/;
 const MAX_BYTES = 6 * 1024 * 1024; // 6 MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',

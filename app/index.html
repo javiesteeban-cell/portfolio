@@ -646,6 +646,7 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 .foto-ov-msg{font-size:.82rem;color:var(--mu);text-align:center;font-weight:600;}
 .foto-ov-msg.r{color:var(--r);}
 .foto-ov-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--rr);display:block;}
+.foto-ov-pdf{width:100%;height:100%;border:0;border-radius:var(--rr);background:var(--s1);display:block;}
 .foto-ov.zoom .foto-ov-body{align-items:flex-start;justify-content:flex-start;}
 .foto-ov.zoom .foto-ov-img{max-width:none;max-height:none;width:auto;height:auto;object-fit:none;border-radius:0;}
 .amort-list{margin-top:10px;}
@@ -1554,8 +1555,9 @@ var Foto = (function(){
   var MAX_LADO = 1600;
   var CALIDAD = 0.82;
   var MAX_BYTES = 6 * 1024 * 1024;
-  var TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp'];
+  var TIPOS_OK = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
   var cache = new Map();   // id -> blob: URL ya descargada
+  var tipos = new Map();   // id -> content-type descargado
 
   function validId(id) { return typeof id === 'string' && ID_RE.test(id); }
   function nuevoId() {
@@ -1599,7 +1601,14 @@ var Foto = (function(){
   async function comprimir(file) {
     if (!file) throw new Error('No se ha seleccionado ninguna imagen');
     var tipo = String(file.type || '').toLowerCase().split(';')[0].trim();
-    if (tipo.indexOf('image/') !== 0) throw new Error('El fichero seleccionado no es una imagen');
+    var nombre = String(file.name || '').toLowerCase();
+    if (tipo === 'application/pdf' || (!tipo && /\.pdf$/.test(nombre))) {
+      // Los PDF se suben tal cual (sin comprimir), con el mismo límite de tamaño.
+      if (file.size > MAX_BYTES) throw new Error('El PDF supera el tamaño permitido (6 MB)');
+      if (file.size <= 0) throw new Error('El PDF está vacío');
+      return tipo === 'application/pdf' ? file : new Blob([file], { type: 'application/pdf' });
+    }
+    if (tipo.indexOf('image/') !== 0) throw new Error('Solo se admiten imágenes o PDF');
     var src = await decodificar(file);
     try {
       var w = src.width || src.naturalWidth || 0;
@@ -1676,6 +1685,7 @@ var Foto = (function(){
     var blob = await res.blob();
     var url = URL.createObjectURL(blob);
     cache.set(id, url);
+    tipos.set(id, String(blob.type || res.headers.get('Content-Type') || '').toLowerCase().split(';')[0].trim());
     return url;
   }
 
@@ -1692,6 +1702,8 @@ var Foto = (function(){
   return {
     nuevoId: nuevoId, validId: validId, comprimir: comprimir,
     subir: subir, cargar: cargar, borrar: borrar, olvidar: olvidar,
+    tipoDe: function(id) { return tipos.get(id) || ''; },
+    esPdf: function(b) { return !!b && String(b.type || '').toLowerCase().indexOf('application/pdf') === 0; },
     MAX_BYTES: MAX_BYTES
   };
 })();
@@ -2553,7 +2565,8 @@ function sanitizeFacturas(arr) {
       cat: partidaCat(f.cat) ? String(f.cat) : 'nodeducible',
       notas: String(f.notas == null ? '' : f.notas),
       fotoId: (typeof f.fotoId === 'string' && f.fotoId) ? f.fotoId : null,
-      fotoBytes: bytes > 0 ? bytes : 0
+      fotoBytes: bytes > 0 ? bytes : 0,
+      fotoTipo: f.fotoTipo === 'pdf' ? 'pdf' : 'image'
     });
   });
   return out;
@@ -3812,7 +3825,7 @@ function fotoCtlHTML(pid, fid) {
   var h = '<div class="foto-ctl" id="foto-ctl-' + key + '">';
   h += '<input type="file" accept="image/*" capture="environment" id="foto-in-' + key +
        '" hidden onchange="onFotoElegida(\'' + key + '\', this)">';
-  h += '<input type="file" accept="image/*" id="foto-arch-' + key +
+  h += '<input type="file" accept="image/*,application/pdf,.pdf" id="foto-arch-' + key +
        '" hidden onchange="onFotoElegida(\'' + key + '\', this)">';
 
   if (pend) {
@@ -3841,6 +3854,7 @@ function fotoCtlHTML(pid, fid) {
 }
 function fotoTipoLabel(blob) {
   var t = String((blob && blob.type) || '').toLowerCase();
+  if (t.indexOf('pdf') >= 0) return 'PDF';
   if (t.indexOf('png') >= 0) return 'PNG';
   if (t.indexOf('webp') >= 0) return 'WEBP';
   return 'JPEG';
@@ -3918,11 +3932,13 @@ function fotoVisorEl() {
   ov.innerHTML =
     '<div class="foto-ov-bar">' +
       '<button type="button" class="btn ghost sm" id="foto-ov-zoom" onclick="toggleFotoZoom()">Ampliar</button>' +
+      '<button type="button" class="btn ghost sm" id="foto-ov-abrir" onclick="abrirFotoPestana()" hidden>Abrir en pestaña nueva</button>' +
       '<button type="button" class="btn ghost sm" onclick="cerrarFoto()">Cerrar</button>' +
     '</div>' +
     '<div class="foto-ov-body" id="foto-ov-body" onclick="fotoFondoClick(event)">' +
       '<div class="foto-ov-msg" id="foto-ov-msg">Cargando…</div>' +
       '<img class="foto-ov-img" id="foto-ov-img" alt="Foto de la factura" hidden>' +
+      '<iframe class="foto-ov-pdf" id="foto-ov-pdf" title="PDF de la factura" hidden></iframe>' +
     '</div>';
   document.body.appendChild(ov);
   return ov;
@@ -3940,7 +3956,13 @@ async function verFoto(id) {
   _fotoVisor.zoom = false;
   ov.className = 'foto-ov';
   ov.hidden = false;
+  var pdf = document.getElementById('foto-ov-pdf');
+  var zoomBtn = document.getElementById('foto-ov-zoom');
+  var abrirBtn = document.getElementById('foto-ov-abrir');
   if (img) { img.hidden = true; if (img.removeAttribute) img.removeAttribute('src'); }
+  if (pdf) { pdf.hidden = true; if (pdf.removeAttribute) pdf.removeAttribute('src'); }
+  if (zoomBtn) zoomBtn.hidden = false;
+  if (abrirBtn) abrirBtn.hidden = true;
   if (msg) { msg.hidden = false; msg.className = 'foto-ov-msg'; msg.textContent = 'Cargando…'; }
   fotoZoomLabel();
   if (!_fotoVisor.esc) {
@@ -3950,12 +3972,22 @@ async function verFoto(id) {
   try {
     var url = await Foto.cargar(id);
     if (_fotoVisor.id !== id) return;        // se cerró o se abrió otra mientras tanto
-    if (img) { img.src = url; img.hidden = false; }
+    _fotoVisor.url = url;
+    if (Foto.tipoDe(id) === 'application/pdf') {
+      if (pdf) { pdf.src = url; pdf.hidden = false; }
+      if (zoomBtn) zoomBtn.hidden = true;
+      if (abrirBtn) abrirBtn.hidden = false;
+    } else {
+      if (img) { img.src = url; img.hidden = false; }
+    }
     if (msg) { msg.hidden = true; msg.textContent = ''; }
   } catch(e) {
     if (_fotoVisor.id !== id) return;
     if (msg) { msg.className = 'foto-ov-msg r'; msg.textContent = (e && e.message) ? e.message : 'No se pudo cargar la foto'; }
   }
+}
+function abrirFotoPestana() {
+  if (_fotoVisor.url) window.open(_fotoVisor.url, '_blank');
 }
 function cerrarFoto() {
   var ov = document.getElementById('foto-viewer');
@@ -3980,7 +4012,7 @@ function fotoFondoClick(e) {
 // Acceso a la foto desde la fila de la factura.
 function factFotoHTML(f) {
   if (!f || !Foto.validId(f.fotoId)) return '';
-  var h = '<button type="button" class="btn ghost sm" onclick="verFoto(\'' + esc(f.fotoId) + '\')">Ver foto</button>';
+  var h = '<button type="button" class="btn ghost sm" onclick="verFoto(\'' + esc(f.fotoId) + '\')">' + (f.fotoTipo === 'pdf' ? 'Ver PDF' : 'Ver foto') + '</button>';
   if (nv(f.fotoBytes) > 0) h += '<span class="fact-foto-kb">' + fotoKB(f.fotoBytes) + '</span>';
   return h;
 }
@@ -4106,7 +4138,7 @@ async function addFactura(pid) {
   var nueva = {
     id: Date.now(), fecha: fecha, concepto: concepto, importe: importe,
     cat: cat, notas: elN ? String(elN.value == null ? '' : elN.value).trim() : '',
-    fotoId: null, fotoBytes: 0
+    fotoId: null, fotoBytes: 0, fotoTipo: 'image'
   };
   p.facturas.push(nueva);
   _propYear[pid] = anioISO(fecha);   // salta al ejercicio de la factura recién creada
@@ -4128,6 +4160,7 @@ async function addFactura(pid) {
     await Foto.subir(nid, pend.blob);
     nueva.fotoId = nid;
     nueva.fotoBytes = nv(pend.blob.size);
+    nueva.fotoTipo = Foto.esPdf(pend.blob) ? 'pdf' : 'image';
     trySave();
   } catch(e) { err = e; }
   if (btn) btn.disabled = false;
@@ -4214,11 +4247,13 @@ async function saveEditFactura(pid, fid) {
       await Foto.subir(nid, pend.blob);
       f.fotoId = nid;
       f.fotoBytes = nv(pend.blob.size);
+      f.fotoTipo = Foto.esPdf(pend.blob) ? 'pdf' : 'image';
       if (anterior) Foto.borrar(anterior);   // best-effort, no bloquea
     } catch(e) { err = e; }
   } else {
     f.fotoId = null;
     f.fotoBytes = 0;
+    f.fotoTipo = 'image';
     if (anterior) Foto.borrar(anterior);
   }
   if (btn) btn.disabled = false;
