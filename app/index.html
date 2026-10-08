@@ -3811,25 +3811,29 @@ function fotoCtlHTML(pid, fid) {
 
   var h = '<div class="foto-ctl" id="foto-ctl-' + key + '">';
   h += '<input type="file" accept="image/*" capture="environment" id="foto-in-' + key +
-       '" hidden onchange="onFotoElegida(\'' + key + '\')">';
+       '" hidden onchange="onFotoElegida(\'' + key + '\', this)">';
+  h += '<input type="file" accept="image/*" id="foto-arch-' + key +
+       '" hidden onchange="onFotoElegida(\'' + key + '\', this)">';
 
   if (pend) {
     h += '<img class="foto-thumb" src="' + esc(pend.url) + '" alt="Vista previa de la foto">';
     h += '<span class="foto-info"><span class="foto-nm">' + esc(pend.nombre) + '</span>' +
          '<span>Se subirá como ' + esc(fotoTipoLabel(pend.blob)) + ' · ' + fotoKB(pend.blob.size) + '</span></span>';
-    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Cambiar</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Otra foto</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\', \'archivo\')">Otro archivo</button>';
     h += '<button type="button" class="btn ghost sm" onclick="quitarFotoPendiente(\'' + key + '\')">Quitar</button>';
   } else if (tiene && !quitada) {
     h += '<span class="foto-info"><span class="foto-nm">Foto adjunta</span><span>' + fotoKB(f.fotoBytes) + '</span></span>';
     h += '<button type="button" class="btn ghost sm" onclick="verFoto(\'' + esc(f.fotoId) + '\')">Ver foto</button>';
-    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Sustituir</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Sustituir con foto</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\', \'archivo\')">Sustituir con archivo</button>';
     h += '<button type="button" class="btn ghost sm" onclick="marcarQuitarFoto(' + fid + ')">Quitar foto</button>';
   } else if (tiene && quitada) {
     h += '<span class="foto-info"><span class="foto-nm">La foto se quitará al guardar</span></span>';
     h += '<button type="button" class="btn ghost sm" onclick="deshacerQuitarFoto(' + fid + ')">Deshacer</button>';
   } else {
-    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">' +
-         (fid ? 'Añadir foto' : 'Hacer foto o adjuntar') + '</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\')">Hacer foto</button>';
+    h += '<button type="button" class="btn ghost sm" onclick="pedirFoto(\'' + key + '\', \'archivo\')">Adjuntar archivo</button>';
   }
   h += '<span class="foto-est" id="foto-est-' + key + '"></span>';
   h += '</div>';
@@ -3853,8 +3857,9 @@ function fotoEstado(key, txt, level) {
   el.className = 'foto-est' + (level ? ' ' + level : '');
   el.textContent = txt || '';
 }
-function pedirFoto(key) {
-  var inp = document.getElementById('foto-in-' + key);
+function pedirFoto(key, modo) {
+  // 'archivo' abre el selector de ficheros o galería; sin modo abre la cámara en móvil (capture).
+  var inp = document.getElementById((modo === 'archivo' ? 'foto-arch-' : 'foto-in-') + key);
   if (inp && inp.click) inp.click();
 }
 function quitarFotoPendiente(key) {
@@ -3874,8 +3879,8 @@ function deshacerQuitarFoto(fid) {
 }
 
 // Comprime en el momento y guarda el Blob a la espera de subirlo al guardar.
-async function onFotoElegida(key) {
-  var inp = document.getElementById('foto-in-' + key);
+async function onFotoElegida(key, el) {
+  var inp = (el && el.files) ? el : document.getElementById('foto-in-' + key);
   var file = (inp && inp.files && inp.files[0]) ? inp.files[0] : null;
   if (inp) { try { inp.value = ''; } catch(e) {} }
   if (!file) return;

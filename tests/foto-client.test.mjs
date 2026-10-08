@@ -423,7 +423,9 @@ test('El formulario de alta y la edición pintan el control de foto', () => {
   incluye(alta, 'type="file"', 'hay un input de fichero');
   incluye(alta, 'accept="image/*"', 'solo imágenes');
   incluye(alta, 'capture="environment"', 'la cámara trasera en móvil');
-  incluye(alta, 'Hacer foto o adjuntar', 'botón de alta en español');
+  incluye(alta, 'Hacer foto', 'botón de cámara en el alta');
+  incluye(alta, 'Adjuntar archivo', 'botón de archivo en el alta');
+  incluye(alta, 'foto-arch-', 'selector de archivo sin capture');
 
   ctx._factEdit = { pid: PID, fid: 901 };
   const edic = ctx.renderFacturaRow(p, p.facturas[0]);
@@ -440,7 +442,8 @@ test('El formulario de alta y la edición pintan el control de foto', () => {
   // Sin foto: el botón es "Añadir foto".
   p.facturas[0].fotoId = null;
   const sinFoto = ctx.renderFacturaRow(p, p.facturas[0]);
-  incluye(sinFoto, 'Añadir foto', 'sin foto se ofrece añadirla');
+  incluye(sinFoto, 'Hacer foto', 'sin foto se ofrece hacerla');
+  incluye(sinFoto, 'Adjuntar archivo', 'sin foto se ofrece adjuntar un archivo');
   noIncluye(sinFoto, 'Quitar foto', 'sin foto no se ofrece quitarla');
   ctx._factEdit = null;
 });
