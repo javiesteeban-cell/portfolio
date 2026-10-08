@@ -642,13 +642,13 @@ input[readonly]{background:var(--s1);color:var(--mu);cursor:default;}
 .foto-ov[hidden]{display:none;}
 .foto-ov::before{content:'';position:fixed;inset:0;background:var(--bg);opacity:.96;}
 .foto-ov-bar{position:relative;z-index:1;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 14px;border-bottom:1px solid var(--bd);}
-.foto-ov-body{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;display:flex;align-items:center;justify-content:center;padding:14px;}
+.foto-ov-body{position:relative;z-index:1;flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;padding:14px;}
 .foto-ov-msg{font-size:.82rem;color:var(--mu);text-align:center;font-weight:600;}
 .foto-ov-msg.r{color:var(--r);}
-.foto-ov-img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--rr);display:block;}
-.foto-ov-pdf{width:100%;height:100%;border:0;border-radius:var(--rr);background:var(--s1);display:block;}
-.foto-ov.zoom .foto-ov-body{align-items:flex-start;justify-content:flex-start;}
-.foto-ov.zoom .foto-ov-img{max-width:none;max-height:none;width:auto;height:auto;object-fit:none;border-radius:0;}
+.foto-ov-img{max-width:100%;max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);width:auto;height:auto;object-fit:contain;border-radius:var(--rr);display:block;margin:auto;}
+.foto-ov-pdfbtn{margin:auto;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;}
+.foto-ov-pdf{flex:1;width:100%;min-height:70vh;min-height:70dvh;border:0;border-radius:var(--rr);background:var(--s1);display:block;}
+.foto-ov.zoom .foto-ov-img{max-width:none;max-height:none;width:auto;height:auto;object-fit:none;border-radius:0;margin:0;}
 .amort-list{margin-top:10px;}
 .amort-row{display:grid;grid-template-columns:98px repeat(4,minmax(0,1fr));gap:8px;padding:7px 4px;border-bottom:1px solid var(--bd);font-size:.76rem;font-variant-numeric:tabular-nums;border-radius:6px;}
 .amort-row:last-child{border-bottom:none;}
@@ -3974,9 +3974,18 @@ async function verFoto(id) {
     if (_fotoVisor.id !== id) return;        // se cerró o se abrió otra mientras tanto
     _fotoVisor.url = url;
     if (Foto.tipoDe(id) === 'application/pdf') {
-      if (pdf) { pdf.src = url; pdf.hidden = false; }
       if (zoomBtn) zoomBtn.hidden = true;
       if (abrirBtn) abrirBtn.hidden = false;
+      if (esIOS()) {
+        if (msg) {
+          msg.className = 'foto-ov-msg';
+          msg.innerHTML = '<div class="foto-ov-pdfbtn"><span>El PDF está listo. En iPhone y iPad se abre en el visor de Safari.</span>' +
+            '<button type="button" class="btn" onclick="abrirFotoPestana()">Abrir PDF</button></div>';
+          msg.hidden = false;
+        }
+        return;
+      }
+      if (pdf) { pdf.src = url; pdf.hidden = false; }
     } else {
       if (img) { img.src = url; img.hidden = false; }
     }
@@ -3985,6 +3994,11 @@ async function verFoto(id) {
     if (_fotoVisor.id !== id) return;
     if (msg) { msg.className = 'foto-ov-msg r'; msg.textContent = (e && e.message) ? e.message : 'No se pudo cargar la foto'; }
   }
+}
+function esIOS() {
+  var ua = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : '';
+  var ipadOS = typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  return /iPhone|iPad|iPod/i.test(ua) || ipadOS;
 }
 function abrirFotoPestana() {
   if (_fotoVisor.url) window.open(_fotoVisor.url, '_blank');
