@@ -3399,6 +3399,7 @@ var _propYear = {};       // { id: yyyy }
 var _rentaYear = null;    // ejercicio del bloque de la renta
 var _rentaOpen = false;   // bloque de la renta desplegado (cerrado por defecto)
 var _factEdit = null;     // { pid, fid } de la factura en edición en línea
+var _factFormOpen = {};   // pid -> true si el formulario de nueva factura está abierto
 
 function anioHoy() { return new Date().getFullYear(); }
 function hoyISO() { return fechaISO(new Date()); }
@@ -4082,8 +4083,22 @@ function renderFacturaRow(p, f) {
   return h;
 }
 
+function abrirFactForm(pid) {
+  _factFormOpen[pid] = true;
+  rerenderProp(pid);
+  var el = document.getElementById('fa' + pid + '-concepto');
+  if (el && el.focus) { try { el.focus(); } catch (e) {} }
+}
+function cerrarFactForm(pid) {
+  _factFormOpen[pid] = false;
+  olvidaPendiente(fotoKey(pid, null));
+  rerenderProp(pid);
+}
 function renderFacturaForm(p) {
   var pf = 'fa' + p.id + '-';
+  if (!_factFormOpen[p.id]) {
+    return '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" onclick="abrirFactForm(' + p.id + ')">+ Nueva factura</button></div>';
+  }
   var h = '<div class="fact-form">';
   h += '<div class="subbox-l" style="margin-bottom:10px;">Nueva factura</div>';
   h += '<div class="fgrid">';
@@ -4097,6 +4112,7 @@ function renderFacturaForm(p) {
        fotoCtlHTML(p.id, null) + '</div>';
   h += '</div>';
   h += '<div class="btn-row" style="margin-top:12px;"><button class="btn bp sm" id="' + pf + 'btn" onclick="addFactura(' + p.id + ')">Añadir factura</button>';
+  h += '<button class="btn ghost sm" onclick="cerrarFactForm(' + p.id + ')">Cancelar</button>';
   h += '<span class="flash" id="' + pf + 'flash"></span></div>';
   h += '</div>';
   return h;
@@ -4157,6 +4173,7 @@ async function addFactura(pid) {
   p.facturas.push(nueva);
   _propYear[pid] = anioISO(fecha);   // salta al ejercicio de la factura recién creada
   _factEdit = null;
+  _factFormOpen[pid] = false;        // el formulario se pliega tras añadir
   trySave();
 
   var key = fotoKey(pid, null);

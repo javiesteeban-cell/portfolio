@@ -272,6 +272,7 @@ test('El select de categorías expone los 10 label de FACT_CATS', () => {
   resetEstado([propAlquiler()]);
   ctx._propExpanded[PID] = true;
   ctx._propSubtab[PID] = 'facturas';
+  ctx._factFormOpen[PID] = true;   // el formulario de alta está plegado por defecto
   ctx.renderPropList();
   const h = htmlLista();
   eq(ctx.FACT_CATS.length, 10, 'siguen siendo 10 categorías');

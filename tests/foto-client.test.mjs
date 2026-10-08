@@ -418,6 +418,9 @@ test('El formulario de alta y la edición pintan el control de foto', () => {
   resetEstado([propAlquiler([factura(901, { fotoId: 'fctl0001-aaa', fotoBytes: 30720 })])]);
   const p = ctx.findPropById(PID);
 
+  const plegado = ctx.renderFacturaForm(p);
+  incluye(plegado, 'Nueva factura', 'plegado por defecto: solo el botón de nueva factura');
+  ctx._factFormOpen[PID] = true;
   const alta = ctx.renderFacturaForm(p);
   incluye(alta, 'id="fact-foto-slot-' + PID + '"', 'el hueco del alta conserva su id');
   incluye(alta, 'type="file"', 'hay un input de fichero');
